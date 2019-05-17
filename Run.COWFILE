@@ -1,0 +1,5 @@
+fifteenVariable = getFifteen()
+twentyVariable = fifteenVariable + 5
+twentyFivePointFiveVariable = getFifteen() + 10.5
+fiveVariable = twentyFivePointFiveVariable - twentyVariable - 0.5
+greet(25.3)
