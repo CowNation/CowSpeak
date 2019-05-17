@@ -59,7 +59,8 @@ class Function {
 };
 
 std::vector< Function< float > > intFX = {
-	Function<float>("VOID__greet()", greet),
+	Function<float>("VOID__exit()", exit),
+	Function<float>("VOID__pause()", pause),
 	Function<float>("getFifteen()", getFifteen)
 };
 
@@ -81,7 +82,7 @@ private:
 		int retVal = 0;
 		for (int j = 0; j < fx.size(); j++){
 			if (fx[j].funcName == tok.identifier || "VOID__" + tok.identifier == fx[j].funcName){
-				if (fx[j].isVoid() && (IsOperatorToken(type[i - 1].type) || IsOperatorToken(type[i + 1].type))) {
+				if (fx[j].isVoid() && ((i - 1 > 0 && i + 1 < type.size() && (type[i - 1].type == EqualOperator || type[i + 1].type == EqualOperator)) || IsOperatorToken(type[i - 1].type) || IsOperatorToken(type[i + 1].type))) {
 					FATAL_ERROR("Cannot perform operation on void function: " + type[i].identifier);
 				}
 				retVal = fx[j].FuncDef();
@@ -130,7 +131,6 @@ public:
 				}
 			}
 			else if (type[i].type == FunctionCall){
-
 				Evaluated.push_back(std::to_string(CheckMatchingFuncName<float>(intFX, type[i], i)));
 			}
 		}
