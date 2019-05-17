@@ -19,8 +19,7 @@ public:
 
 void FATAL_ERROR(std::string errorStr) {
 	std::cout << "\nFATAL_ERROR: " << errorStr << std::endl;
-	int i;
-	std::cin >> i;
+	system("pause");
 	exit(-1);
 }
 
@@ -37,7 +36,7 @@ Variable& getNamedVariable(std::vector< Variable > Vars, std::string varName) {
 			return Vars[i];
 	}
 	FATAL_ERROR("Could not find named variable: " + varName);
-	exit(0);
+	exit(-1);
 }
 void assignDefinedVar(std::vector< Variable > Vars, std::string varName, float Val) {
 	for (int i = 0; i < Vars.size(); i++) {
