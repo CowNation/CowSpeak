@@ -4,7 +4,8 @@
 #include <string>
 #include <iostream>
 
-float greet();
 float getFifteen();
+float pause();
+float exit();
 
 #endif
