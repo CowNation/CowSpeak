@@ -1,10 +1,14 @@
 #include "InternalFunctions.h"
 #include <stdlib.h>
+#include <Windows.h>
 
 float getFifteen(){
 	return 15;
 }
-float greet(){
-	std::cout << "Hello!\n";
+float pause() {
+	system("pause");
 	return 0;
+}
+float exit() {
+	exit(-1);
 }
