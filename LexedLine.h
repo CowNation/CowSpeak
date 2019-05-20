@@ -15,12 +15,13 @@ enum TokenType {
 	MultiplyOperator,
 	DivideOperator,
 	PowerOperator,
+	ModOperator,
 	EqualOperator,
 	VariableIdentifier
 };
 
 bool IsOperatorToken(TokenType tt){
-	return (tt == AddOperator || tt == SubtractOperator || tt == MultiplyOperator || tt == DivideOperator || tt == PowerOperator);
+	return (tt == AddOperator || tt == SubtractOperator || tt == MultiplyOperator || tt == DivideOperator || tt == ModOperator || tt == PowerOperator);
 }
 
 void PrintTokenType(TokenType tt){
@@ -42,6 +43,8 @@ void PrintTokenType(TokenType tt){
 		std::cout << "Variable";
 	else if (tt == PowerOperator)
 		std::cout << "Power";
+	else if (tt == ModOperator)
+		std::cout << "Modulo";
 }
 
 template <class T>
@@ -183,6 +186,8 @@ public:
 						temp = left / right;
 					else if (type[i].type == PowerOperator)
 						temp = pow(left, right);
+					else if (type[i].type == ModOperator)
+						temp = left % right;
 					tempModified = true;
 				}
 				else{
