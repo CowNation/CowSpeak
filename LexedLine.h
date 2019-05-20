@@ -144,7 +144,7 @@ public:
 		}
 		if (Evaluated.size() == 1) 
 			return std::stof(Evaluated[0]);
-		if (Evaluated.size() == 3 && is_digits_only(Evaluated[2]))
+		if (Evaluated.size() == 3 && is_digits_only(Evaluated[2]) && Evaluated[1] == "=")
 			return std::stof(Evaluated[2]);
 		//for (int i = 0; i < Evaluated.size(); i++)
 		//	std::cout << Evaluated[i] << " ";
