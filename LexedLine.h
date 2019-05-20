@@ -4,6 +4,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#inclide <math.h>
 #include "Utils.h"
 #include "InternalFunctions.h"
 
@@ -187,7 +188,7 @@ public:
 					else if (type[i].type == PowerOperator)
 						temp = pow(left, right);
 					else if (type[i].type == ModOperator)
-						temp = left % right;
+						temp = fmod(left, right);
 					tempModified = true;
 				}
 				else{
