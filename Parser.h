@@ -33,6 +33,8 @@ private:
 				ret.push_back(Token(TokenType::DivideOperator, splitLine[i]));
 			else if (splitLine[i] == "^")
 				ret.push_back(Token(TokenType::PowerOperator, splitLine[i]));
+			else if (splitLine[i] == "%")
+				ret.push_back(Token(TokenType::ModOperator, splitLine[i]));
 			else if (splitLine[i] == "=")
 				ret.push_back(Token(TokenType::EqualOperator, splitLine[i]));
 			else if (is_letters_only(splitLine[i]))
