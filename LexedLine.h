@@ -146,8 +146,8 @@ public:
 			return std::stof(Evaluated[0]);
 		if (Evaluated.size() == 3 && is_digits_only(Evaluated[2]))
 			return std::stof(Evaluated[2]);
-		for (int i = 0; i < Evaluated.size(); i++)
-			std::cout << Evaluated[i] << " ";
+		//for (int i = 0; i < Evaluated.size(); i++)
+		//	std::cout << Evaluated[i] << " ";
 		std::cout << std::endl;
 		for (int i = 0; i < Evaluated.size(); i++){
 			if (IsOperatorToken(type[i].type)){
