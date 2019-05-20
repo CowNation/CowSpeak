@@ -120,6 +120,14 @@ public:
 				Evaluated.push_back(type[i].identifier);
 			}
 			else if (type[i].type == EqualOperator) {
+				if (i - 1 >= 0 && i + 1 < type.size()) {
+					if (type[i - 1].type != Number && type[i - 1].type != VariableIdentifier && type[i - 1].type != FunctionCall)
+						FATAL_ERROR("No operands of operator: =");
+					if (type[i + 1].type != Number && type[i + 1].type != VariableIdentifier && type[i + 1].type != FunctionCall)
+						FATAL_ERROR("No operands of operator: =");
+				}
+				else
+					FATAL_ERROR("No operands of operator: =");
 				Evaluated.push_back(type[i].identifier);
 			}
 			else if (type[i].type == VariableIdentifier) {
