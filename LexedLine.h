@@ -144,6 +144,11 @@ public:
 		for (int i = 0; i < Evaluated.size(); i++){
 			if (IsOperatorToken(type[i].type)){
 				if (i - 1 >= 0 && i + 1 < Evaluated.size()){
+					if (type[i - 1].type != Number && type[i - 1].type != VariableIdentifier && type[i - 1].type != FunctionCall)
+						FATAL_ERROR("No operands of operator: " + type[i].identifier);
+					if (type[i + 1].type != Number && type[i + 1].type != VariableIdentifier && type[i + 1].type != FunctionCall)
+						FATAL_ERROR("No operands of operator: " + type[i].identifier);
+					
 					float left;
 					float right;
 
