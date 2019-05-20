@@ -183,12 +183,18 @@ public:
 						temp = left - right;
 					else if (type[i].type == MultiplyOperator)
 						temp = left * right;
-					else if (type[i].type == DivideOperator)
+					else if (type[i].type == DivideOperator){
+						if (right == 0)
+							FATAL_ERROR("Cannot divide by 0");
 						temp = left / right;
+					}
 					else if (type[i].type == PowerOperator)
 						temp = pow(left, right);
-					else if (type[i].type == ModOperator)
+					else if (type[i].type == ModOperator){
+						if (right == 0)
+							FATAL_ERROR("Cannot divide by 0");
 						temp = fmod(left, right);
+					}
 					tempModified = true;
 				}
 				else{
