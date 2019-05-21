@@ -39,6 +39,7 @@ private:
 				ret.push_back(Token(TokenType::EqualOperator, splitLine[i]));
 			else if (is_letters_only(splitLine[i]))
 				ret.push_back(Token(TokenType::VariableIdentifier, splitLine[i]));
+			else if (splitLine[i].at(splitLine[i].length()-1) == '#' && splitLine[i].rfind("#", 0) == 0){}
 			else {
 				FATAL_ERROR("Unknown identifier: " + splitLine[i]);
 			}
