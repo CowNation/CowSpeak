@@ -46,6 +46,8 @@ void PrintTokenType(TokenType tt){
 		std::cout << "Power";
 	else if (tt == ModOperator)
 		std::cout << "Modulo";
+	else
+		std::cout << "Unknown";		
 }
 
 template <class T>
