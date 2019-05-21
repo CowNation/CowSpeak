@@ -4,7 +4,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
-#inclide <math.h>
+#include <math.h>
 #include "Utils.h"
 #include "InternalFunctions.h"
 
