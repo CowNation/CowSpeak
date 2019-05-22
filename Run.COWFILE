@@ -1,7 +1,7 @@
-pause()
-fifteenVariable = getFifteen()
-twentyVariable = fifteenVariable + 5
-twentyFivePointFiveVariable = getFifteen() + 10.5
-fiveVariable = twentyFivePointFiveVariable - twentyVariable - 0.5
-pause()
-exit()
+pause() # Will print 'press any key to continue' #
+fifteenVariable = getFifteen() # set variable equal to 15 #
+twentyVariable = fifteenVariable + 5 # set variable equal to 15 + 5 #
+twentyFivePointFiveVariable = getFifteen() + 10.5 # set variable equal to 15 + 10.5 #
+fiveVariable = twentyFivePointFiveVariable - twentyVariable - 0.5 # set variable equal to 25.5 - 20 - 0.5 #
+pause() # Will print 'press any key to continue' #
+exit() # Will close the program #
