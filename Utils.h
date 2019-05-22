@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-string replaceChar(string str, char ch1, char ch2) {
+std::string replaceChar(std::string str, char ch1, char ch2) {
   for (int i = 0; i < str.length(); ++i) {
     if (str[i] == ch1)
       str[i] = ch2;
