@@ -24,7 +24,6 @@ private:
 				int first = line.find('#');
 				int last = line.rfind('#');
 				line.replace(first, last, replaceChar(line.substr(first, last - first + 1), ' ', '_'));
-				std::cout << line;
 			}
 		}
 		
