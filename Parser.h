@@ -16,6 +16,18 @@ public:
 	std::vector< Variable > Vars;
 private:
 	std::vector < Token > ParseLine(std::string line) {
+		size_t n = std::count(line.begin(), line.end(), '#');
+		if (n != std::string::npos){
+			if (n > 2)
+				FATAL_ERROR("Only one comment is supported per line");
+			else if (n == 2) {
+				int first = line.find('#');
+				int last = line.rfind('#');
+				line.replace(first, last, replaceChar(line.substr(first, last - first + 1), ' ', '_'));
+				std::cout << line;
+			}
+		}
+		
 		std::vector< std::string > splitLine = SplitString(line, ' ');
 		std::vector< Token > ret;
 		for (int i = 0; i < splitLine.size(); i++) {
