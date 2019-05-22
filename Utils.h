@@ -6,6 +6,14 @@
 #include <functional>
 #include <iostream>
 #include <stdlib.h>
+#include <string.h>
+
+size_t find_nth(const string& haystack, size_t pos, const string& needle, size_t nth) 
+{
+    size_t found_pos = haystack.find(needle, pos);
+    if(0 == nth || string::npos == found_pos)  return found_pos;
+    return find_nth(haystack, found_pos+1, needle, nth-1);
+}
 
 class Variable {
 public:
