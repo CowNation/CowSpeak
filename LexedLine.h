@@ -145,6 +145,10 @@ public:
 				}
 			}
 			else if (type[i].type == FunctionCall){
+				if (i + 1 < type.size() && type[i + 1].type == FunctionCall){
+					FATAL_ERROR("Missing operator between FunctionCalls");
+				}
+				
 				Evaluated.push_back(std::to_string(CheckMatchingFuncName<float>(intFX, type[i], i)));
 			}
 		}
