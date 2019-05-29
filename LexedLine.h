@@ -137,6 +137,10 @@ public:
 				Evaluated.push_back(type[i].identifier);
 			}
 			else if (type[i].type == VariableIdentifier) {
+				if (i + 1 < type.size() && type[i + 1].type == VariableIdentifier){
+					FATAL_ERROR("Missing operator between VariableIdentifiers");
+				}
+				
 				if (isVarDefined(Vars, type[i].identifier)) {
 					Evaluated.push_back(std::to_string(getNamedVariable(Vars, type[i].identifier).Value));
 				}
