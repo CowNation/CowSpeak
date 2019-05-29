@@ -20,9 +20,13 @@ private:
 		if (n != std::string::npos){
 			if (n > 2)
 				FATAL_ERROR("Only one comment is supported per line");
-			else if (n == 2) {
+			else if (n == 2 || n == 1) {
 				int first = line.find('#');
 				int last = line.rfind('#');
+				if (last == first){
+					last = line.length();
+					line += "#";
+				}
 				line.replace(first, last, replaceChar(line.substr(first, last - first + 1), ' ', '_'));
 			}
 		}
