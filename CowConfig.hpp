@@ -30,6 +30,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <sstream>
 
 class CowConfig {
 private:
@@ -38,28 +39,24 @@ private:
 	bool FirstLine = true, FirstRead = true;
 	std::string FileName;
 	std::vector< std::string >Lines;
-	///////////////////
-	void RemoveSubStr(std::string substr, std::string& str) {
-		size_t pos = std::string::npos;
-		// Search for the substring in string in a loop untill nothing is found
+  	///////////////////
+  	void RemoveSubStr(std::string substr, std::string& str){
+    	size_t pos = std::string::npos;
+		
 		while ((pos = str.find(substr)) != std::string::npos)
-		{
-			// If found then erase it from string
 			str.erase(pos, substr.length());
-		}
-	}
-	///////////////////
-	void ReadAllLines() {
-		std::string str;
-		while (std::getline(ReadConfig, str)) {
-			Lines.push_back(str);
-		}
-	}
-	///////////////////
-	int FindElement(std::string Section, std::string offsetText) {
+  	}
+  	///////////////////
+  	void ReadAllLines(){
+    	std::string str;
+    	while (std::getline(ReadConfig, str))
+      		Lines.push_back(str);
+  	}
+  	///////////////////
+  	int FindElement(std::string Section, std::string offsetText){
 		Section = "[" + Section + "]";
 		bool SectionFound;
-		for (int i = 0; i < Lines.size(); i++) {
+		for (int i = 0; i < Lines.size(); i++){
 			if (Lines[i] == Section)
 				SectionFound = true;
 			else if (SectionFound && Lines[i].find("[") != std::string::npos && Lines[i].find("]") != std::string::npos)
@@ -68,14 +65,17 @@ private:
 				return i;
 		}
 		return -1;
+  	}
+  	///////////////////
+	int pRead(std::string Section, std::string offsetText){
+		if (FirstRead)
+      		ReadAllLines();
+    	return FindElement(Section, offsetText);
 	}
-	///////////////////
 public:
 	CowConfig() {}
-	CowConfig(std::string fileName) {
-		OpenFile(fileName);
-
-		ReadAllLines();
+	CowConfig(std::string fileName){
+    	OpenFile(fileName);
 	}
 	~CowConfig() {
 		if (ReadConfig.is_open())
@@ -84,16 +84,20 @@ public:
 			WriteConfig.close();
 	}
 	///////////////////
-	std::vector< std::string > GetLines() {
-		return Lines;
-	}
-	///////////////////
 	bool OpenFile(std::string fileName) {
 		FileName = fileName;
 
 		ReadConfig.open(fileName);
 		return (ReadConfig.is_open());
 	} // Will open file with specified filename and will return whether the file is open
+	//////////////////
+	std::vector< std::string > GetLines(){
+		std::string str;
+		std::vector< std::string > ret;
+    	while (std::getline(ReadConfig, str))
+      		ret.push_back(str);
+		return ret;
+	}
 	//////////////////
 	void WriteLine(std::string offsetText, std::string valToWrite) {
 		if (ReadConfig.is_open())
@@ -122,81 +126,28 @@ public:
 
 		ReadConfig.open(FileName);
 	}
-	void Section(std::string SectionText) {
+  	void Section(std::string SectionText) {
 		SectionText = "[" + SectionText + "]";
-		WriteLine("", SectionText);
-	}
+    	WriteLine("", SectionText);
+  	}
 	//////////////////
-	int iRead(std::string Section, std::string offsetText) {
-		if (FirstRead)
-			ReadAllLines();
-		int LineFound = FindElement(Section, offsetText);
-		if (LineFound == -1)
-			return 0;
-		else {
-			try {
-				std::string temp = Lines[LineFound];
-				RemoveSubStr(offsetText, temp);
-				return stoi(temp);
-			}
-			catch (...) {
-				return 0;
-			}
-		}
-	}
-	float fRead(std::string Section, std::string offsetText) {
-		if (FirstRead)
-			ReadAllLines();
-
-		int LineFound = FindElement(Section, offsetText);
-		if (LineFound == -1)
-			return 0.0f;
-		else {
-			try {
-				std::string temp = Lines[LineFound];
-				RemoveSubStr(offsetText, temp);
-				return stof(temp);
-			}
-			catch (...) {
-				return 0.0f;
-			}
-		}
-	}
-	std::string sRead(std::string Section, std::string offsetText) {
-		if (FirstRead)
-			ReadAllLines();
-
-		int LineFound = FindElement(Section, offsetText);
-		if (LineFound == -1)
-			return "";
-		else {
-			try {
-				std::string temp = Lines[LineFound];
-				RemoveSubStr(offsetText, temp);
-				return temp;
-			}
-			catch (...) {
-				return "";
-			}
-		}
-	}
-	bool bRead(std::string Section, std::string offsetText) {
-		if (FirstRead)
-			ReadAllLines();
-
-		int LineFound = FindElement(Section, offsetText);
-		if (LineFound == -1)
-			return false;
-		else {
-			try {
-				std::string temp = Lines[LineFound];
-				RemoveSubStr(offsetText, temp);
-				return temp == "1";
-			}
-			catch (...) {
-				return false;
-			}
-		}
+	template <class T>
+	T Read(std::string Section, std::string offsetText){
+		int _Read = pRead(Section, offsetText);
+    		if (_Read == -1)
+      			return 0;
+    		else{
+      			try{
+        			std::string temp = Lines[_Read];
+        			RemoveSubStr(offsetText, temp);
+					T ret;
+					std::istringstream(temp) >> ret;
+					return ret;
+      			}
+      			catch (...){
+        			return T();
+      			}
+    		}
 	}
 	//////////////////
 	void ClearFile() {
@@ -205,5 +156,4 @@ public:
 		Clear.close();
 	}
 };
-
 #endif

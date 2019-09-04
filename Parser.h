@@ -31,9 +31,11 @@ private:
 			}
 		}
 		
-		if (line.find_first_not_of(' ') == std::string::npos)
+		if (line.find_first_not_of(' ') == std::string::npos){
+			std::cout << "doing\n";
 			return std::vector< Token >();
-		
+		}
+
 		std::vector< std::string > splitLine = SplitString(line, ' ');
 		std::vector< Token > ret;
 		for (int i = 0; i < splitLine.size(); i++) {
@@ -55,6 +57,8 @@ private:
 				ret.push_back(Token(TokenType::ModOperator, splitLine[i]));
 			else if (splitLine[i] == "=")
 				ret.push_back(Token(TokenType::EqualOperator, splitLine[i]));
+			else if (splitLine[i] == "print")
+				ret.push_back(Token(TokenType::PrintIdentifier, splitLine[i]));
 			else if (is_letters_only(splitLine[i]))
 				ret.push_back(Token(TokenType::VariableIdentifier, splitLine[i]));
 			else if (splitLine[i].at(splitLine[i].length()-1) == '#' && splitLine[i].rfind("#", 0) == 0){}
@@ -68,13 +72,22 @@ public:
 	FileLexer(std::vector< std::string > fileLines) {
 		for (int i = 0; i < fileLines.size(); i++) {
 			Lines.push_back(ParseLine(fileLines[i]));
-			if (Lines[i].type.size() > 1 && Lines[i].type[0].type == VariableIdentifier && Lines[i].type[1].type == EqualOperator) {
-				if (!isVarDefined(Vars, Lines[i].type[0].identifier)) {
-					Vars.push_back(Variable(Lines[i].type[0].identifier, 0));
-					Vars[Vars.size() - 1].Value = Lines[i].Exec(Vars);
+			if (Lines[i].type.size() > 1) {
+				if (Lines[i].type[0].type == VariableIdentifier && Lines[i].type[1].type == EqualOperator){
+					if (!isVarDefined(Vars, Lines[i].type[0].identifier)) {
+						Vars.push_back(Variable(Lines[i].type[0].identifier, 0));
+						Vars[Vars.size() - 1].Value = Lines[i].Exec(Vars);
+					}
+					else {
+						assignDefinedVar(Vars, Lines[i].type[0].identifier, Lines[i].Exec(Vars));
+					}
 				}
-				else {
-					assignDefinedVar(Vars, Lines[i].type[0].identifier, Lines[i].Exec(Vars));
+				else if (Lines[i].type[0].type == PrintIdentifier){
+					std::cout << Lines[i].Exec(Vars); // print executed line
+				}
+				for (int t = 0; t < Lines[i].type.size(); t++){
+					if (t != 0 && Lines[i].type[t].type == PrintIdentifier)
+						FATAL_ERROR("PrintIdentifier must be the first token on a line");
 				}
 			}
 		}

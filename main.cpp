@@ -1,9 +1,13 @@
-#include "CowSpeak/CowConfig.hpp"
-#include "CowSpeak/Parser.h"
+#include "cpp-CowSpeak-master/CowConfig.hpp"
+#include "cpp-CowSpeak-master/Parser.h"
 #include <iostream>
 #include <vector>
 #include <string>
 #include <stdlib.h>
+
+/*
+* THIS PROJECT HAS BEEN MOSTLY ABANDONED, IT IS CURRENTLY WORKING BUT WILL RECIEVE FEW UPDATES
+*/
 
 int main() {
 	std::string filename = "Run.COWFILE";
@@ -13,7 +17,7 @@ int main() {
 	FileLexer fl(pLines);
 
 	std::cout << "----------------------------\n";
-
+	
 	for (int i = 0; i < fl.Lines.size(); i++) {
 		for (int j = 0; j < fl.Lines[i].type.size(); j++) {
 			std::cout << "Line #" << i + 1 << " | Token #" << j + 1 << ": ";

@@ -18,7 +18,8 @@ enum TokenType {
 	PowerOperator,
 	ModOperator,
 	EqualOperator,
-	VariableIdentifier
+	VariableIdentifier,
+	PrintIdentifier
 };
 
 bool IsOperatorToken(TokenType tt){
@@ -46,6 +47,8 @@ void PrintTokenType(TokenType tt){
 		std::cout << "Power";
 	else if (tt == ModOperator)
 		std::cout << "Modulo";
+	else if (tt == PrintIdentifier)
+		std::cout << "Print";
 	else
 		std::cout << "Unknown";		
 }
@@ -111,9 +114,8 @@ public:
 		float temp = 0;
 		bool tempModified = false;
 		for (int i = 0; i < type.size(); i++){
-			if (IsOperatorToken(type[i].type)){
+			if (IsOperatorToken(type[i].type))
 				Evaluated.push_back(type[i].identifier);
-			}
 			else if (type[i].type == Number){
 				if ((i + 1 < type.size() && type[i + 1].type == Number) || (i - 1 >= 0 && type[i - 1].type == Number)){
 					FATAL_ERROR("Missing operator after " + type[i].identifier);
@@ -149,10 +151,9 @@ public:
 				}
 			}
 			else if (type[i].type == FunctionCall){
-				if (i + 1 < type.size() && type[i + 1].type == FunctionCall){
+				if (i + 1 < type.size() && type[i + 1].type == FunctionCall)
 					FATAL_ERROR("Missing operator between FunctionCalls");
-				}
-				
+
 				Evaluated.push_back(std::to_string(CheckMatchingFuncName<float>(intFX, type[i], i)));
 			}
 		}
@@ -160,10 +161,8 @@ public:
 			return std::stof(Evaluated[0]);
 		if (Evaluated.size() == 3 && is_digits_only(Evaluated[2]) && Evaluated[1] == "=")
 			return std::stof(Evaluated[2]);
-		//for (int i = 0; i < Evaluated.size(); i++)
-		//	std::cout << Evaluated[i] << " ";
 		std::cout << std::endl;
-		for (int i = 0; i < Evaluated.size(); i++){
+		for (int i = 0; i < type.size(); i++){
 			if (IsOperatorToken(type[i].type)){
 				if (i - 1 >= 0 && i + 1 < Evaluated.size()){
 					if (type[i - 1].type != Number && type[i - 1].type != VariableIdentifier && type[i - 1].type != FunctionCall)
@@ -207,11 +206,11 @@ public:
 					}
 					tempModified = true;
 				}
-				else{
+				else
 					FATAL_ERROR("No operands of operator: " + type[i].identifier);
-				}
 			}
 		}
+
 		return temp;
 	}
 };
