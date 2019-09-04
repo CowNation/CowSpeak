@@ -13,7 +13,3 @@ float pause() {
 float exit() {
 	exit(-1);
 }
-
-void Print(std::string _in){
-	std::cout << _in << std::endl;
-}
