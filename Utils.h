@@ -46,12 +46,15 @@ Variable& getNamedVariable(std::vector< Variable > Vars, std::string varName) {
 			return Vars[i];
 	}
 	FATAL_ERROR("Could not find named variable: " + varName);
+	exit(-1);
 }
+
 void assignDefinedVar(std::vector< Variable > Vars, std::string varName, float Val) {
 	for (int i = 0; i < Vars.size(); i++) {
-		if (Vars[i].varName == varName)
+		if (Vars[i].varName == varName){
 			Vars[i].Value = Val;
 			return;
+		}
 	}
 }
 
