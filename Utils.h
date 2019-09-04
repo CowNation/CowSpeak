@@ -46,7 +46,6 @@ Variable& getNamedVariable(std::vector< Variable > Vars, std::string varName) {
 			return Vars[i];
 	}
 	FATAL_ERROR("Could not find named variable: " + varName);
-	exit(-1);
 }
 void assignDefinedVar(std::vector< Variable > Vars, std::string varName, float Val) {
 	for (int i = 0; i < Vars.size(); i++) {
@@ -60,6 +59,7 @@ bool is_digits_only(const std::string &str)
 {
 	return str.find_first_not_of(".-0123456789") == std::string::npos && str[str.length()] != '-';
 }
+
 bool is_letters_only(std::string str) {
 	return std::find_if(str.begin(), str.end(),
 		std::not1(std::ptr_fun((int(*)(int))std::isalpha))) == str.end();
@@ -82,3 +82,4 @@ std::vector< std::string > SplitString(std::string str, char splitter) {
 }
 
 #endif
+
