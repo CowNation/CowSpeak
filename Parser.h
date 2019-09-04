@@ -31,10 +31,8 @@ private:
 			}
 		}
 		
-		if (line.find_first_not_of(' ') == std::string::npos){
-			std::cout << "doing\n";
+		if (line.find_first_not_of(' ') == std::string::npos)
 			return std::vector< Token >();
-		}
 
 		std::vector< std::string > splitLine = SplitString(line, ' ');
 		std::vector< Token > ret;
