@@ -81,7 +81,7 @@ public:
 					}
 				}
 				else if (Lines[i].type[0].type == PrintIdentifier){
-					std::cout << Lines[i].Exec(Vars); // print executed line
+					std::cout << Lines[i].Exec(Vars) << std::endl; // print executed line
 				}
 				for (int t = 0; t < Lines[i].type.size(); t++){
 					if (t != 0 && Lines[i].type[t].type == PrintIdentifier)
