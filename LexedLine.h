@@ -161,7 +161,7 @@ public:
 			return std::stof(Evaluated[0]);
 		if (Evaluated.size() == 3 && is_digits_only(Evaluated[2]) && Evaluated[1] == "=")
 			return std::stof(Evaluated[2]);
-		std::cout << std::endl;
+
 		for (int i = 0; i < type.size(); i++){
 			if (IsOperatorToken(type[i].type)){
 				if (i - 1 >= 0 && i + 1 < Evaluated.size()){
