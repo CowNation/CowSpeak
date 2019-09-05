@@ -18,37 +18,9 @@ enum TokenType {
 	PowerOperator,
 	ModOperator,
 	EqualOperator,
-	VariableIdentifier
+	VariableIdentifier,
+	ParenthesesOperator
 };
-
-bool IsOperatorToken(TokenType tt){
-	return (tt == AddOperator || tt == SubtractOperator || tt == MultiplyOperator || tt == DivideOperator || tt == ModOperator || tt == PowerOperator);
-}
-
-void PrintTokenType(TokenType tt){
-	if (tt == FunctionCall)
-		std::cout << "FunctionCall";
-	else if (tt == Number)
-		std::cout << "Number";
-	else if (tt == AddOperator)
-		std::cout << "Add";
-	else if (tt == SubtractOperator)
-		std::cout << "Subtract";
-	else if (tt == MultiplyOperator)
-		std::cout << "Multiply";
-	else if (tt == DivideOperator)
-		std::cout << "Divide";
-	else if (tt == EqualOperator)
-		std::cout << "Equal";
-	else if (tt == VariableIdentifier)
-		std::cout << "Variable";
-	else if (tt == PowerOperator)
-		std::cout << "Power";
-	else if (tt == ModOperator)
-		std::cout << "Modulo";
-	else
-		std::cout << "Unknown";		
-}
 
 template <class T>
 class Function {

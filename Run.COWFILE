@@ -1,5 +1,6 @@
-fifteenVariable = 15 + 20 # 35
-fifteenVariable = getFifteen() - 10 # 5
-fifteenVariable = fifteenVariable + 10 # 15
-print fifteenVariable # 15
+fifteenVariable = ( 15 + 20 ) * 2 # CowSpeak is the best lang
+print fifteenVariable
+fifteenVariable = fifteenVariable - 50
+fifteenVariable = fifteenVariable - 5
+print fifteenVariable
 print fifteenVariable % 2

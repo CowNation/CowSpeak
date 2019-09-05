@@ -25,8 +25,10 @@ private:
 			if (splitLine[i] == printID)
 				continue;
 
-			if (splitLine[i].find(")") == splitLine[i].length() - 1 && splitLine[i].find("(") != -1)
+			if (splitLine[i].find("()") != -1)
 				ret.push_back(Token(TokenType::FunctionCall, splitLine[i]));
+			else if (splitLine[i] == "(" || splitLine[i] == ")")
+				ret.push_back(Token(TokenType::ParenthesesOperator, splitLine[i]));
 			else if (splitLine[i] == "-")
 				ret.push_back(Token(TokenType::SubtractOperator, splitLine[i]));
 			else if (is_digits_only(splitLine[i]))
