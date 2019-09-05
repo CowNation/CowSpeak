@@ -18,8 +18,7 @@ enum TokenType {
 	PowerOperator,
 	ModOperator,
 	EqualOperator,
-	VariableIdentifier,
-	PrintIdentifier
+	VariableIdentifier
 };
 
 bool IsOperatorToken(TokenType tt){
@@ -47,8 +46,6 @@ void PrintTokenType(TokenType tt){
 		std::cout << "Power";
 	else if (tt == ModOperator)
 		std::cout << "Modulo";
-	else if (tt == PrintIdentifier)
-		std::cout << "Print";
 	else
 		std::cout << "Unknown";		
 }
@@ -85,133 +82,54 @@ public:
 
 class TokenLine {
 private:
-	template <class c>
-	int CheckMatchingFuncName(std::vector< Function< c > > fx, Token tok, int i){
-		bool Match = false;
-		int retVal = 0;
-		for (int j = 0; j < fx.size(); j++){
-			if (fx[j].funcName == tok.identifier || "VOID__" + tok.identifier == fx[j].funcName){
-				if (fx[j].isVoid() && ((i - 1 > 0 && i + 1 < type.size() && (type[i - 1].type == EqualOperator || type[i + 1].type == EqualOperator)) || IsOperatorToken(type[i - 1].type) || IsOperatorToken(type[i + 1].type))) {
-					FATAL_ERROR("Cannot perform operation on void function: " + type[i].identifier);
-				}
-				retVal = fx[j].FuncDef();
-				Match = true;
-				break;
-			}
+	Function<float> findFunction(std::string functionName){
+		for (int i = 0; i < intFX.size(); i++){
+			if (intFX[i].funcName == functionName)
+				return intFX[i];
 		}
-		if (!Match)
-			FATAL_ERROR("No matching function for call to: " + tok.identifier);
-		return retVal;
-	}
+
+		FATAL_ERROR("Function " + functionName + " not found");
+		exit(-1);
+	} // find fuction with matching name
 public:
 	std::vector< Token > type;
 
 	TokenLine(std::vector< Token > tt){
 		type = tt;
 	}
-	float Exec(std::vector< Variable > Vars){
-		std::vector< std::string > Evaluated;
-		float temp = 0;
-		bool tempModified = false;
-		for (int i = 0; i < type.size(); i++){
-			if (IsOperatorToken(type[i].type))
-				Evaluated.push_back(type[i].identifier);
-			else if (type[i].type == Number){
-				if ((i + 1 < type.size() && type[i + 1].type == Number) || (i - 1 >= 0 && type[i - 1].type == Number)){
-					FATAL_ERROR("Missing operator after " + type[i].identifier);
-					if ((i + 1 < type.size() && type[i + 1].type == Number))
-						std::cout << type[i + 1].identifier << std::endl;
-					else
-						std::cout << type[i - 1].identifier << std::endl;
-					return 0;
-				}
-				Evaluated.push_back(type[i].identifier);
-			}
-			else if (type[i].type == EqualOperator) {
-				if (i - 1 >= 0 && i + 1 < type.size()) {
-					if (type[i - 1].type != Number && type[i - 1].type != VariableIdentifier && type[i - 1].type != FunctionCall)
-						FATAL_ERROR("No operands of operator: =");
-					if (type[i + 1].type != Number && type[i + 1].type != VariableIdentifier && type[i + 1].type != FunctionCall)
-						FATAL_ERROR("No operands of operator: =");
-				}
-				else
-					FATAL_ERROR("No operands of operator: =");
-				Evaluated.push_back(type[i].identifier);
-			}
-			else if (type[i].type == VariableIdentifier) {
-				if (i + 1 < type.size() && type[i + 1].type == VariableIdentifier){
-					FATAL_ERROR("Missing operator between VariableIdentifiers");
-				}
-				
-				if (isVarDefined(Vars, type[i].identifier)) {
-					Evaluated.push_back(std::to_string(getNamedVariable(Vars, type[i].identifier).Value));
-				}
-				else {
-					FATAL_ERROR("Unknown VariableIdentifier: " + type[i].identifier);
-				}
-			}
-			else if (type[i].type == FunctionCall){
-				if (i + 1 < type.size() && type[i + 1].type == FunctionCall)
-					FATAL_ERROR("Missing operator between FunctionCalls");
-
-				Evaluated.push_back(std::to_string(CheckMatchingFuncName<float>(intFX, type[i], i)));
-			}
-		}
-		if (Evaluated.size() == 1) 
-			return std::stof(Evaluated[0]);
-		if (Evaluated.size() == 3 && is_digits_only(Evaluated[2]) && Evaluated[1] == "=")
-			return std::stof(Evaluated[2]);
+	float betaExec(std::vector< Variable > Vars){
+		std::vector< Token > toEval = type;
 
 		for (int i = 0; i < type.size(); i++){
-			if (IsOperatorToken(type[i].type)){
-				if (i - 1 >= 0 && i + 1 < Evaluated.size()){
-					if (type[i - 1].type != Number && type[i - 1].type != VariableIdentifier && type[i - 1].type != FunctionCall)
-						FATAL_ERROR("No operands of operator: " + type[i].identifier);
-					if (type[i + 1].type != Number && type[i + 1].type != VariableIdentifier && type[i + 1].type != FunctionCall)
-						FATAL_ERROR("No operands of operator: " + type[i].identifier);
-					
-					float left;
-					float right;
-
-					if (Evaluated[i - 1].find(".") == -1)
-						left = std::stoi(Evaluated[i - 1]);
-					else
-						left = std::stof(Evaluated[i - 1]);
-
-					if (Evaluated[i + 1].find(".") == -1)
-						right = std::stoi(Evaluated[i + 1]);
-					else
-						right = std::stof(Evaluated[i + 1]);
-
-					if (tempModified)
-						left = temp;
-
-					if (type[i].type == AddOperator)
-						temp = left + right;
-					else if (type[i].type == SubtractOperator)
-						temp = left - right;
-					else if (type[i].type == MultiplyOperator)
-						temp = left * right;
-					else if (type[i].type == DivideOperator){
-						if (right == 0)
-							FATAL_ERROR("Cannot divide by 0");
-						temp = left / right;
-					}
-					else if (type[i].type == PowerOperator)
-						temp = pow(left, right);
-					else if (type[i].type == ModOperator){
-						if (right == 0)
-							FATAL_ERROR("Cannot divide by 0");
-						temp = fmod(left, right);
-					}
-					tempModified = true;
-				}
-				else
-					FATAL_ERROR("No operands of operator: " + type[i].identifier);
+			if (type[i].type == EqualOperator){
+				toEval = slice(type, i + 1, type.size()-1);
+				break;
 			}
+		} // remove the equal sign and everything to the left
+
+		std::string Evaluated;
+		for (int i = 0; i < toEval.size(); i++){
+			std::string identifier = toEval[i].identifier;
+
+			if (toEval[i].type == TokenType::VariableIdentifier){
+				identifier = std::to_string(getVariable(Vars, identifier).Value);
+			} // replace variable name with it's value
+			else if (toEval[i].type == TokenType::FunctionCall){
+				identifier = std::to_string(findFunction(identifier).FuncDef());
+			} // replace function call with it's return value
+
+			Evaluated += identifier;
 		}
 
-		return temp;
+		float evaluatedValue = 0;
+		try{
+			evaluatedValue = eval(Evaluated);
+		}
+		catch (...){
+			FATAL_ERROR("Could not evaluate expression '" + Evaluated + "'");
+		}
+
+		return evaluatedValue;
 	}
 };
 

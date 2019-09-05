@@ -5,10 +5,6 @@
 #include <string>
 #include <stdlib.h>
 
-/*
-* THIS PROJECT HAS BEEN MOSTLY ABANDONED, IT IS CURRENTLY WORKING BUT WILL RECIEVE FEW UPDATES
-*/
-
 #define DEBUG 0
 
 int main() {
@@ -27,7 +23,7 @@ int main() {
 				PrintTokenType(fl.Lines[i].type[j].type);
 				std::cout << std::endl;
 			}
-			std::cout << "Line #" << i + 1 << " Executed: " << fl.Lines[i].Exec(fl.Vars) << std::endl;
+			std::cout << "Line #" << i + 1 << " Executed: " << fl.Lines[i].betaExec(fl.Vars) << std::endl;
 			std::cout << "----------------------------\n";
 		}
 	}

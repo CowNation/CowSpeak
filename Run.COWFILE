@@ -1,6 +1,5 @@
-fifteenVariable = getFifteen() # pet variable equal to 15 #
-print 15 # bore ragnarok
-twentyVariable = fifteenVariable + 5 # 20 = 15 + 5 #
-twentyFivePointFiveVariable = getFifteen() + 10.5 # 25.5 = 15 + 10.5 #
-fiveVariable = twentyFivePointFiveVariable - twentyVariable - 0.5 # 5 = 25 - 20 #
-print fiveVariable
+fifteenVariable = 15 + 20 # 35
+fifteenVariable = getFifteen() - 10 # 5
+fifteenVariable = fifteenVariable + 10 # 15
+print fifteenVariable # 15
+print fifteenVariable % 2
