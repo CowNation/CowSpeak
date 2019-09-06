@@ -8,13 +8,12 @@ float getFifteen(){
 
 float VOID_pause() {
 	Keyboard kb;
-	kb.WhiteListKeys({10}); // 127 
-	std::cout << "Press Enter to Continue: ";
+	std::cout << "Press Any Key to Continue: ";
 	char pressedKey;
 	do{
 		kb.Update();
 		pressedKey = kb.GetPressedKey();
-	} while (pressedKey != 10);
+	} while (pressedKey == 0);
 	return 0;
 }
 
