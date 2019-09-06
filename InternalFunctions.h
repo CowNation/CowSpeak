@@ -5,7 +5,9 @@
 #include <iostream>
 
 float getFifteen();
-float pause();
-float exit();
+float VOID_pause();
+float VOID_exit();
+float getInput();
+float VOID_clrConsole();
 
 #endif

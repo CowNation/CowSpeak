@@ -36,10 +36,12 @@ class Function {
 	}
 };
 
-std::vector< Function< float > > intFX = {
-	Function<float>("VOID__exit()", exit),
-	Function<float>("VOID__pause()", pause),
-	Function<float>("getFifteen()", getFifteen)
+std::vector< Function< float > > floatFX = {
+	Function<float>("VOID_exit()", VOID_exit),
+	Function<float>("VOID_pause()", VOID_pause),
+	Function<float>("VOID_clrConsole()", VOID_clrConsole),
+	Function<float>("getFifteen()", getFifteen),
+	Function<float>("getInput()", getInput)
 };
 
 class Token {
@@ -55,9 +57,9 @@ public:
 class TokenLine {
 private:
 	Function<float> findFunction(std::string functionName){
-		for (int i = 0; i < intFX.size(); i++){
-			if (intFX[i].funcName == functionName)
-				return intFX[i];
+		for (int i = 0; i < floatFX.size(); i++){
+			if (floatFX[i].funcName == functionName)
+				return floatFX[i];
 		}
 
 		FATAL_ERROR("Function " + functionName + " not found");

@@ -1,3 +1,7 @@
+print 'Enter float: '
+myVar = getInput()
+print myVar
+VOID_clrConsole()
 fifteenVariable = ( 15 + 20 ) * 2 # CowSpeak is the best lang
 print fifteenVariable
 fifteenVariable = fifteenVariable - 50

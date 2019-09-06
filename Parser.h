@@ -66,6 +66,15 @@ public:
 			if (fileLines[i] == "") // no need to parse or evaluate empty line
 				continue;
 
+			int startIndex = fileLines[i].find("print '");
+			int endIndex = fileLines[i].rfind("'");
+			if (startIndex == 0 && endIndex == fileLines[i].length() - 1){
+				std::string toPrint = fileLines[i].substr(startIndex + 7, fileLines[i].length() - (startIndex + 8));
+				std::cout << toPrint << std::endl;
+				Lines.push_back(std::vector<Token>{}); // prevents bad_alloc exception
+				continue;
+			} // example line = print 'Hello World'
+
 			Lines.push_back(ParseLine(fileLines[i]));
 
 			float retVal = Lines[i].betaExec(Vars);
