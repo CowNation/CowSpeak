@@ -2,13 +2,9 @@
 #include <stdlib.h>
 #include "input.hpp"
 
-float getFifteen(){
-	return 15;
-} 
-
 float VOID_pause() {
 	Keyboard kb;
-	std::cout << "Press Any Key to Continue: ";
+	std::cout << "Press Any Key to Continue ";
 	char pressedKey;
 	do{
 		kb.Update();
@@ -18,7 +14,7 @@ float VOID_pause() {
 }
 
 float VOID_exit() {
-	exit(-1);
+	exit(0);
 }
 
 float getInput(){
