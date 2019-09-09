@@ -40,7 +40,6 @@ std::vector< Function< float > > floatFX = {
 	Function<float>("VOID_exit()", VOID_exit),
 	Function<float>("VOID_pause()", VOID_pause),
 	Function<float>("VOID_clrConsole()", VOID_clrConsole),
-	Function<float>("getFifteen()", getFifteen),
 	Function<float>("getInput()", getInput)
 };
 
