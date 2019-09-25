@@ -8,5 +8,5 @@ fifteenVariable = fifteenVariable - 50 # subtraction operator is epic!
 fifteenVariable = fifteenVariable - 5 # subtraction operator is epic!
 print fifteenVariable
 run 'helloWorld.COWFILE' # pauses the execution of this file and executes helloWorld.COWFILE before continuing
-print '\nchina numbah ' # printing is dope
+print 'china numbah ' # printing is dope
 print fifteenVariable % 2 # modulo operator is epic!
