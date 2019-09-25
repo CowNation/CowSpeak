@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 
 /*
-* Contains constants relating to the functionality of CowSpeak
 * TODOS (In no particular order):
 * Parameters for static functions & replace some keywords with static functions (run, print)
 * Add types for Variables
 * Add user-defined functions
-* move some Utils to CowSpeak class so lineIndex isn't passed every FATAL_ERROR call
+* Move some Utils to CowSpeak class so lineIndex isn't passed every FATAL_ERROR call
+* Add debugging so that shouldDebug does something
+* Recode Execute function to take order of operations into account
 */
 
 namespace CowSpeak{
