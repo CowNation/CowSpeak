@@ -1,0 +1,12 @@
+myVar = 15 + 15 # addition operator is epic!
+print myVar
+print '\n'
+fifteenVariable = ( 15 + 20 ) * 2 # parenthesis and multiplication operators are epic!
+print fifteenVariable
+print '\n'
+fifteenVariable = fifteenVariable - 50 # subtraction operator is epic!
+fifteenVariable = fifteenVariable - 5 # subtraction operator is epic!
+print fifteenVariable
+run 'helloWorld.COWFILE' # pauses the execution of this file and executes helloWorld.COWFILE before continuing
+print '\nchina numbah ' # printing is dope
+print fifteenVariable % 2 # modulo operator is epic!
