@@ -1,5 +1,6 @@
 print '\nHello World from helloWorld.COWFILE!'
 print '\nI can also read memory from other files!\n'
 print myVar
+print '\n'
 VOID_pause()
 VOID_clrConsole()
