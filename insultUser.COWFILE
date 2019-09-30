@@ -1,0 +1,6 @@
+print "Input an insult: "
+string insult = inputString()
+print "You are so " + insult + "\n"
+print "Let that sink in " + yadig + "\nPress Any Key To Continue"
+pause()
+clrConsole()

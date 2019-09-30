@@ -1,0 +1,5 @@
+print "Input a decimal: "
+decimal input = inputDecimal()
+decimal xtwo = input * 2
+decimal xfour = input * 4
+print "x2:" + xtwo + "\nx4:" + xfour + "\n"

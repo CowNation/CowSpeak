@@ -2,7 +2,37 @@ using System.Collections.Generic;
 using System;
 
 namespace CowSpeak{
-	public static class Utils{
+	public static class Utils {
+		public static bool isOperator(TokenType type){
+			return type.ToString().IndexOf("Operator") != -1;
+		}
+
+		public static bool isBetween(string str, int index, char start, char end) {
+			bool between = false;
+			int i = 0;
+			foreach (char letter in str){
+				if (letter == start)
+					between = true;
+				else if (letter == end)
+					between = false;
+
+				if (i == index)
+					return between;
+
+				i++;
+			}
+			return between;
+		}
+
+		public static string AddStrings(List< string > toAdd){
+			// example input is "hello ", "world", "!"
+			string result = "";
+			foreach (string _add in toAdd){
+				result += _add;
+			}
+			return result;
+		}
+
 		public static double Evaluate(string expr) {
 			Stack<string> stack = new Stack<string>();
 
@@ -96,28 +126,11 @@ namespace CowSpeak{
 			return index >= 0 && index < container.Count && container.Count > 0;
 		}
 
-		public static bool isDecimal(string input){
-			return input.IndexOf(".") != -1;
-		}
-
-		public static float varToType(string input){
-			if (!isDecimal(input)) // find decimal point to determine type
-				return Int32.Parse(input); // type is int
-			else
-				return float.Parse(input); // type is float
-		}
-
-		public static void FATAL_ERROR(int failedAt, string errorStr) {
-			Console.WriteLine("\n(" + failedAt + ") FATAL_ERROR: " + errorStr);
-			Console.ReadKey();
-			Environment.Exit(-1);
-		}
-
 		public static bool IsLettersOnly(string s)
 		{
 			foreach (char c in s)
 			{
-				if (!Char.IsLetter(c))
+				if (!Char.IsLetter(c) && c != '_')
 					return false;
 			}
 			return true;
@@ -127,54 +140,11 @@ namespace CowSpeak{
 		{
 			foreach (char c in str)
 			{
-				if ((c < '0' || c > '9') && c != '.')
+				if ((c < '0' || c > '9') && c != '.' && c != '-')
 					return false;
 			}
 
 			return true;
-		}
-
-		public static bool isVarDefined(List< Variable > Vars, string varName) {
-			for (int i = 0; i < Vars.Count; i++) {
-				if (Vars[i].Name == varName)
-					return true;
-			}
-			return false;
-		}
-
-		public static int getVariable(int lineNum, List< Variable > Vars, string varName) {
-			for (int i = 0; i < Vars.Count; i++) {
-				if (Vars[i].Name == varName)
-					return i;
-			}
-			FATAL_ERROR(lineNum + 1, "Could not find variable: " + varName);
-			Environment.Exit(-1);
-			return -1;
-		} // returns index of variable cuz C# hates refs and ptrs
-
-		public static void assignDefinedVar(List< Variable > Vars, string varName, float Val) {
-			for (int i = 0; i < Vars.Count; i++) {
-				if (Vars[i].Name == varName){
-					Vars[i].Value = Val;
-					return;
-				}
-			}
-		}
-
-		public static List< string > Splitstring(string str, char splitter) {
-			List< string > ret = new List< string >();
-			string temp = "";
-			for (int i = 0; i < str.Length; i++) {
-				if (str[i] == splitter && temp.Length > 0) {
-					ret.Add(temp);
-					temp = "";
-				}
-				else
-					temp += str[i];
-			}
-			if (temp.Length > 0)
-				ret.Add(temp);
-			return ret;
 		}
 	}
 }

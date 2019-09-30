@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using System.Text;
 using System.IO;
 
 namespace CowSpeak{
@@ -9,15 +10,49 @@ namespace CowSpeak{
 
 		private List < Token > ParseLine(string line) {
 			if (string.IsNullOrWhiteSpace(line))
-				return new List< Token >();
+				return new List< Token >(); // don't parse empty line
+
+			bool betweenQuotes = false;
+			for (int i = 0; i < line.Length; i++){
+				if (line[i] == '\"'){
+					if (betweenQuotes){
+						betweenQuotes = false;
+					}
+					else{
+						betweenQuotes = true;
+					}
+				}
+
+				if (betweenQuotes && line[i] == ' ')
+					line = line.Remove(i, 1).Insert(i, ((char)0x1f).ToString());
+			}
 
 			List< string > splitLine = line.Split(' ').ToList();
 			List< Token > ret = new List< Token >();
 			for (int i = 0; i < splitLine.Count; i++) {
-				if (splitLine[i] == "print")
+				if (string.IsNullOrWhiteSpace(splitLine[i]))
 					continue;
 
-				if (splitLine[i].IndexOf("()") != -1)
+				bool isType = false;
+				foreach (VarType type in VarType.GetTypes()){
+					if (type.Name == splitLine[i]){
+						ret.Add(new Token(TokenType.TypeIdentifier, splitLine[i]));
+						isType = true;
+						break;
+					}
+				} // loop through all language defined types and check for a match
+
+				if (isType)
+					continue;
+				else if (splitLine[i][0] == '\"' && splitLine[i][splitLine[i].Length - 1] == '\"')
+					ret.Add(new Token(TokenType.String, splitLine[i].Replace(((char)0x1f).ToString(), " ").Substring(1, splitLine[i].Replace(((char)0x1f).ToString(), " ").Length - 2)));
+				else if (splitLine[i][0] == '\'' && splitLine[i][splitLine[i].Length - 1] == '\'' && splitLine[i].Length == 3)
+					ret.Add(new Token(TokenType.Character, splitLine[i][splitLine[i].Length - 2].ToString()));
+				else if (splitLine[i] == "run")
+					ret.Add(new Token(TokenType.RunIdentifier, splitLine[i]));
+				else if (splitLine[i] == "print")
+					ret.Add(new Token(TokenType.PrintIdentifier, splitLine[i]));
+				else if (splitLine[i].IndexOf("()") != -1)
 					ret.Add(new Token(TokenType.FunctionCall, splitLine[i]));
 				else if (splitLine[i] == "(" || splitLine[i] == ")")
 					ret.Add(new Token(TokenType.ParenthesesOperator, splitLine[i]));
@@ -41,74 +76,85 @@ namespace CowSpeak{
 					ret.Add(new Token(TokenType.VariableIdentifier, splitLine[i]));
 				else if (splitLine[i][splitLine[i].Length-1] == '#' && splitLine[i].LastIndexOf("#", 0) == 0){}
 				else {
-					Utils.FATAL_ERROR(i + 1,"Unknown identifier: " + splitLine[i]);
+					CowSpeak.FATAL_ERROR("Unknown identifier: " + splitLine[i].Replace(((char)0x1f).ToString(), " "));
 				}
 			}
 
 			return ret;
 		}
 
-		public FileLexer(CowSpeak owner, List< string > fileLines, bool shouldDebug) {
+		public FileLexer(List< string > fileLines, bool shouldDebug) {
 			for (int i = 0; i < fileLines.Count; i++) {
+				CowSpeak.currentLine = i + 1;
+
 				fileLines[i] = fileLines[i].Replace(@"\n", Environment.NewLine); // \n is not interpreted as a newline in strings
 
 				while (fileLines[i].IndexOf("#") != -1){
 					int pos = fileLines[i].IndexOf("#");
+					if (Utils.isBetween(fileLines[i], pos, '"', '"') || Utils.isBetween(fileLines[i], pos, '\'', '\'')){
+						StringBuilder fileLine = new StringBuilder(fileLines[i]);
+						fileLine[pos] = (char)0x1f;
+						fileLines[i] = fileLine.ToString(); 
+						continue;
+						// replace with placeholder temporarily to prevent while loop forever
+					}
+
 					fileLines[i] = fileLines[i].Remove(pos, fileLines[i].Length - pos);
-				} // get rid of all '#' and anything after it
+				} // get rid of all '#' and anything after it (but it cannot be enclosed in quotes or apostrophes)
 
-				if (fileLines[i] == "") // no need to parse or evaluate empty line
+				fileLines[i] = fileLines[i].Replace(((char)0x1f).ToString(), "#"); // replace placeholders back with comment token
+
+				if (string.IsNullOrWhiteSpace(fileLines[i])){
+					Lines.Add(new TokenLine(new List<Token>()));
 					continue;
-
-				int startIndex = fileLines[i].IndexOf("print '");
-				int endIndex = fileLines[i].LastIndexOf("'");
-				if (startIndex == 0 && endIndex > startIndex){
-					string toPrint = fileLines[i].Substring(startIndex + 7, endIndex - (startIndex + 7));
-					Console.Write(toPrint);
-					Lines.Add(new TokenLine(new List<Token>())); // prevents bad_alloc exception
-					continue;
-				} // example line = print 'Hello World'
-
-				int runIndex = fileLines[i].IndexOf("run '");
-				if (runIndex == 0){
-					runIndex += 5;
-					int endQuotes = fileLines[i].LastIndexOf("'");
-
-					if (endQuotes == -1)
-						Utils.FATAL_ERROR(i + 1,"Invalid parameter for 'run' keyword");
-
-					string fileName = fileLines[i].Substring(runIndex, endQuotes - runIndex);
-					if (File.Exists(fileName))
-						owner.Exec(fileName); // Execute file specified
-					else
-						Utils.FATAL_ERROR(i + 1,fileName + " does not exist");
-					Lines.Add(new TokenLine(new List<Token>())); // prevents bad_alloc exception
-					continue;
-				}
-
+				} // no need to parse or evaluate empty line
 
 				Lines.Add(new TokenLine(ParseLine(fileLines[i])));
 
-				float retVal = Lines[i].Exec(i, owner.Vars); // Execute line
-
-				if (Utils.isIndexValid(0, Lines[i].tokens) && Lines[i].tokens[0].type == TokenType.VariableIdentifier && Utils.isIndexValid(1, Lines[i].tokens) && Lines[i].tokens[1].type == TokenType.EqualOperator){
-					if (!Utils.isVarDefined(owner.Vars, Lines[i].tokens[0].identifier)) {
-						owner.Vars.Add(new Variable(Lines[i].tokens[0].identifier, 0));
-						owner.Vars[owner.Vars.Count - 1].Value = retVal;
-					} // create new variable
-					else {
-						for (int v = 0; v < owner.Vars.Count; v++){
-							if (Lines[i].tokens[0].identifier == owner.Vars[v].Name)
-								owner.Vars[v].Value = retVal;
-						} // using getVariable does not work for this
+				if (shouldDebug){
+					Console.WriteLine("\nLine " + (i + 1) + ": ");
+					foreach (var token in Lines[i].tokens){
+						Console.WriteLine(token.type.ToString() + " - " + token.identifier);
 					}
-				} // first token is VariableIdentifier | second token is EqualOperator
+				}
 
-				int printIndex = fileLines[i].IndexOf("print ");
-				if (printIndex == 0)
-					Console.Write(retVal); // print executed line
-				else if (printIndex != -1)
-					Utils.FATAL_ERROR(i + 1,"PrintIdentifier must be the first token on a line");
+				if (Lines[i].tokens.Count >= 2 && Lines[i].tokens[0].type == TokenType.VariableIdentifier && Lines[i].tokens[1].type == TokenType.VariableIdentifier) // first token is interpreted as a variable because the type does not exist
+					CowSpeak.FATAL_ERROR("Type '" + Lines[i].tokens[0].identifier + "' does not exist");
+
+				bool shouldBeSet = false; // the most recent variable in list should be set after exec
+				if (Lines[i].tokens.Count >= 3 && Lines[i].tokens[0].type == TokenType.TypeIdentifier && Lines[i].tokens[1].type == TokenType.VariableIdentifier && Lines[i].tokens[2].type == TokenType.EqualOperator){
+					CowSpeak.Vars.Add(new Variable(VarType.GetType(Lines[i].tokens[0].identifier), Lines[i].tokens[1].identifier));
+					shouldBeSet = true;
+				} // variable must be created before exec is called so that it may be accessed
+
+				Any retVal = Lines[i].Exec(); // Execute line
+
+				if (Lines[i].tokens.Count >= 2 && Lines[i].tokens[0].type == TokenType.PrintIdentifier){
+					Console.Write(retVal.Get().ToString());
+				}
+
+				if (Lines[i].tokens.Count >= 2 && Lines[i].tokens[0].type == TokenType.RunIdentifier){
+					string currentFile = CowSpeak.currentFile;
+					string fileName = retVal.Get().ToString();
+					if (File.Exists(fileName))
+						CowSpeak.Exec(fileName); // Execute file specified
+					else
+						CowSpeak.FATAL_ERROR(fileName + " does not exist");
+					CowSpeak.currentFile = currentFile; // curr file is not set back after exec of another file
+				}
+
+				if (shouldBeSet)
+					CowSpeak.Vars[CowSpeak.Vars.Count - 1].byteArr = retVal.byteArr;
+				else if (Lines[i].tokens.Count >= 2 && Lines[i].tokens[0].type == TokenType.VariableIdentifier && Lines[i].tokens[1].type == TokenType.EqualOperator){
+					if (!CowSpeak.isVarDefined(Lines[i].tokens[0].identifier)){
+						CowSpeak.FATAL_ERROR("Variable '" + Lines[i].tokens[0].identifier + "' must be defined before it can be set");
+					}
+
+					for (int v = 0; v < CowSpeak.Vars.Count; v++){
+						if (Lines[i].tokens[0].identifier == CowSpeak.Vars[v].Name)
+							CowSpeak.Vars[v].byteArr = retVal.byteArr;
+					} // using getVariable does not work for this
+				} // type is not specified, var must be defined
 			}
 		}
 	}

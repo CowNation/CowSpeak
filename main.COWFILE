@@ -1,12 +1,9 @@
-myVar = 15 + 15 # addition operator is epic!
-print myVar
-print '\n'
-fifteenVariable = ( 15 + 20 ) * 2 # parenthesis and multiplication operators are epic!
-print fifteenVariable
-print '\n'
-fifteenVariable = fifteenVariable - 50 # subtraction operator is epic!
-fifteenVariable = fifteenVariable - 5 # subtraction operator is epic!
-print fifteenVariable
-run 'helloWorld.COWFILE' # pauses the execution of this file and executes helloWorld.COWFILE before continuing
-print 'china numbah ' # printing is dope
-print fifteenVariable % 2 # modulo operator is epic!
+character ping_pong = '!'
+string myStr = "Hello World"
+print ping_pong + myStr + ping_pong + "\n"
+string yadig = "frfr"
+print "my " + "str " + yadig + "\n"
+integer partNum = 999999999
+print "welcome to my mc lets play part #" + partNum + "\n"
+run "math.COWFILE"
+run "insultUser.COWFILE"
