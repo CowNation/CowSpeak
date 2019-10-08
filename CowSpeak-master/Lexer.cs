@@ -211,7 +211,7 @@ namespace CowSpeak{
 					i = endingBracket; // loop is over, skip to end of brackets to prevent continedLines getting executed again
 				}
 
-				if (shouldDebug){
+				if (shouldDebug && Lines[i].tokens.Count > 0){
 					Console.WriteLine("\nLine " + (i + 1) + ": ");
 					foreach (var token in Lines[i].tokens){
 						Console.WriteLine(token.type.ToString() + " - " + token.identifier);
