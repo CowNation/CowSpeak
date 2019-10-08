@@ -1,10 +1,39 @@
-using System.Collections.Generic;
 using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+using System.ComponentModel;
+using System.Globalization;
+using System.Text;
 
 namespace CowSpeak{
 	public static class Utils {
+		public static Random rand = new Random();
+
 		public static bool isOperator(TokenType type){
 			return type.ToString().IndexOf("Operator") != -1;
+		}
+
+		public static T TryParse<T>(string inValue)
+		{
+			TypeConverter converter = TypeDescriptor.GetConverter(typeof(T));
+			return (T)converter.ConvertFromString(null, CultureInfo.InvariantCulture, inValue);
+		}
+
+		public static List< string > GetContainedLines(List< TokenLine > Lines, int endingBracket, int i){
+			List< TokenLine > _containedLines = new List< TokenLine >();
+			_containedLines = Lines.GetRange(i + 1, endingBracket - (i + 1));
+			List< string > containedLines = new List< string >();
+
+			foreach (TokenLine line in _containedLines){
+				string built = "";
+				foreach (Token pToken in line.tokens){
+					built += pToken.identifier.Replace(Environment.NewLine, @"\n").Replace(((char)0x1f).ToString(), " ").Replace(((char)0x1D).ToString(), " ") + " ";
+				}
+				containedLines.Add(built);
+			}
+
+			return containedLines;
 		}
 
 		public static bool isBetween(string str, int index, char start, char end) {

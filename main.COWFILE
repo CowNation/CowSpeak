@@ -1,9 +1,27 @@
-character ping_pong = '!'
-string myStr = "Hello World"
-print ping_pong + myStr + ping_pong + "\n"
-string yadig = "frfr"
-print "my " + "str " + yadig + "\n"
-integer partNum = 999999999
-print "welcome to my mc lets play part #" + partNum + "\n"
-run "math.COWFILE"
-run "insultUser.COWFILE"
+run("start.COWFILE")
+
+integer correctGuess = randomInteger(1, 100)
+integer guess = 0
+boolean firstTime = True
+
+while(isNotEqual(correctGuess, guess)){
+	if(isEqual(firstTime, False)){
+		print("Wrong Answer - ")
+
+		if(isLessThan(guess, correctGuess)){
+			print("Too Low!!")
+		}
+
+		if(isGreaterThan(guess, correctGuess)){
+			print("Too High!!")
+		}
+
+		print("\n")
+	}
+	
+	print("Input Your Guess: ")
+	guess = inputInteger()
+	firstTime = False # it's not the first time through the loop
+}
+
+print("Correct Answer!!")
