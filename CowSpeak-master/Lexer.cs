@@ -212,9 +212,9 @@ namespace CowSpeak{
 				}
 
 				if (shouldDebug && Lines[i].tokens.Count > 0){
-					Console.WriteLine("\nLine " + (i + 1) + ": ");
+					Console.WriteLine("\n(" + CowSpeak.currentFile + ") Line " + (i + 1) + ": ");
 					foreach (var token in Lines[i].tokens){
-						Console.WriteLine(token.type.ToString() + " - " + token.identifier);
+						Console.WriteLine(token.type.ToString() + " - " + token.identifier.Replace(Environment.NewLine, @"\n"));
 					}
 				}
 

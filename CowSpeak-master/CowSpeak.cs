@@ -67,8 +67,9 @@ namespace CowSpeak{
 			return getVariable(varName, false) != null;
 		}
 
-		static public void Exec(string fileName, bool shouldDebug = false){
+		static public void Exec(string fileName, bool ishouldDebug = false){
 			currentFile = fileName;
+			shouldDebug = ishouldDebug;
 			new Lexer(new CowConfig.readConfig(fileName).GetLines(), shouldDebug);
 		}
 	}
