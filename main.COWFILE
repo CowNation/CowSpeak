@@ -1,4 +1,4 @@
-run("start.COWFILE")
+run("start.COWFILE") # start countdown
 
 integer correctGuess = randomInteger(1, 100)
 integer guess = 0

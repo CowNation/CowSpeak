@@ -40,7 +40,7 @@ namespace CowSpeak{
 			bool between = false;
 			int i = 0;
 			foreach (char letter in str){
-				if (letter == start)
+				if (letter == start && between == false)
 					between = true;
 				else if (letter == end)
 					between = false;

@@ -23,6 +23,8 @@ namespace CowSpeak{
 			new Function("isGreaterThan", Functions.isGreaterThan, VarType.Boolean, "isGreaterThan(left, right)", 2),
 		};
 
+		static public List< string[] > Definitions = new List< string[] >();
+
 		static public Function findFunction(string functionName, bool _throw = true){
 			for (int i = 0; i < staticFX.Count; i++){
 				if (functionName.IndexOf(staticFX[i].funcName) == 0)
