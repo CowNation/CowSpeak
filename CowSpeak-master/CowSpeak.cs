@@ -9,11 +9,11 @@ namespace CowSpeak{
 			new Function("clrConsole", Functions.clrConsole, VarType.Void, "clrConsole() - Clears all text from the console"),
 			new Function("clearMem", Functions.clearMem, VarType.Void, "clearMem() - Deletes all variables from memory"),
 			new Function("inputString", Functions.inputString, VarType.String, "inputString() - Allows the user to input a string"),
-			new Function("inputInteger", Functions.inputInt, VarType.Int, "inputInteger() - Allows the user to input a int"),
+			new Function("inputInteger", Functions.inputInt, VarType.Integer, "inputInteger() - Allows the user to input a int"),
 			new Function("inputDecimal", Functions.inputDecimal, VarType.Decimal, "inputDecimal() - Allows the user to input a decimal"),
 			new Function("print", Functions.print, VarType.Void, "print(string text) - Prints 'text' to the console", 1),
 			new Function("run", Functions.run, VarType.Void, "run(string fileName) - Executes a cowfile with the name 'fileName'", 1),
-			new Function("randomInteger", Functions.randomInteger, VarType.Int, "randomInteger(integer minimum, integer maximum) - Returns a random integer with a minimum of 'minimum' and a maximum of 'maximum'", 2),
+			new Function("randomInteger", Functions.randomInteger, VarType.Integer, "randomInteger(integer minimum, integer maximum) - Returns a random integer with a minimum of 'minimum' and a maximum of 'maximum'", 2),
 			new Function("sleep", Functions.sleep, VarType.Void, "sleep(integer milliseconds) - Program waits for 'milliseconds' milliseconds", 1),
 
 			// Comparison Functions
@@ -70,6 +70,7 @@ namespace CowSpeak{
 		static public void Exec(string fileName, bool ishouldDebug = false){
 			currentFile = fileName;
 			shouldDebug = ishouldDebug;
+
 			new Lexer(new CowConfig.readConfig(fileName).GetLines(), shouldDebug);
 		}
 	}

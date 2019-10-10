@@ -7,7 +7,7 @@ namespace CowSpeak{
 		public ByteArray(){}
 		public byte[] bytes;
 
-		public static Object ByteArrayToObject(byte[] arrBytes)
+		public static object ByteArrayToObject(byte[] arrBytes)
 		{
 			using (var memStream = new MemoryStream())
 			{

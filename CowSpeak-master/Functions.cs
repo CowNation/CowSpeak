@@ -8,11 +8,11 @@ namespace CowSpeak{
 	public static class Functions{
 		public static Any sleep(params Any[] parameters){
 			Thread.Sleep((int)parameters[0].Get());
-			return new Any(VarType.Int, 0);
+			return new Any(VarType.Integer, 0);
 		}
 		public static Any pause(params Any[] parameters) {
 			Console.ReadKey();
-			return new Any(VarType.Int, 0);
+			return new Any(VarType.Integer, 0);
 		}
 
 
@@ -44,12 +44,12 @@ namespace CowSpeak{
 			if (minimum > maximum)
 				CowSpeak.FATAL_ERROR("Minimum may not be greater than the maximum");
 
-			return new Any(VarType.Int, Utils.rand.Next(minimum, maximum));
+			return new Any(VarType.Integer, Utils.rand.Next(minimum, maximum));
 		}
 
 		public static Any print(params Any[] parameters){
 			Console.Write(parameters[0].Get().ToString());
-			return new Any(VarType.Int, 0);
+			return new Any(VarType.Integer, 0);
 		}
 
 		public static Any run(params Any[] parameters){
@@ -60,22 +60,22 @@ namespace CowSpeak{
 			else
 				CowSpeak.FATAL_ERROR(fileName + " does not exist");
 			CowSpeak.currentFile = currentFile; // curr file is not set back after exec of another file
-			return new Any(VarType.Int, 0);
+			return new Any(VarType.Integer, 0);
 		}
 
 		public static Any clearMem(params Any[] parameters){
 			CowSpeak.Vars.Clear();
-			return new Any(VarType.Int, 0);
+			return new Any(VarType.Integer, 0);
 		}
 
 		public static Any exit(params Any[] parameters) {
 			Environment.Exit(0);
-			return new Any(VarType.Int, 0);
+			return new Any(VarType.Integer, 0);
 		}
 
 		public static Any clrConsole(params Any[] parameters){
 			Console.Clear();
-			return new Any(VarType.Int, 0);
+			return new Any(VarType.Integer, 0);
 		}
 
 		public static Any inputString(params Any[] parameters){
@@ -83,7 +83,7 @@ namespace CowSpeak{
 		}
 
 		public static Any geta(params Any[] parameters){
-			return new Any(VarType.Int, 150);
+			return new Any(VarType.Integer, 150);
 		}
 
 		public static Any inputInt(params Any[] parameters){
@@ -102,7 +102,7 @@ namespace CowSpeak{
 			}
 			int _out = -1;
 			Int32.TryParse(built, out _out);
-			return new Any(VarType.Int, _out);
+			return new Any(VarType.Integer, _out);
 		}
 
 		public static Any inputDecimal(params Any[] parameters){

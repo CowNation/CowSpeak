@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Diagnostics;
 
 namespace CowSpeak{
 	public class Lexer {
@@ -118,6 +119,9 @@ namespace CowSpeak{
 		}
 
 		public Lexer(List< string > fileLines, bool shouldDebug, int currentLineOffset = 0) {
+			Stopwatch stopWatch = new Stopwatch();
+        	stopWatch.Start();
+
 			for (int i = 0; i < fileLines.Count; i++) {
 				CowSpeak.currentLine = i + 1 + currentLineOffset;
 
@@ -146,6 +150,13 @@ namespace CowSpeak{
 				Lines.Add(new TokenLine(ParseLine(fileLines[i])));
 			}
 
+			stopWatch.Stop();
+			if (shouldDebug){
+				TimeSpan executionTime = stopWatch.Elapsed;
+				Console.WriteLine("Compilation of " + CowSpeak.currentFile + " took " + executionTime.Milliseconds + " milliseconds");
+			}
+			
+
 			for (int i = 0; i < fileLines.Count; i++){
 				CowSpeak.currentLine = i + 1 + currentLineOffset;
 
@@ -160,7 +171,7 @@ namespace CowSpeak{
 						scope.End();
 					}
 
-					i = endingBracket; // IfConditional is over, skip to end of brackets to prevent continedLines to be executed again
+					i = endingBracket + 1; // IfConditional is over, skip to end of brackets to prevent continedLines to be executed again
 				}
 				else if (Lines[i].tokens.Count > 0 && Lines[i].tokens[0].type == TokenType.WhileConditional){
 					int endingBracket = findClosingBracket(i);
@@ -175,7 +186,7 @@ namespace CowSpeak{
 						scope.End();
 					}
 
-					i = endingBracket; // while loop is over, skip to end of brackets to prevent continedLines to be executed again
+					i = endingBracket + 1; // while loop is over, skip to end of brackets to prevent continedLines to be executed again
 				}
 				else if (Lines[i].tokens.Count > 0 && Lines[i].tokens[0].type == TokenType.LoopConditional){
 					int endingBracket = findClosingBracket(i);
@@ -189,7 +200,7 @@ namespace CowSpeak{
 					string varName = loopParams[0].Get().ToString();
 					int count = (int)loopParams[1].Get();
 
-					CowSpeak.Vars.Add(new Variable(VarType.Int, varName));
+					CowSpeak.Vars.Add(new Variable(VarType.Integer, varName));
 
 					for (int p = 0; p < count; p++){
 						RestrictedScope scope = new RestrictedScope();
@@ -208,13 +219,16 @@ namespace CowSpeak{
 						}
 					} // delete the variable after loop is done
 
-					i = endingBracket; // loop is over, skip to end of brackets to prevent continedLines getting executed again
+					i = endingBracket + 1; // loop is over, skip to end of brackets to prevent continedLines getting executed again
 				}
+
+				if (i >= fileLines.Count)
+					break;
 
 				if (shouldDebug && Lines[i].tokens.Count > 0){
 					Console.WriteLine("\n(" + CowSpeak.currentFile + ") Line " + (i + 1) + ": ");
 					foreach (var token in Lines[i].tokens){
-						Console.WriteLine(token.type.ToString() + " - " + token.identifier.Replace(Environment.NewLine, @"\n"));
+						Console.WriteLine(token.type.ToString() + " - " + token.identifier.Replace(Environment.NewLine, @"\n").Replace(((char)0x1f).ToString(), " "));
 					}
 				}
 

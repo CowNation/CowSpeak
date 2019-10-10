@@ -11,14 +11,14 @@ namespace CowSpeak{
 		}
 		
 		public static VarType Void = new VarType("void", typeof(void));
-		public static VarType Int = new VarType("integer", typeof(int));
+		public static VarType Integer = new VarType("integer", typeof(int));
 		public static VarType Decimal = new VarType("decimal", typeof(double));
 		public static VarType String = new VarType("string", typeof(string));
 		public static VarType Boolean = new VarType("boolean", typeof(bool));
 		public static VarType Character = new VarType("character", typeof(char));
 
 		public static VarType[] GetTypes(){
-			return new VarType[]{Int, Decimal, String, Character, Boolean};
+			return new VarType[]{Integer, Decimal, String, Character, Boolean};
 		} // returns array of all static types
 
 		public static VarType GetType(string typeName){

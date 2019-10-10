@@ -66,7 +66,7 @@ namespace CowSpeak{
 					if (token.identifier.IndexOf(".") != -1)
 						vtype = VarType.Decimal;
 					else
-						vtype = VarType.Int;
+						vtype = VarType.Integer;
 				}
 
 				if (vtype == null)

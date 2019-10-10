@@ -160,14 +160,14 @@ namespace CowSpeak{
 			}
 
 			if (Evaluated == "")
-				return new Any(VarType.Int, 0);
+				return new Any(VarType.Integer, 0);
 
 			Any evaluatedValue = new Any();
 			try{
 				evaluatedValue.vType = VarType.Decimal;
 				evaluatedValue.Set(Utils.Evaluate(Evaluated));
 				if (((double)evaluatedValue.Get()).ToString().IndexOf(".") == -1)
-					evaluatedValue.vType = VarType.Int; // decimal not found, we can convert to int
+					evaluatedValue.vType = VarType.Integer; // decimal not found, we can convert to int
 			}
 			catch{
 				CowSpeak.FATAL_ERROR("Could not evaluate expression '" + Evaluated + "'");
