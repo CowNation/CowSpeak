@@ -10,11 +10,16 @@ namespace CowSpeak{
 			Thread.Sleep((int)parameters[0].Get());
 			return new Any(VarType.Integer, 0);
 		}
+
 		public static Any pause(params Any[] parameters) {
 			Console.ReadKey();
 			return new Any(VarType.Integer, 0);
 		}
 
+		public static Any define(params Any[] parameters) {
+			CowSpeak.Definitions.Add(new string[]{parameters[0].Get().ToString(), parameters[1].Get().ToString()});
+			return new Any(VarType.Integer, 0);
+		}
 
 		private static string toStr(Any toPrep){
 			return toPrep.Get().ToString().Replace("True", "1").Replace("False", "0");

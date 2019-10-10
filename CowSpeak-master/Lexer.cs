@@ -119,13 +119,14 @@ namespace CowSpeak{
 		}
 
 		public Lexer(List< string > fileLines, bool shouldDebug, int currentLineOffset = 0) {
-			Stopwatch stopWatch = new Stopwatch();
-        	stopWatch.Start();
-
 			for (int i = 0; i < fileLines.Count; i++) {
 				CowSpeak.currentLine = i + 1 + currentLineOffset;
 
 				fileLines[i] = fileLines[i].Replace(@"\n", Environment.NewLine).Replace("True", "1").Replace("False", "0").Replace("	", ""); // \n is not interpreted as a newline in strings & support for setting booleans using true and false
+
+				foreach (string[] Definition in CowSpeak.Definitions){
+					fileLines[i] = fileLines[i].Replace(Definition[0], Definition[1]);
+				}
 
 				while (fileLines[i].IndexOf("#") != -1){
 					int pos = fileLines[i].IndexOf("#");
@@ -148,14 +149,12 @@ namespace CowSpeak{
 				} // no need to parse or evaluate empty line
 
 				Lines.Add(new TokenLine(ParseLine(fileLines[i])));
-			}
 
-			stopWatch.Stop();
-			if (shouldDebug){
-				TimeSpan executionTime = stopWatch.Elapsed;
-				Console.WriteLine("Compilation of " + CowSpeak.currentFile + " took " + executionTime.Milliseconds + " milliseconds");
+				if (Lines[Lines.Count - 1].tokens.Count > 0 && Lines[Lines.Count - 1].tokens[0].type == TokenType.FunctionCall && Lines[Lines.Count - 1].tokens[0].identifier.IndexOf("define(") == 0){
+					CowSpeak.findFunction("define(").Execute(Lines[Lines.Count - 1].tokens[0].identifier);
+					Lines[Lines.Count - 1] = new TokenLine(new List<Token>()); // line was already handled, clear
+				} // must handle this function before the other lines are compiled to avoid errors
 			}
-			
 
 			for (int i = 0; i < fileLines.Count; i++){
 				CowSpeak.currentLine = i + 1 + currentLineOffset;

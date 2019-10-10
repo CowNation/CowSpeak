@@ -15,6 +15,7 @@ namespace CowSpeak{
 			new Function("run", Functions.run, VarType.Void, "run(string fileName) - Executes a cowfile with the name 'fileName'", 1),
 			new Function("randomInteger", Functions.randomInteger, VarType.Integer, "randomInteger(integer minimum, integer maximum) - Returns a random integer with a minimum of 'minimum' and a maximum of 'maximum'", 2),
 			new Function("sleep", Functions.sleep, VarType.Void, "sleep(integer milliseconds) - Program waits for 'milliseconds' milliseconds", 1),
+			new Function("define", Functions.define, VarType.Void, "define(string from, string to) - Replaces all occurences of 'from' with 'to' in the code", 2),
 
 			// Comparison Functions
 			new Function("isEqual", Functions.isEqual, VarType.Boolean, "isEqual(left, right) - Returns whether left and right are equal", 2),
@@ -22,6 +23,8 @@ namespace CowSpeak{
 			new Function("isLessThan", Functions.isLessThan, VarType.Boolean, "isLessThan(left, right) - Returns whether left is less than right", 2),
 			new Function("isGreaterThan", Functions.isGreaterThan, VarType.Boolean, "isGreaterThan(left, right) - Returns whether left is greater than right", 2),
 		};
+
+		static public List< string[] > Definitions = new List< string[] >();
 
 		static public Function findFunction(string functionName, bool _throw = true){
 			for (int i = 0; i < staticFX.Count; i++){
