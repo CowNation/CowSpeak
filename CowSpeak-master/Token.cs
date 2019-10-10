@@ -12,7 +12,6 @@ namespace CowSpeak{
 		ModOperator, //7
 		EqualOperator, //8
 		VariableIdentifier, //9
-		ParenthesesOperator, //10
 		TypeIdentifier,
 		String,
 		Character,
@@ -90,9 +89,10 @@ namespace CowSpeak{
 				}
 			} // remove the equal sign and everything to the left
 
-			string Evaluated = "";
+			List< Token > Evaluated = new List< Token >();
 			for (int i = 0; i < toEval.Count; i++){
 				string identifier = toEval[i].identifier;
+				TokenType type = toEval[i].type;
 
 				if ((toEval[i].type == TokenType.Character || isCharableFunc(toEval[i]) || isCharableVar(toEval[i])) && i == toEval.Count - 1){
 					Any result = new Any();
@@ -149,30 +149,32 @@ namespace CowSpeak{
 					return result;
 				}
 
-				if (toEval[i].type == TokenType.VariableIdentifier)
+				if (toEval[i].type == TokenType.VariableIdentifier){
+					type = TokenType.Number;
 					identifier = CowSpeak.getVariable(identifier).Get().ToString(); // replace variable name with it's value
+				}
 				if (toEval[i].type == TokenType.WhileConditional || toEval[i].type == TokenType.IfConditional || toEval[i].type == TokenType.EndBracket)
-					identifier = "";
-				else if (toEval[i].type == TokenType.FunctionCall)
+					continue;
+				else if (toEval[i].type == TokenType.FunctionCall){
+					type = TokenType.Number;
 					identifier = CowSpeak.findFunction(identifier).Execute(identifier).Get().ToString(); // replace function call with it's return value
-				else if (toEval[i].type == TokenType.Number)
-					identifier = identifier.Replace("-", ((char)26).ToString()); // replace negative sign with substitute to work well with Utils.Evaluate
-
-				Evaluated += identifier;
+				}
+				
+				Evaluated.Add(new Token(type, identifier));
 			}
 
-			if (Evaluated == "")
+			if (Evaluated.Count == 0)
 				return new Any(VarType.Integer, 0);
 
 			Any evaluatedValue = new Any();
 			try{
 				evaluatedValue.vType = VarType.Decimal;
-				evaluatedValue.Set(Utils.Evaluate(Evaluated));
+				evaluatedValue.Set(Evaluate.EvaluateTokens(Evaluated));
 				if (((double)evaluatedValue.Get()).ToString().IndexOf(".") == -1)
 					evaluatedValue.vType = VarType.Integer; // decimal not found, we can convert to int
 			}
 			catch{
-				CowSpeak.FATAL_ERROR("Could not evaluate expression '" + Evaluated.Replace(((char)26).ToString(), "-") + "'");
+				CowSpeak.FATAL_ERROR("Could not evaluate expression");
 			}
 
 			return evaluatedValue;

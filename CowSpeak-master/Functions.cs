@@ -98,7 +98,7 @@ namespace CowSpeak{
 				Thread.Sleep(100);
 
 				key = Console.ReadKey();
-				if (key.KeyChar >= '0' && key.KeyChar <= '9')
+				if ((key.KeyChar >= '0' && key.KeyChar <= '9') || (built.IndexOf("-") == -1 && key.KeyChar == '-'))
 					built += key.KeyChar;
 				else if (key.Key == ConsoleKey.Backspace)
 					built = built.Remove(built.Length - 1, 1);
@@ -117,7 +117,7 @@ namespace CowSpeak{
 				Thread.Sleep(50);
 
 				key = Console.ReadKey();
-				if ((key.KeyChar >= '0' && key.KeyChar <= '9') || (built.IndexOf(".") == -1 && key.KeyChar == '.'))
+				if ((key.KeyChar >= '0' && key.KeyChar <= '9') || (built.IndexOf(".") == -1 && key.KeyChar == '.') || (built.IndexOf("-") == -1 && key.KeyChar == '-'))
 					built += key.KeyChar;
 				else if (key.Key == ConsoleKey.Backspace)
 					built = built.Remove(built.Length - 1, 1);

@@ -53,8 +53,6 @@ namespace CowSpeak{
 				return new Token(TokenType.WhileConditional, token);
 			else if (token.IndexOf("loop(") == 0 && token[token.Length - 1] == '{' && token[token.Length - 2] == ')')
 				return new Token(TokenType.LoopConditional, token);
-			else if (token == "(" || token == ")")
-				return new Token(TokenType.ParenthesesOperator, token);
 			else if (token == "-")
 				return new Token(TokenType.SubtractOperator, token);
 			else if (Utils.IsDigitsOnly(token))
