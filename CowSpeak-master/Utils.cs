@@ -71,7 +71,7 @@ namespace CowSpeak{
 				string s = expr.Substring(i, 1);
 				char chr = s.ToCharArray()[0];
 
-				if (!char.IsDigit(chr) && chr != '.' && value != "")
+				if (!char.IsDigit(chr) && chr != '.' && chr != ((char)26) && value != "")
 				{
 					stack.Push(value);
 					value = "";
@@ -111,8 +111,11 @@ namespace CowSpeak{
 				else if (s.Equals(")"))
 				{
 				}
-				else if (char.IsDigit(chr) || chr == '.')
+				else if (char.IsDigit(chr) || chr == '.' || chr == ((char)26))
 				{
+					if (chr == ((char)26))
+						s = "-";
+
 					value += s;
 
 					if (value.Split('.').Length > 2)

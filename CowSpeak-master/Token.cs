@@ -155,6 +155,8 @@ namespace CowSpeak{
 					identifier = "";
 				else if (toEval[i].type == TokenType.FunctionCall)
 					identifier = CowSpeak.findFunction(identifier).Execute(identifier).Get().ToString(); // replace function call with it's return value
+				else if (toEval[i].type == TokenType.Number)
+					identifier = identifier.Replace("-", ((char)26).ToString()); // replace negative sign with substitute to work well with Utils.Evaluate
 
 				Evaluated += identifier;
 			}
@@ -170,7 +172,7 @@ namespace CowSpeak{
 					evaluatedValue.vType = VarType.Integer; // decimal not found, we can convert to int
 			}
 			catch{
-				CowSpeak.FATAL_ERROR("Could not evaluate expression '" + Evaluated + "'");
+				CowSpeak.FATAL_ERROR("Could not evaluate expression '" + Evaluated.Replace(((char)26).ToString(), "-") + "'");
 			}
 
 			return evaluatedValue;
