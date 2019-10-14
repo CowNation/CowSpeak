@@ -57,13 +57,13 @@ namespace CowSpeak{
 					Token answer = new Token(TokenType.Number, "");
 					if (_operator.type == TokenType.AddOperator)
 						answer.identifier = (_left + _right).ToString();
-					if (_operator.type == TokenType.SubtractOperator)
+					else if (_operator.type == TokenType.SubtractOperator)
 						answer.identifier = (_left - _right).ToString();
-					if (_operator.type == TokenType.MultiplyOperator)
+					else if (_operator.type == TokenType.MultiplyOperator)
 						answer.identifier = (_left * _right).ToString();
-					if (_operator.type == TokenType.DivideOperator)
+					else if (_operator.type == TokenType.DivideOperator)
 						answer.identifier = (_left / _right).ToString();
-					if (_operator.type == TokenType.ModOperator)
+					else if (_operator.type == TokenType.ModOperator)
 						answer.identifier = (_left % _right).ToString();
 					
 					Tokens.RemoveAt(index);

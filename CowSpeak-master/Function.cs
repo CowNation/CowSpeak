@@ -21,20 +21,33 @@ namespace CowSpeak{
 				return new Any[0]; // no parameters
 
 			List< Any > parameters = new List< Any >();
-			s_parameters = s_parameters.Substring(1, s_parameters.Length - 2); // remove parenthesis
+			s_parameters = s_parameters.Substring(1, s_parameters.Length - 2); // remove parentheses
 			
 			for (int i = 0; i < s_parameters.Length; i++){
-				if (s_parameters[i] == ',' && Utils.isBetween(s_parameters, i, '(', ')')){
+				if ((s_parameters[i] == ',' && (Utils.isBetween(s_parameters, i, '(', ')') || Utils.isBetween(s_parameters, i, '\"', '\"')))){
 					StringBuilder fileLine = new StringBuilder(s_parameters);
-					fileLine[i] = (char)0x1D;
+					fileLine[i] = (char)0x1a;
 					s_parameters = fileLine.ToString(); 
 				}
-			} // prevent splitting of commas in nested functions
+			} // prevent splitting of commas in nested functions & strings
 
 			string[] splitParams = s_parameters.Split(","); // split by each comma (each item is a parameter)
-			s_parameters = s_parameters.Replace(((char)0x1D).ToString(), ","); // splitting has been done so we can revert placeholders back
+
+			for (int i = 0; i < splitParams.Length; i++){
+				splitParams[i] = splitParams[i].Replace(((char)0x1a).ToString(), ",");
+
+				if (splitParams[i][0] == ',')
+					splitParams[i] = splitParams[i].Substring(1, splitParams[i].Length - 1);
+			} // splitting has been done so we can revert placeholders back
+
 			foreach (string parameter in splitParams){
-				string cleanedUp = parameter.Replace("\"", "").Replace("\'", "").Replace(((char)0x1f).ToString(), " ").Replace(((char)0x1E).ToString(), ","); // remove quotes/apostrophes & remove string space placeholders
+				string cleanedUp = "";
+				if (parameter != "\"\"" && (parameter[0] == '\"' || parameter[0] == '\'') && (parameter[parameter.Length - 1] == '\"' || parameter[parameter.Length - 1] == '\''))
+					cleanedUp = parameter.Substring(1, parameter.Length - 2);
+				else
+					cleanedUp = parameter;
+
+				cleanedUp = cleanedUp.Replace(((char)0x1f).ToString(), " ").Replace(((char)0x1E).ToString(), ","); // remove quotes/apostrophes & remove string space placeholders
 				Token token = null;
 
 				if (parameter.Split('\"').Length - 1 <= 2){

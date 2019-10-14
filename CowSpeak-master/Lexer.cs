@@ -82,19 +82,10 @@ namespace CowSpeak{
 			if (string.IsNullOrWhiteSpace(line))
 				return new List< Token >(); // don't parse empty line
 
-			bool betweenQuotes = false;
-			bool betweenParenthesis = false;
 			for (int i = 0; i < line.Length; i++){
-				if (line[i] == '\"')
-					betweenQuotes = !betweenQuotes;
-				else if (line[i] == '(')
-					betweenParenthesis = true;
-				else if (line[i] == ')')
-					betweenParenthesis = false;
-
-				if (betweenQuotes && line[i] == ' ')
+				if (Utils.isBetween(line, i, '\"', '\"') && line[i] == ' ')
 					line = line.Remove(i, 1).Insert(i, ((char)0x1f).ToString());
-				else if (betweenParenthesis && line[i] == ' ')
+				if (Utils.isBetween(line, i, '(', ')') && line[i] == ' ')
 					line = line.Remove(i, 1).Insert(i, ((char)0x1D).ToString());
 			}
 

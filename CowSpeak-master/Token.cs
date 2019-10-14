@@ -142,9 +142,8 @@ namespace CowSpeak{
 
 					if (additors.Count == 1)
 						result.Set(additors[0]);
-					else{
+					else
 						result.Set(Utils.AddStrings(additors));
-					}
 
 					return result;
 				}
