@@ -66,7 +66,7 @@ namespace CowSpeak{
 			else if (token == "^")
 				return new Token(TokenType.PowerOperator, token);
 			else if (token == "%")
-				return new Token(TokenType.ModOperator, token);
+				return new Token(TokenType.ModuloOperator, token);
 			else if (token == "=")
 				return new Token(TokenType.EqualOperator, token);
 			else if (Utils.IsLettersOnly(token))
@@ -82,12 +82,8 @@ namespace CowSpeak{
 			if (string.IsNullOrWhiteSpace(line))
 				return new List< Token >(); // don't parse empty line
 
-			for (int i = 0; i < line.Length; i++){
-				if (Utils.isBetween(line, i, '\"', '\"') && line[i] == ' ')
-					line = line.Remove(i, 1).Insert(i, ((char)0x1f).ToString());
-				if (Utils.isBetween(line, i, '(', ')') && line[i] == ' ')
-					line = line.Remove(i, 1).Insert(i, ((char)0x1D).ToString());
-			}
+			line = Utils.substituteBetween(line, ' ', '\"', '\"', (char)0x1f);
+			line = Utils.substituteBetween(line, ' ', '(', ')', (char)0x1D);
 
 			List< string > splitLine = line.Split(' ').ToList();
 			List< Token > ret = new List< Token >();
@@ -141,7 +137,7 @@ namespace CowSpeak{
 
 				if (Lines[Lines.Count - 1].tokens.Count > 0 && Lines[Lines.Count - 1].tokens[0].type == TokenType.FunctionCall && Lines[Lines.Count - 1].tokens[0].identifier.IndexOf("define(") == 0){
 					CowSpeak.findFunction("define(").Execute(Lines[Lines.Count - 1].tokens[0].identifier);
-					Lines[Lines.Count - 1] = new TokenLine(new List<Token>()); // line was already handled, clear
+					Lines[Lines.Count - 1] = new TokenLine(new List<Token>()); // line was already handled, clear line
 				} // must handle this function before the other lines are compiled to avoid errors
 			}
 

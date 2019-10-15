@@ -3,6 +3,7 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Linq;
 
 namespace CowSpeak{
 	public class Function {
@@ -23,13 +24,7 @@ namespace CowSpeak{
 			List< Any > parameters = new List< Any >();
 			s_parameters = s_parameters.Substring(1, s_parameters.Length - 2); // remove parentheses
 			
-			for (int i = 0; i < s_parameters.Length; i++){
-				if ((s_parameters[i] == ',' && (Utils.isBetween(s_parameters, i, '(', ')') || Utils.isBetween(s_parameters, i, '\"', '\"')))){
-					StringBuilder fileLine = new StringBuilder(s_parameters);
-					fileLine[i] = (char)0x1a;
-					s_parameters = fileLine.ToString(); 
-				}
-			} // prevent splitting of commas in nested functions & strings
+			s_parameters = Utils.substituteBetween(s_parameters, ',', '(', ')', (char)0x1a); // prevent splitting of commas in nested functions & strings
 
 			string[] splitParams = s_parameters.Split(","); // split by each comma (each item is a parameter)
 
@@ -38,6 +33,10 @@ namespace CowSpeak{
 
 				if (splitParams[i][0] == ',')
 					splitParams[i] = splitParams[i].Substring(1, splitParams[i].Length - 1);
+
+				while (splitParams[i].Length >= 1 && splitParams[i][0] == (char)0x1D){
+					splitParams[i] = splitParams[i].Remove(0, 1);
+				} // remove invisible space placeholders so we can find matching func and vars
 			} // splitting has been done so we can revert placeholders back
 
 			foreach (string parameter in splitParams){
@@ -50,9 +49,8 @@ namespace CowSpeak{
 				cleanedUp = cleanedUp.Replace(((char)0x1f).ToString(), " ").Replace(((char)0x1E).ToString(), ","); // remove quotes/apostrophes & remove string space placeholders
 				Token token = null;
 
-				if (parameter.Split('\"').Length - 1 <= 2){
-					token = Lexer.ParseToken(parameter, false);
-				} // a flaw in the parsing function for strings would take a string chain as 1 string (this is a janky workaround)
+				if (parameter.Split('\"').Length - 1 <= 2)
+					token = Lexer.ParseToken(parameter, false); // a flaw in the parsing function for strings would take a string chain if it starts and ends with a string as 1 string (this is a janky workaround)
 
 				VarType vtype = null;
 

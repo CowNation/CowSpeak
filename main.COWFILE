@@ -1,7 +1,6 @@
-run("start.COWFILE") # start countdown
+#run("start.COWFILE") # start countdown
 
-define("int ", "integer ") # replace all occurences of "int " with "integer "
-
+define("int ", "integer ")
 int correctGuess = randomInteger(1, 100) # unknown type error is not thrown because "int " is replaced with "integer " before compilation because of the previous definition
 integer guess = -1
 boolean firstTime = True

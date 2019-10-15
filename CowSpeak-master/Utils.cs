@@ -37,6 +37,9 @@ namespace CowSpeak{
 		}
 
 		public static bool isBetween(string str, int index, char start, char end) {
+			if (index == 0 || index == str.Length - 1)
+				return false;
+
 			bool between = false;
 			int i = 0;
 			foreach (char letter in str){
@@ -52,6 +55,27 @@ namespace CowSpeak{
 			}
 			return between;
 		}
+
+		public static string substituteBetween(string str, char toSub, char start, char end, char substitution = (char)0x1a){
+			bool between = false;
+			int i = 0;
+			string _str = str;
+			foreach (char letter in str){
+				if (letter == start && between == false)
+					between = true;
+				else if (letter == end)
+					between = false;
+
+				if (letter == toSub && between){
+					StringBuilder fileLine = new StringBuilder(_str);
+					fileLine[i] = substitution;
+					_str = fileLine.ToString(); 
+				}
+
+				i++;
+			}
+			return _str;
+		} // so you don't have to do it very inefficently with isBetween on each char
 
 		public static string AddStrings(List< string > toAdd){
 			// example input is "hello ", "world", "!"

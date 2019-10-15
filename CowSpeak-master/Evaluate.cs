@@ -10,7 +10,7 @@ namespace CowSpeak{
 			while (true){
 				Token token = Tokens[index];
 
-				if ((token.type == TokenType.MultiplyOperator || token.type == TokenType.DivideOperator || token.type == TokenType.ModOperator) && Utils.isIndexValid(index - 1, Tokens) && Utils.isIndexValid(index + 1, Tokens)){
+				if ((token.type == TokenType.MultiplyOperator || token.type == TokenType.DivideOperator || token.type == TokenType.ModuloOperator) && Utils.isIndexValid(index - 1, Tokens) && Utils.isIndexValid(index + 1, Tokens)){
 					Token _operator = Tokens[index];
 					double _left = Convert.ToDouble(Tokens[index - 1].identifier);
 					double _right = Convert.ToDouble(Tokens[index + 1].identifier);
@@ -20,7 +20,7 @@ namespace CowSpeak{
 						answer.identifier = (_left * _right).ToString();
 					else if (_operator.type == TokenType.DivideOperator)
 						answer.identifier = (_left / _right).ToString();
-					else if (_operator.type == TokenType.ModOperator)
+					else if (_operator.type == TokenType.ModuloOperator)
 						answer.identifier = (_left % _right).ToString();
 
 					Tokens.RemoveAt(index + 1);
@@ -63,7 +63,7 @@ namespace CowSpeak{
 						answer.identifier = (_left * _right).ToString();
 					else if (_operator.type == TokenType.DivideOperator)
 						answer.identifier = (_left / _right).ToString();
-					else if (_operator.type == TokenType.ModOperator)
+					else if (_operator.type == TokenType.ModuloOperator)
 						answer.identifier = (_left % _right).ToString();
 					
 					Tokens.RemoveAt(index);

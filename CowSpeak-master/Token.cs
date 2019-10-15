@@ -9,7 +9,7 @@ namespace CowSpeak{
 		MultiplyOperator, //4
 		DivideOperator, //5
 		PowerOperator, //6
-		ModOperator, //7
+		ModuloOperator, //7
 		EqualOperator, //8
 		VariableIdentifier, //9
 		TypeIdentifier,
@@ -18,6 +18,7 @@ namespace CowSpeak{
 		IfConditional,
 		WhileConditional,
 		LoopConditional,
+		CommentIdentifier,
 		EndBracket
 	};
 
