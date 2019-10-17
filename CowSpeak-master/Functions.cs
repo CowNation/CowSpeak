@@ -16,6 +16,23 @@ namespace CowSpeak{
 			return new Any(VarType.Integer, 0);
 		}
 
+		private static RestrictedScope rs = null;
+		public static Any startRestrictedScope(params Any[] parameters){
+			if (rs != null)
+				CowSpeak.FATAL_ERROR("RestrictedScope is already active. End it first before starting it again by using endRestrictedScope()");
+
+			rs = new RestrictedScope();
+			return new Any(VarType.Integer, 0);
+		}
+		public static Any endRestrictedScope(params Any[] parameters){
+			if (rs == null)
+				CowSpeak.FATAL_ERROR("RestrictedScope is not started, activate start it first with startRestrictedScope()");
+
+			rs.End();
+			rs = null;
+			return new Any(VarType.Integer, 0);
+		}
+
 		public static Any define(params Any[] parameters) {
 			CowSpeak.Definitions.Add(new string[]{parameters[0].Get().ToString(), parameters[1].Get().ToString()});
 			return new Any(VarType.Integer, 0);

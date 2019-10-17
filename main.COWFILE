@@ -1,7 +1,21 @@
-#run("start.COWFILE") # start countdown
+startRestrictedScope()
+run("start.COWFILE") # start countdown
+endRestrictedScope()
 
+# if you are too lazy to write the funcs out
+define("!=", "isNotEqual")
+define("==", "isEqual")
+define(">", "isGreaterThan")
+define("<", "isLessThan")
+
+# if you prefer C++ names instead
 define("int ", "integer ")
-int correctGuess = randomInteger(1, 100) # unknown type error is not thrown because "int " is replaced with "integer " before compilation because of the previous definition
+define("float ", "decimal ")
+define("bool ", "boolean ")
+define("true", "True")
+define("false", "False")
+
+integer correctGuess = randomInteger(1, 100)
 integer guess = -1
 boolean firstTime = True
 

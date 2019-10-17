@@ -107,7 +107,11 @@ namespace CowSpeak{
 			for (int i = 0; i < fileLines.Count; i++) {
 				CowSpeak.currentLine = i + 1 + currentLineOffset;
 
-				fileLines[i] = fileLines[i].Replace(@"\n", Environment.NewLine).Replace("True", "1").Replace("False", "0").Replace("	", ""); // \n is not interpreted as a newline in strings & support for setting booleans using true and false
+				fileLines[i] = fileLines[i].Replace(@"\n", Environment.NewLine).Replace("True", "1").Replace("False", "0"); // \n is not interpreted as a newline in strings & support for setting booleans using true and false
+
+				while (fileLines[i].IndexOf("	") == 0 || fileLines[i].IndexOf(" ") == 0){
+					fileLines[i] = fileLines[i].Remove(0, 1);
+				}
 
 				foreach (string[] Definition in CowSpeak.Definitions){
 					fileLines[i] = fileLines[i].Replace(Definition[0], Definition[1]);

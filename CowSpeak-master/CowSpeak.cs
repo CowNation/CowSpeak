@@ -16,6 +16,8 @@ namespace CowSpeak{
 			new Function("randomInteger", Functions.randomInteger, VarType.Integer, "randomInteger(integer minimum, integer maximum) - Returns a random integer with a minimum of 'minimum' and a maximum of 'maximum'", 2),
 			new Function("sleep", Functions.sleep, VarType.Void, "sleep(integer milliseconds) - Program waits for 'milliseconds' milliseconds", 1),
 			new Function("define", Functions.define, VarType.Void, "define(string from, string to) - Replaces all occurences of 'from' with 'to' in the code", 2),
+			new Function("startRestrictedScope", Functions.startRestrictedScope, VarType.Void, "startRestrictedScope() - Starts a RestrictedScope", 0),
+			new Function("endRestrictedScope", Functions.endRestrictedScope, VarType.Void, "endRestrictedScope() - Starts a RestrictedScope (Any variables or definitions created in this scope will be deleted)", 0),
 
 			// Comparison Functions
 			new Function("isEqual", Functions.isEqual, VarType.Boolean, "isEqual(left, right) - Returns whether left and right are equal", 2),

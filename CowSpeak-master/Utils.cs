@@ -67,9 +67,14 @@ namespace CowSpeak{
 					between = false;
 
 				if (letter == toSub && between){
-					StringBuilder fileLine = new StringBuilder(_str);
-					fileLine[i] = substitution;
-					_str = fileLine.ToString(); 
+					if (substitution == (char)0x0){
+						_str = _str.Remove(i, 1);
+					}
+					else{
+						StringBuilder fileLine = new StringBuilder(_str);
+						fileLine[i] = substitution;
+						_str = fileLine.ToString(); 
+					}
 				}
 
 				i++;

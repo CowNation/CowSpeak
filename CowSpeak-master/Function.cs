@@ -24,7 +24,7 @@ namespace CowSpeak{
 			List< Any > parameters = new List< Any >();
 			s_parameters = s_parameters.Substring(1, s_parameters.Length - 2); // remove parentheses
 			
-			s_parameters = Utils.substituteBetween(s_parameters, ',', '(', ')', (char)0x1a); // prevent splitting of commas in nested functions & strings
+			s_parameters = Utils.substituteBetween(s_parameters, ',', '(', ')', (char)0x1a).Replace(((char)0x1D).ToString(), " "); // prevent splitting of commas in nested functions & strings
 
 			string[] splitParams = s_parameters.Split(","); // split by each comma (each item is a parameter)
 
@@ -33,10 +33,6 @@ namespace CowSpeak{
 
 				if (splitParams[i][0] == ',')
 					splitParams[i] = splitParams[i].Substring(1, splitParams[i].Length - 1);
-
-				while (splitParams[i].Length >= 1 && splitParams[i][0] == (char)0x1D){
-					splitParams[i] = splitParams[i].Remove(0, 1);
-				} // remove invisible space placeholders so we can find matching func and vars
 			} // splitting has been done so we can revert placeholders back
 
 			foreach (string parameter in splitParams){
@@ -55,7 +51,7 @@ namespace CowSpeak{
 				VarType vtype = null;
 
 				if (token == null){
-					TokenLine tl = new TokenLine(Lexer.ParseLine(parameter.Replace(((char)0x1D).ToString(), " ")));
+					TokenLine tl = new TokenLine(Lexer.ParseLine(parameter));
 					parameters.Add(tl.Exec());
 					continue;
 				} // unknown identifier, could be an equation waiting to be solved

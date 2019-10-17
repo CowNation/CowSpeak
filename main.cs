@@ -4,7 +4,7 @@ using CowSpeak;
 using System.Diagnostics;
 
 class MainClass {
-	public static void Main (string[] args) {
+	public static void Main(string[] args) {
 		CowSpeak.CowSpeak.Exec("main.COWFILE", false);
 	}
 }

@@ -30,10 +30,13 @@ namespace CowSpeak{
 
 	public class RestrictedScope {
 		public RestrictedScope(){
-			oldVars = new List< Variable >(CowSpeak.Vars); // get a copy so it's not a reference
+			// get a copy so it's not a reference
+			oldVars = new List< Variable >(CowSpeak.Vars);
+			oldDefs = new List< string[] >(CowSpeak.Definitions);
 		} // any vars created in this scope will be destroyed at the end of the scope
 
 		private List< Variable > oldVars = null;
+		private List< string[] > oldDefs = null;
 
 		public void End(){
 			for (int i = 0; i < CowSpeak.Vars.Count; i++){
@@ -44,10 +47,21 @@ namespace CowSpeak{
 						break;
 					}
 				}
-				if (!matchFound){
-					CowSpeak.Vars.RemoveAt(i); // was created in restricted scope because it does not exist before the restricted scope began
-				}
+				if (!matchFound)
+					CowSpeak.Vars.RemoveAt(i); // was created in restricted scope because it didn't exist before the restricted scope began
 			}
-		} // destroy any new vars during the restricted scope
+
+			for (int i = 0; i < CowSpeak.Definitions.Count; i++){
+				bool matchFound = false;
+				foreach (string[] oldDef in oldDefs){
+					if (oldDef == CowSpeak.Definitions[i]){
+						matchFound = true;
+						break;
+					}
+				}
+				if (!matchFound)
+					CowSpeak.Vars.RemoveAt(i); // was created in restricted scope because it didn't exist before the restricted scope began
+			}
+		} // destroy any new vars & definitions created during the restricted scope
 	}
 }

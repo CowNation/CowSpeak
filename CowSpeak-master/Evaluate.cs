@@ -6,6 +6,33 @@ namespace CowSpeak{
 		public static double EvaluateTokens(List< Token > Tokens){
 			int index = 0;
 
+			// Order of operations: solve exponents first
+			while (true){
+				Token token = Tokens[index];
+
+				if (token.type == TokenType.PowerOperator && Utils.isIndexValid(index - 1, Tokens) && Utils.isIndexValid(index + 1, Tokens)){
+					Token _operator = Tokens[index];
+					double _left = Convert.ToDouble(Tokens[index - 1].identifier);
+					double _right = Convert.ToDouble(Tokens[index + 1].identifier);
+
+					Token answer = new Token(TokenType.Number, "");
+					answer.identifier = Math.Pow(_left, _right).ToString();
+
+					Tokens.RemoveAt(index + 1);
+					Tokens.RemoveAt(index);
+					Tokens.RemoveAt(index - 1);
+					Tokens.Insert(index - 1, answer);
+
+					index = 0;			
+				}
+
+				if (Utils.isIndexValid(index + 1, Tokens))
+					index++;
+				else
+					break;	
+			} // can't do a traditional for loop because we are modifing the collection
+			index = 0;
+
 			// Order of operations: solve Multiply, Divide, and Modulus first
 			while (true){
 				Token token = Tokens[index];
@@ -18,8 +45,11 @@ namespace CowSpeak{
 					Token answer = new Token(TokenType.Number, "");
 					if (_operator.type == TokenType.MultiplyOperator)
 						answer.identifier = (_left * _right).ToString();
-					else if (_operator.type == TokenType.DivideOperator)
+					else if (_operator.type == TokenType.DivideOperator){
+						if (_right == 0)
+							CowSpeak.FATAL_ERROR("Cannot divide by 0");
 						answer.identifier = (_left / _right).ToString();
+					}
 					else if (_operator.type == TokenType.ModuloOperator)
 						answer.identifier = (_left % _right).ToString();
 
@@ -38,10 +68,6 @@ namespace CowSpeak{
 			} // can't do a traditional for loop because we are modifing the collection
 			index = 0;
 
-			/*foreach (Token token in Tokens){
-				Console.WriteLine(token.type.ToString() + " - " + token.identifier);
-			}*/
-
 			while (Tokens.Count > 1){
 				Token token = Tokens[index];
 
@@ -59,13 +85,9 @@ namespace CowSpeak{
 						answer.identifier = (_left + _right).ToString();
 					else if (_operator.type == TokenType.SubtractOperator)
 						answer.identifier = (_left - _right).ToString();
-					else if (_operator.type == TokenType.MultiplyOperator)
-						answer.identifier = (_left * _right).ToString();
-					else if (_operator.type == TokenType.DivideOperator)
-						answer.identifier = (_left / _right).ToString();
-					else if (_operator.type == TokenType.ModuloOperator)
-						answer.identifier = (_left % _right).ToString();
-					
+					else
+						CowSpeak.FATAL_ERROR("Cannot evaluate unknown token: " + answer.type.ToString());
+
 					Tokens.RemoveAt(index);
 					Tokens.RemoveAt(index - 1);
 					Tokens.RemoveAt(index - 2);
