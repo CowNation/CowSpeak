@@ -4,6 +4,7 @@ A pointless programming language programmed in C#
 This program uses csharp-CowConfig. To see the GH repo of CowConfig go to https://github.com/CowNation/csharp-CowConfig
 ## Previous Versions
 [v1 (Initial release on May 17, 2019)](https://github.com/CowNation/CowSpeak/tree/295d57e0a54622b5fc0483c6d1f163408d728aaf)
+
 [v2 (Recode of line evaluations on September 5, 2019)](https://github.com/CowNation/CowSpeak/tree/75c0002235ae917f6d7070cbc35dbfa2c4bb56a8)
 
 [v3 (Recoded in C# on September 25, 2019)](https://github.com/CowNation/CowSpeak/tree/dc7ad0acd7648f64796d9b953425475d3b484e84)
