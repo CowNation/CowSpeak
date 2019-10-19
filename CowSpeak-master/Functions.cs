@@ -104,10 +104,6 @@ namespace CowSpeak{
 			return new Any(VarType.String, Console.ReadLine());	
 		}
 
-		public static Any geta(params Any[] parameters){
-			return new Any(VarType.Integer, 150);
-		}
-
 		public static Any inputInt(params Any[] parameters){
 			string built = "";
 			ConsoleKeyInfo key = new ConsoleKeyInfo();
@@ -125,6 +121,10 @@ namespace CowSpeak{
 			int _out = -1;
 			Int32.TryParse(built, out _out);
 			return new Any(VarType.Integer, _out);
+		}
+
+		public static Any inputCharacter(params Any[] parameters){
+			return new Any(VarType.Character, Console.ReadKey().KeyChar);
 		}
 
 		public static Any inputDecimal(params Any[] parameters){

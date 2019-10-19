@@ -1,0 +1,14 @@
+print("Enter the number of stairs: ")
+integer steps = inputInteger()
+
+print("Enter the symbol: ")
+character symbol = inputCharacter()
+
+print("\n")
+
+loop("step", steps){
+	loop("symbolNum", step + 1){
+		print("" + symbol + " ")
+	}
+	print("\n")
+}

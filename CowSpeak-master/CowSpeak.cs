@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System;
+using System.IO;
 
 namespace CowSpeak{
 	public class CowSpeak{
@@ -9,6 +10,7 @@ namespace CowSpeak{
 			new Function("clrConsole", Functions.clrConsole, VarType.Void, "clrConsole() - Clears all text from the console"),
 			new Function("clearMem", Functions.clearMem, VarType.Void, "clearMem() - Deletes all variables from memory"),
 			new Function("inputString", Functions.inputString, VarType.String, "inputString() - Allows the user to input a string"),
+			new Function("inputCharacter", Functions.inputCharacter, VarType.Character, "inputString() - Allows the user to input a string"),
 			new Function("inputInteger", Functions.inputInt, VarType.Integer, "inputInteger() - Allows the user to input a int"),
 			new Function("inputDecimal", Functions.inputDecimal, VarType.Decimal, "inputDecimal() - Allows the user to input a decimal"),
 			new Function("print", Functions.print, VarType.Void, "print(string text) - Prints 'text' to the console", 1),
@@ -72,9 +74,18 @@ namespace CowSpeak{
 			return getVariable(varName, false) != null;
 		}
 
+		static public void Run(string fileName, bool ishouldDebug = false){
+			Functions.startRestrictedScope();
+			Exec(fileName, ishouldDebug);
+			Functions.endRestrictedScope();
+		}
+
 		static public void Exec(string fileName, bool ishouldDebug = false){
 			currentFile = fileName;
 			shouldDebug = ishouldDebug;
+
+			if (!File.Exists(fileName))
+				FATAL_ERROR("Cannot execute file '" + fileName + "', it does not exist");
 
 			new Lexer(new CowConfig.readConfig(fileName).GetLines(), shouldDebug);
 		}

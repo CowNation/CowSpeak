@@ -1,0 +1,25 @@
+integer correctGuess = randomInteger(1, 100)
+integer guess = -1
+boolean firstTime = True
+
+while(isNotEqual(correctGuess, guess)){
+	if(isEqual(firstTime, False)){
+		print("Wrong Answer - ")
+
+		if(isLessThan(guess, correctGuess)){
+			print("Too Low!!")
+		}
+
+		if(isGreaterThan(guess, correctGuess)){
+			print("Too High!!")
+		}
+
+		print("\n")
+	}
+	
+	print("Input Your Guess: ")
+	guess = inputInteger()
+	firstTime = False # it's not the first time through the loop
+}
+
+print("Correct Answer!!")
