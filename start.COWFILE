@@ -1,8 +1,0 @@
-print("Game starting in..\n")
-integer startTime = 3
-
-loop("index", startTime){
-	integer ct = startTime - index
-	print("" + ct + "\n")
-	sleep(1000)
-}
