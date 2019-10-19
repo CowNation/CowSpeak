@@ -8,7 +8,7 @@ print("\n")
 
 loop("step", steps){
 	loop("symbolNum", step + 1){
-		print("" + symbol + " ")
+		print(symbol + " ")
 	}
 	print("\n")
 }
