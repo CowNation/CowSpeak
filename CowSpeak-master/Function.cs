@@ -51,6 +51,7 @@ namespace CowSpeak{
 				VarType vtype = null;
 
 				if (token == null){
+					//Console.WriteLine("Doing - " + parameter);
 					TokenLine tl = new TokenLine(Lexer.ParseLine(parameter));
 					parameters.Add(tl.Exec());
 					continue;
@@ -61,6 +62,9 @@ namespace CowSpeak{
 					continue;
 				}
 				else if (token.type == TokenType.FunctionCall){
+					while ((int)token.identifier[0] < 'A' || (int)token.identifier[0] > 'z'){
+						token.identifier = token.identifier.Remove(0, 1);
+					}
 					Function func = CowSpeak.findFunction(token.identifier);
 					parameters.Add(new Any(func.type, func.Execute(token.identifier).Get()));
 					continue;
@@ -96,7 +100,7 @@ namespace CowSpeak{
 
 		public Any Execute(string usage) {
 			if (usage.IndexOf("(") == -1 || usage.IndexOf(")") == -1)
-				CowSpeak.FATAL_ERROR("Invalid usage of function: '" + funcName + "'. Proper Usage: " + properUsage);
+				CowSpeak.FATAL_ERROR("Invalid usage of function: '" + usage + "'. Proper Usage: " + properUsage);
 
 			usage = usage.Substring(usage.IndexOf("("));
 			Any[] parameters = parseParameters(usage);

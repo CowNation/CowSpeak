@@ -36,37 +36,25 @@ namespace CowSpeak{
 			return containedLines;
 		}
 
-		public static bool isBetween(string str, int index, char start, char end) {
-			if (index == 0 || index == str.Length - 1)
-				return false;
+		public static bool isBetween(string str, int index, char start, char end){
+			string leftOf = str.Substring(0, index);
+			int starts = leftOf.Split(start).Length - 1;
 
-			bool between = false;
-			int i = 0;
-			foreach (char letter in str){
-				if (letter == start && between == false)
-					between = true;
-				else if (letter == end)
-					between = false;
-
-				if (i == index)
-					return between;
-
-				i++;
+			if (start != end){
+				int lastStart = leftOf.LastIndexOf(start);
+				int lastEnd = leftOf.LastIndexOf(end);
+				int ends = leftOf.Split(end).Length - 1;
+				return lastStart != -1 && (lastStart > lastEnd || starts > ends);
 			}
-			return between;
+			else
+				return starts % 2 != 0;
 		}
 
 		public static string substituteBetween(string str, char toSub, char start, char end, char substitution = (char)0x1a){
-			bool between = false;
 			int i = 0;
 			string _str = str;
 			foreach (char letter in str){
-				if (letter == start && between == false)
-					between = true;
-				else if (letter == end)
-					between = false;
-
-				if (letter == toSub && between){
+				if (letter == toSub && isBetween(str, i, start, end)){
 					if (substitution == (char)0x0){
 						_str = _str.Remove(i, 1);
 					}

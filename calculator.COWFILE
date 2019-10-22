@@ -1,0 +1,11 @@
+print("Enter number left of symbol: ")
+decimal left = inputDecimal()
+
+print("Enter symbol: ")
+character symbol = inputCharacter()
+
+print("\nEnter number right of symbol: ")
+decimal right = inputDecimal()
+
+string expression = "" + left + " " + symbol + " " + right
+print("" + expression + " = " + Evaluate(expression) + "\n")

@@ -38,6 +38,22 @@ namespace CowSpeak{
 			return new Any(VarType.Integer, 0);
 		}
 
+		public static Any _Evaluate(params Any[] parameters) {
+			//Console.WriteLine(parameters[0].Get().ToString() + " | as");
+			Any evaluatedValue = new Any();
+			try{
+				evaluatedValue.vType = VarType.Decimal;
+				evaluatedValue.Set(Evaluate.EvaluateTokens(Lexer.ParseLine(parameters[0].Get().ToString())));
+				if (((double)evaluatedValue.Get()).ToString().IndexOf(".") == -1)
+					evaluatedValue.vType = VarType.Integer; // decimal not found, we can convert to int
+			}
+			catch{
+				CowSpeak.FATAL_ERROR("Could not evaluate expression");
+			}
+
+			return evaluatedValue;
+		}
+
 		private static string toStr(Any toPrep){
 			return toPrep.Get().ToString().Replace("True", "1").Replace("False", "0");
 		}

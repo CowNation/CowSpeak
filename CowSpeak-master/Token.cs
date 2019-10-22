@@ -16,6 +16,7 @@ namespace CowSpeak{
 		String,
 		Character,
 		IfConditional,
+		ElseConditional,
 		WhileConditional,
 		LoopConditional,
 		CommentIdentifier,
@@ -136,7 +137,7 @@ namespace CowSpeak{
 						else if (toEval[index + 1].type == TokenType.String || toEval[index + 1].type == TokenType.Number || toEval[index + 1].type == TokenType.Character)
 							additors.Add(toEval[index + 1].identifier);
 						else if (toEval[index + 1].type == TokenType.FunctionCall)
-							additors.Add(CowSpeak.findFunction(toEval[index + 1].identifier).Execute(identifier).Get().ToString()); // stringable func
+							additors.Add(CowSpeak.findFunction(toEval[index + 1].identifier).Execute(toEval[index + 1].identifier).Get().ToString()); // stringable func
 						else 
 							break;
 					}

@@ -11,7 +11,7 @@ namespace CowSpeak{
 			new Function("clearMem", Functions.clearMem, VarType.Void, "clearMem() - Deletes all variables from memory"),
 			new Function("inputString", Functions.inputString, VarType.String, "inputString() - Allows the user to input a string"),
 			new Function("inputCharacter", Functions.inputCharacter, VarType.Character, "inputString() - Allows the user to input a string"),
-			new Function("inputInteger", Functions.inputInt, VarType.Integer, "inputInteger() - Allows the user to input a int"),
+			new Function("inputInteger", Functions.inputInt, VarType.Integer, "inputInteger() - Allows the user to input a integer"),
 			new Function("inputDecimal", Functions.inputDecimal, VarType.Decimal, "inputDecimal() - Allows the user to input a decimal"),
 			new Function("print", Functions.print, VarType.Void, "print(string text) - Prints 'text' to the console", 1),
 			new Function("run", Functions.run, VarType.Void, "run(string fileName) - Executes a cowfile with the name 'fileName'", 1),
@@ -20,6 +20,7 @@ namespace CowSpeak{
 			new Function("define", Functions.define, VarType.Void, "define(string from, string to) - Replaces all occurences of 'from' with 'to' in the code", 2),
 			new Function("startRestrictedScope", Functions.startRestrictedScope, VarType.Void, "startRestrictedScope() - Starts a RestrictedScope", 0),
 			new Function("endRestrictedScope", Functions.endRestrictedScope, VarType.Void, "endRestrictedScope() - Starts a RestrictedScope (Any variables or definitions created in this scope will be deleted)", 0),
+			new Function("Evaluate", Functions._Evaluate, VarType.Decimal, "Evaluate(string toExec) - Evaluates toExec as an expression and returns the result", 1),
 
 			// Comparison Functions
 			new Function("isEqual", Functions.isEqual, VarType.Boolean, "isEqual(left, right) - Returns whether left and right are equal", 2),
@@ -75,9 +76,9 @@ namespace CowSpeak{
 		}
 
 		static public void Run(string fileName, bool ishouldDebug = false){
-			Functions.startRestrictedScope();
 			Exec(fileName, ishouldDebug);
-			Functions.endRestrictedScope();
+			Vars.Clear();
+			Definitions.Clear();
 		}
 
 		static public void Exec(string fileName, bool ishouldDebug = false){

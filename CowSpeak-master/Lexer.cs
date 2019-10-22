@@ -49,6 +49,8 @@ namespace CowSpeak{
 				return new Token(TokenType.FunctionCall, token);
 			else if (token.IndexOf("if(") == 0 && token[token.Length - 1] == '{' && token[token.Length - 2] == ')')
 				return new Token(TokenType.IfConditional, token);
+			else if (token.IndexOf("else") == 0 && token[token.Length - 1] == '{')
+				return new Token(TokenType.ElseConditional, token);
 			else if (token.IndexOf("while(") == 0 && token[token.Length - 1] == '{' && token[token.Length - 2] == ')')
 				return new Token(TokenType.WhileConditional, token);
 			else if (token.IndexOf("loop(") == 0 && token[token.Length - 1] == '{' && token[token.Length - 2] == ')')
@@ -159,7 +161,37 @@ namespace CowSpeak{
 						scope.End();
 					}
 
-					i = endingBracket + 1; // IfConditional is over, skip to end of brackets to prevent continedLines to be executed again
+					i = endingBracket; // IfConditional is over, skip to end of brackets to prevent continedLines to be executed again
+				}
+				else if (Lines[i].tokens.Count > 0 && Lines[i].tokens[0].type == TokenType.ElseConditional){
+					int parentIf = -1;
+
+					if (i == 0 || (Lines[i - 1].tokens.Count > 0 && Lines[i - 1].tokens[0].type != TokenType.EndBracket))
+						CowSpeak.FATAL_ERROR("ElseConditional isn't immediately preceding an EndBracket");
+
+
+					for (int j = 0; j < i; j++){
+						if (Lines[j].tokens.Count > 0 && Lines[j].tokens[0].type == TokenType.IfConditional && findClosingBracket(j) == i - 1){
+							parentIf = j;
+							break;
+						}
+					}
+
+					if (parentIf == -1)
+						CowSpeak.FATAL_ERROR("ElseConditional isn't immediately preceding an EndBracket");
+
+
+					int endingBracket = findClosingBracket(i);
+
+					if (!new Conditional(Lines[parentIf].tokens[0].identifier).Evaluate()){
+						RestrictedScope scope = new RestrictedScope();
+
+						new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), shouldDebug, i + 1);
+
+						scope.End();
+					}
+
+					i = endingBracket; // ElseConditional is over, skip to end of brackets to prevent continedLines to be executed again
 				}
 				else if (Lines[i].tokens.Count > 0 && Lines[i].tokens[0].type == TokenType.WhileConditional){
 					int endingBracket = findClosingBracket(i);
@@ -174,7 +206,7 @@ namespace CowSpeak{
 						scope.End();
 					}
 
-					i = endingBracket + 1; // while loop is over, skip to end of brackets to prevent continedLines to be executed again
+					i = endingBracket; // while loop is over, skip to end of brackets to prevent continedLines to be executed again
 				}
 				else if (Lines[i].tokens.Count > 0 && Lines[i].tokens[0].type == TokenType.LoopConditional){
 					int endingBracket = findClosingBracket(i);
@@ -207,7 +239,7 @@ namespace CowSpeak{
 						}
 					} // delete the variable after loop is done
 
-					i = endingBracket + 1; // loop is over, skip to end of brackets to prevent continedLines getting executed again
+					i = endingBracket; // loop is over, skip to end of brackets to prevent continedLines getting executed again
 				}
 
 				if (i >= fileLines.Count)
