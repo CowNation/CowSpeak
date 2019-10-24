@@ -1,0 +1,4 @@
+string cs = "CowSpeak is literally the best language in the world!"
+print(cs.SubString(0,8) + "\n")
+character w = cs.CharacterAt(2)
+print(w.ToUpper() + cs.CharacterAt(1) + w + "ie\n")

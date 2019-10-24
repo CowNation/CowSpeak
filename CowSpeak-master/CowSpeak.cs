@@ -37,6 +37,16 @@ namespace CowSpeak{
 					return staticFX[i];
 			}
 
+			if (functionName.IndexOf(".") != -1){
+				functionName = functionName.Substring(functionName.IndexOf(".") + 1);
+				foreach (VarType type in VarType.GetTypes()){
+					for (int i = 0; i < type.methods.Length; i++){
+						if (functionName.IndexOf(type.methods[i].funcName) == 0)
+							return type.methods[i];
+					}
+				}
+			} // if it has a period, it's probably a method
+
 			if (_throw){
 				FATAL_ERROR("Function '" + functionName + "' not found");
 				Functions.exit();
@@ -86,7 +96,18 @@ namespace CowSpeak{
 			shouldDebug = ishouldDebug;
 
 			if (!File.Exists(fileName))
-				FATAL_ERROR("Cannot execute file '" + fileName + "', it does not exist");
+				FATAL_ERROR("Cannot execute file '" + fileName + "', it doesn't exist");
+			else if (fileName.IndexOf(".COWFILE") == -1)
+				FATAL_ERROR("Cannot execute file '" + fileName + "', it doesn't have the .COWFILE file extension");
+
+			// Extremely poor fix for a VarType's method return type cannot return that VarType
+			VarType.String.methods = new Function[2]{
+				new Function("SubString", Functions.SubString, VarType.String, "SubString(integer startIndex, integer length) - Returns a string starting at 'startIndex' with the length 'length'", 2, true),
+				new Function("CharacterAt", Functions.CharacterAt, VarType.Character, "CharacterAt(integer index) - Returns the character at index", 1, true)
+			};
+			VarType.Character.methods = new Function[1]{
+				new Function("ToUpper", Functions.ToUpper, VarType.Character, "ToUpper(character char) - Returns 'char' converted to uppercase", 1, true)
+			};
 
 			new Lexer(new CowConfig.readConfig(fileName).GetLines(), shouldDebug);
 		}

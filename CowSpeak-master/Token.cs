@@ -2,16 +2,16 @@ using System.Collections.Generic;
 
 namespace CowSpeak{
 	public enum TokenType {
-		FunctionCall, //0
-		Number, //1
-		AddOperator, //2
-		SubtractOperator, //3
-		MultiplyOperator, //4
-		DivideOperator, //5
-		PowerOperator, //6
-		ModuloOperator, //7
-		EqualOperator, //8
-		VariableIdentifier, //9
+		FunctionCall,
+		Number,
+		AddOperator,
+		SubtractOperator,
+		MultiplyOperator,
+		DivideOperator,
+		PowerOperator,
+		ModuloOperator,
+		EqualOperator,
+		VariableIdentifier,
 		TypeIdentifier,
 		String,
 		Character,
@@ -158,7 +158,10 @@ namespace CowSpeak{
 					continue;
 				else if (toEval[i].type == TokenType.FunctionCall){
 					type = TokenType.Number;
-					identifier = CowSpeak.findFunction(identifier).Execute(identifier).Get().ToString(); // replace function call with it's return value
+					Function func = CowSpeak.findFunction(identifier);
+					if (toEval.Count == 1)
+						return new Any(func.type, func.Execute(identifier).Get());
+					identifier = func.Execute(identifier).Get().ToString(); // replace function call with it's return value
 				}
 				
 				Evaluated.Add(new Token(type, identifier));

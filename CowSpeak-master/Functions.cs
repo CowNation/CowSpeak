@@ -6,6 +6,23 @@ using System.IO;
 
 namespace CowSpeak{
 	public static class Functions{
+		// STRING METHODS
+		public static Any SubString(params Any[] parameters){
+			string str = parameters[0].Get().ToString();
+			int index = (int)parameters[1].Get();
+			int length = (int)parameters[2].Get();
+
+			return new Any(VarType.String, str.Substring(index, length));
+		}
+		public static Any CharacterAt(params Any[] parameters){
+			return new Any(VarType.Character, parameters[0].Get().ToString()[(int)parameters[1].Get()]);
+		}
+
+		// CHARACTER METHODS
+		public static Any ToUpper(params Any[] parameters){
+			return new Any(VarType.Character, Char.ToUpper(parameters[0].Get().ToString()[0]));
+		}
+
 		public static Any sleep(params Any[] parameters){
 			Thread.Sleep((int)parameters[0].Get());
 			return new Any(VarType.Integer, 0);

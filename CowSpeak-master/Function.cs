@@ -12,6 +12,7 @@ namespace CowSpeak{
 		public VarType type;
 		public int requiredParams;
 		public string properUsage = "";
+		public bool isMethod = false;
 
 		public bool isVoid(){
 			return type == VarType.Void;
@@ -51,7 +52,6 @@ namespace CowSpeak{
 				VarType vtype = null;
 
 				if (token == null){
-					//Console.WriteLine("Doing - " + parameter);
 					TokenLine tl = new TokenLine(Lexer.ParseLine(parameter));
 					parameters.Add(tl.Exec());
 					continue;
@@ -90,32 +90,40 @@ namespace CowSpeak{
 			return parameters.ToArray();
 		}
 
-		public Function(string FunctionName, Func<Any[], Any> FunctionDefinition, VarType type, string properUsage, int requiredParams = 0) {
+		public Function(string FunctionName, Func<Any[], Any> FunctionDefinition, VarType type, string properUsage, int requiredParams = 0, bool isMethod = false) {
 			this.type = type;
 			FuncDef = FunctionDefinition;
 			this.properUsage = properUsage;
 			funcName = FunctionName;
 			this.requiredParams = requiredParams;
+			this.isMethod = isMethod;
 		}
 
 		public Any Execute(string usage) {
+			Variable methodVar = null;
+			if (isMethod)
+				methodVar = CowSpeak.getVariable(usage.Substring(0, usage.IndexOf(".")));
+
 			if (usage.IndexOf("(") == -1 || usage.IndexOf(")") == -1)
 				CowSpeak.FATAL_ERROR("Invalid usage of function: '" + usage + "'. Proper Usage: " + properUsage);
 
-			usage = usage.Substring(usage.IndexOf("("));
-			Any[] parameters = parseParameters(usage);
+			usage = usage.Substring(usage.IndexOf("(")); // reduce it to parentheses and params inside of them
+			List< Any > parameters = parseParameters(usage).ToList();
+			if (isMethod)
+				parameters.Insert(0, new Any(VarType.String, methodVar.Get()));
 
-			if (requiredParams != parameters.Length)
-				CowSpeak.FATAL_ERROR("Invalid number of parameters passed in FunctionCall: '" + funcName + "'. Proper Usage: " + properUsage + " (" + parameters.Length + " given)");
+			if (requiredParams != parameters.Count && (!isMethod || requiredParams != parameters.Count - 1))
+				CowSpeak.FATAL_ERROR("Invalid number of parameters passed in FunctionCall: '" + funcName + "'. Proper Usage: " + properUsage + " (" + parameters.Count + " given)");
 
 			try{
-				return FuncDef(parameters);
+				return FuncDef(parameters.ToArray());
 			}
 			catch (Exception ex) {
 				if (ex.GetType().IsAssignableFrom(typeof(InvalidCastException)))
 					CowSpeak.FATAL_ERROR("Invalid parameter types passed in FunctionCall: '" + funcName + "'. Proper Usage: " + properUsage);
-				else
-					CowSpeak.FATAL_ERROR("There was an unknown error when executing FunctionCall: '" + funcName + "'. Proper Usage: " + properUsage);
+				else{
+					CowSpeak.FATAL_ERROR("There was an unknown error when executing function: '" + funcName + "'. Proper Usage: " + properUsage + ex.Message);
+				}
 
 				return null;
 			}
