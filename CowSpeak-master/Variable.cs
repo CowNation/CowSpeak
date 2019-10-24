@@ -6,18 +6,18 @@ namespace CowSpeak{
 		public Type rep; // C# represtation of type
 		public Function[] methods = new Function[0]{};
 
-		public VarType(string Name, Type rep, Function[] methods){
+		public VarType(string Name, Type rep, Function[] methods = new Function[0]{}){
 			this.Name = Name;
 			this.rep = rep;
 			this.methods = methods;
 		}
-		
-		public static VarType Void = new VarType("void", typeof(void), new Function[0]{});
-		public static VarType Integer = new VarType("integer", typeof(int), new Function[0]{});
-		public static VarType Decimal = new VarType("decimal", typeof(double), new Function[0]{});
-		public static VarType String = new VarType("string", typeof(string), new Function[0]{});
-		public static VarType Boolean = new VarType("boolean", typeof(bool), new Function[0]{});
-		public static VarType Character = new VarType("character", typeof(char), new Function[0]{});
+
+		public static VarType Void = new VarType("void", typeof(void));
+		public static VarType Integer = new VarType("integer", typeof(int));
+		public static VarType Decimal = new VarType("decimal", typeof(double));
+		public static VarType String = new VarType("string", typeof(string));
+		public static VarType Boolean = new VarType("boolean", typeof(bool));
+		public static VarType Character = new VarType("character", typeof(char));
 
 		public static VarType[] GetTypes(){
 			return new VarType[]{Integer, Decimal, String, Character, Boolean};
@@ -54,9 +54,6 @@ namespace CowSpeak{
 		}
 
 		public object Get(){
-			if (vType == null)
-				CowSpeak.FATAL_ERROR("Cannot read object, it's type is null");
-
 			try {
 				return Convert.ChangeType(byteArr.Get(), vType.rep);
 			}
