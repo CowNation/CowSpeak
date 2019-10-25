@@ -6,10 +6,14 @@ namespace CowSpeak{
 		public Type rep; // C# represtation of type
 		public Function[] methods = new Function[0]{};
 
-		public VarType(string Name, Type rep, Function[] methods = new Function[0]{}){
+		public VarType(string Name, Type rep, Function[] methods = null){
 			this.Name = Name;
 			this.rep = rep;
-			this.methods = methods;
+
+			if (methods != null)
+				this.methods = methods;
+			else
+				this.methods = new Function[0]{};
 		}
 
 		public static VarType Void = new VarType("void", typeof(void));

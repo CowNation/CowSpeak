@@ -101,12 +101,18 @@ namespace CowSpeak{
 				FATAL_ERROR("Cannot execute file '" + fileName + "', it doesn't have the .COWFILE file extension");
 
 			// Extremely poor fix for a VarType's method return type cannot return that VarType
-			VarType.String.methods = new Function[2]{
-				new Function("SubString", Functions.SubString, VarType.String, "SubString(integer startIndex, integer length) - Returns a string starting at 'startIndex' with the length 'length'", 2, true),
-				new Function("CharacterAt", Functions.CharacterAt, VarType.Character, "CharacterAt(integer index) - Returns the character at index", 1, true)
+			VarType.String.methods = new Function[7]{
+				new Function("SubString", Functions.SubString, VarType.String, "string.SubString(integer startIndex, integer length) - Retrieves a substring from this instance starting at a specified character position and has a specified length", 2, true),
+				new Function("CharacterAt", Functions.CharacterAt, VarType.Character, "string.CharacterAt(integer index) - Returns a character at 'index'", 1, true),
+				new Function("Length", Functions.Length, VarType.Integer, "string.Length() - Returns the number of characters", 0, true),
+				new Function("Remove", Functions.Remove, VarType.String, "string.Remove(integer startIndex, integer Count) - Returns a new string in which a specified number of characters from the current string are deleted", 2, true),
+				new Function("Insert", Functions.Insert, VarType.String, "string.Insert(integer startIndex, string value) - Returns a new string in which a specified string is inserted at a specified index position in this instance", 2, true),
+				new Function("IndexOf", Functions.IndexOf, VarType.Integer, "string.IndexOf(string value) - Reports the zero-based index of the first occurrence of the specified string in this instance", 1, true),
+				new Function("LastIndexOf", Functions.LastIndexOf, VarType.Integer, "string.LastIndexOf(string value) - Reports the zero-based index of the last occurrence of the specified string in this instance", 1, true)
 			};
-			VarType.Character.methods = new Function[1]{
-				new Function("ToUpper", Functions.ToUpper, VarType.Character, "ToUpper(character char) - Returns 'char' converted to uppercase", 1, true)
+			VarType.Character.methods = new Function[2]{
+				new Function("ToUpper", Functions.ToUpper, VarType.Character, "character.ToUpper() - Converts the value to its uppercase equivalent", 0, true),
+				new Function("ToLower", Functions.ToLower, VarType.Character, "character.ToUpper(character char) - Converts the value to its lowercase equivalent", 0, true)
 			};
 
 			new Lexer(new CowConfig.readConfig(fileName).GetLines(), shouldDebug);

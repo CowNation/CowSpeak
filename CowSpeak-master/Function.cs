@@ -46,8 +46,9 @@ namespace CowSpeak{
 				cleanedUp = cleanedUp.Replace(((char)0x1f).ToString(), " ").Replace(((char)0x1E).ToString(), ","); // remove quotes/apostrophes & remove string space placeholders
 				Token token = null;
 
-				if (parameter.Split('\"').Length - 1 <= 2)
+				if (parameter.Split('\"').Length - 1 <= 2 && parameter.IndexOf(" ") == -1){
 					token = Lexer.ParseToken(parameter, false); // a flaw in the parsing function for strings would take a string chain if it starts and ends with a string as 1 string (this is a janky workaround)
+				}
 
 				VarType vtype = null;
 
@@ -119,10 +120,24 @@ namespace CowSpeak{
 				return FuncDef(parameters.ToArray());
 			}
 			catch (Exception ex) {
-				if (ex.GetType().IsAssignableFrom(typeof(InvalidCastException)))
-					CowSpeak.FATAL_ERROR("Invalid parameter types passed in FunctionCall: '" + funcName + "'. Proper Usage: " + properUsage);
+				if (ex.GetType().IsAssignableFrom(typeof(InvalidCastException))){
+					string givenParams = funcName + "(";
+					int i = 0;
+					foreach (Any _param in parameters){
+						if (i == 0 && isMethod){
+							i++;
+							continue;
+						}
+
+						givenParams += _param.vType.Name + "(" + _param.Get().ToString() + ")" + (i == parameters.Count - 1 ? "" : ",");
+
+						i++;
+					}
+					givenParams += ")";
+					CowSpeak.FATAL_ERROR("Invalid parameter types passed in FunctionCall: '" + funcName + "'. \nProper Usage: \n" + properUsage + "\nGiven Parameter Types: \n" + givenParams);
+				}
 				else{
-					CowSpeak.FATAL_ERROR("There was an unknown error when executing function: '" + funcName + "'. Proper Usage: " + properUsage + ex.Message);
+					CowSpeak.FATAL_ERROR("There was an unknown error when executing function: '" + funcName + "'. \nProper Usage: \n" + properUsage);
 				}
 
 				return null;

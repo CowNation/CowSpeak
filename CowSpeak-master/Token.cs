@@ -171,15 +171,10 @@ namespace CowSpeak{
 				return new Any(VarType.Integer, 0);
 
 			Any evaluatedValue = new Any();
-			try{
-				evaluatedValue.vType = VarType.Decimal;
-				evaluatedValue.Set(Evaluate.EvaluateTokens(Evaluated));
-				if (((double)evaluatedValue.Get()).ToString().IndexOf(".") == -1)
-					evaluatedValue.vType = VarType.Integer; // decimal not found, we can convert to int
-			}
-			catch{
-				CowSpeak.FATAL_ERROR("Could not evaluate expression");
-			}
+			evaluatedValue.vType = VarType.Decimal;
+			evaluatedValue.Set(Evaluate.EvaluateTokens(Evaluated));
+			if (((double)evaluatedValue.Get()).ToString().IndexOf(".") == -1)
+				evaluatedValue.vType = VarType.Integer; // decimal not found, we can convert to int
 
 			return evaluatedValue;
 		}

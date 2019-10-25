@@ -1,4 +1,17 @@
-string cs = "CowSpeak is literally the best language in the world!"
+string cs = "CowSpeak is literally the best language in the world!" # just kidding
 print(cs.SubString(0,8) + "\n")
+
+# make a word out of a string
 character w = cs.CharacterAt(2)
 print(w.ToUpper() + cs.CharacterAt(1) + w + "ie\n")
+
+# split string in two
+integer halfLen = cs.Length() / 2 # cast decimal to integer for use with some string methods
+print("First Half: " + cs.SubString(0, halfLen) + "\n")
+print("Second Half: " + cs.SubString(halfLen, halfLen) + "\n")
+
+# replace "world" with "universe"
+integer worldIndex = cs.IndexOf("world")
+cs = cs.Remove(worldIndex, 5)
+cs = cs.Insert(worldIndex, "universe")
+print(cs + "\n")

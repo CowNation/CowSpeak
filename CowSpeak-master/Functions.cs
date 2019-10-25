@@ -17,10 +17,34 @@ namespace CowSpeak{
 		public static Any CharacterAt(params Any[] parameters){
 			return new Any(VarType.Character, parameters[0].Get().ToString()[(int)parameters[1].Get()]);
 		}
+		public static Any Length(params Any[] parameters){
+			return new Any(VarType.Integer, parameters[0].Get().ToString().Length);
+		}
+		public static Any Remove(params Any[] parameters){
+			int index = (int)parameters[1].Get();
+			int length = (int)parameters[2].Get();
+			return new Any(VarType.String, parameters[0].Get().ToString().Remove(index, length));
+		}
+		public static Any Insert(params Any[] parameters){
+			int index = (int)parameters[1].Get();
+			string toPut = parameters[2].Get().ToString();
+			return new Any(VarType.String, parameters[0].Get().ToString().Insert(index, toPut));
+		}
+		public static Any IndexOf(params Any[] parameters){
+			string toSearchFor = parameters[1].Get().ToString();
+			return new Any(VarType.String, parameters[0].Get().ToString().IndexOf(toSearchFor));
+		}
+		public static Any LastIndexOf(params Any[] parameters){
+			string toSearchFor = parameters[1].Get().ToString();
+			return new Any(VarType.String, parameters[0].Get().ToString().LastIndexOf(toSearchFor));
+		}
 
 		// CHARACTER METHODS
 		public static Any ToUpper(params Any[] parameters){
 			return new Any(VarType.Character, Char.ToUpper(parameters[0].Get().ToString()[0]));
+		}
+		public static Any ToLower(params Any[] parameters){
+			return new Any(VarType.Character, Char.ToLower(parameters[0].Get().ToString()[0]));
 		}
 
 		public static Any sleep(params Any[] parameters){
