@@ -6,66 +6,89 @@ using System.IO;
 
 namespace CowSpeak{
 	public static class Functions{
-		// STRING METHODS
-		public static Any SubString(params Any[] parameters){
+		#region STRING_METHODS
+		[_Function(Syntax.String + ".SubString", Syntax.String, Syntax.String + "SubString(integer startIndex, integer length) - Retrieves a substring from this instance starting at a specified character position and has a specified length", 2, true)]
+		public static Any SubString(Any[] parameters){
 			string str = parameters[0].Get().ToString();
 			int index = (int)parameters[1].Get();
 			int length = (int)parameters[2].Get();
 
 			return new Any(VarType.String, str.Substring(index, length));
 		}
-		public static Any CharacterAt(params Any[] parameters){
+
+		[_Function(Syntax.String + ".CharacterAt", Syntax.Character, Syntax.String + "CharacterAt(integer index) - Returns a character at 'index'", 1, true)]
+		public static Any CharacterAt(Any[] parameters){
 			return new Any(VarType.Character, parameters[0].Get().ToString()[(int)parameters[1].Get()]);
 		}
-		public static Any Length(params Any[] parameters){
+
+		[_Function(Syntax.String + ".Length", Syntax.Integer, Syntax.String + "Length() - Returns the number of characters", 0, true)]
+		public static Any Length(Any[] parameters){
 			return new Any(VarType.Integer, parameters[0].Get().ToString().Length);
 		}
-		public static Any Remove(params Any[] parameters){
+
+		[_Function(Syntax.String + ".Remove", Syntax.String, Syntax.String + "Remove(integer startIndex, integer Count) - Returns a new string in which a specified number of characters from the current string are deleted", 2, true)]
+		public static Any Remove(Any[] parameters){
 			int index = (int)parameters[1].Get();
 			int length = (int)parameters[2].Get();
 			return new Any(VarType.String, parameters[0].Get().ToString().Remove(index, length));
 		}
-		public static Any Insert(params Any[] parameters){
+
+		[_Function(Syntax.String + ".Insert", Syntax.String, Syntax.String + "Insert(integer startIndex, string value) - Returns a new string in which a specified string is inserted at a specified index position in this instance", 2, true)]
+		public static Any Insert(Any[] parameters){
 			int index = (int)parameters[1].Get();
 			string toPut = parameters[2].Get().ToString();
 			return new Any(VarType.String, parameters[0].Get().ToString().Insert(index, toPut));
 		}
-		public static Any IndexOf(params Any[] parameters){
+
+		[_Function(Syntax.String + ".IndexOf", Syntax.Integer, Syntax.String + "IndexOf(string value) - Reports the zero-based index of the first occurrence of the specified string in this instance", 1, true)]
+		public static Any IndexOf(Any[] parameters){
 			string toSearchFor = parameters[1].Get().ToString();
 			return new Any(VarType.String, parameters[0].Get().ToString().IndexOf(toSearchFor));
 		}
-		public static Any LastIndexOf(params Any[] parameters){
+
+		[_Function(Syntax.String + ".LastIndexOf", Syntax.Integer, Syntax.String + "LastIndexOf(string value) - Reports the zero-based index of the last occurrence of the specified string in this instance", 1, true)]
+		public static Any LastIndexOf(Any[] parameters){
 			string toSearchFor = parameters[1].Get().ToString();
 			return new Any(VarType.String, parameters[0].Get().ToString().LastIndexOf(toSearchFor));
 		}
+		#endregion
 
-		// CHARACTER METHODS
-		public static Any ToUpper(params Any[] parameters){
+		#region CHARACTER_METHODS
+		[_Function(Syntax.Character + ".ToUpper", Syntax.Character, "character.ToUpper() - Converts the value to its uppercase equivalent", 0, true)]
+		public static Any ToUpper(Any[] parameters){
 			return new Any(VarType.Character, Char.ToUpper(parameters[0].Get().ToString()[0]));
 		}
-		public static Any ToLower(params Any[] parameters){
+		[_Function(Syntax.Character + ".ToLower", Syntax.Character, "character.ToUpper(character char) - Converts the value to its lowercase equivalent", 0, true)]
+		public static Any ToLower(Any[] parameters){
 			return new Any(VarType.Character, Char.ToLower(parameters[0].Get().ToString()[0]));
 		}
+		#endregion
 
-		public static Any sleep(params Any[] parameters){
+		[_Function("sleep", Syntax.Void, "sleep(integer milliseconds) - Program waits for 'milliseconds' milliseconds", 1)]
+		public static Any sleep(Any[] parameters){
 			Thread.Sleep((int)parameters[0].Get());
 			return new Any(VarType.Integer, 0);
 		}
 
-		public static Any pause(params Any[] parameters) {
+		[_Function("pause", Syntax.Void, "pause() - Pauses the program and waits for a keypress")]
+		public static Any pause(Any[] parameters) {
 			Console.ReadKey();
 			return new Any(VarType.Integer, 0);
 		}
 
 		private static RestrictedScope rs = null;
-		public static Any startRestrictedScope(params Any[] parameters){
+
+		[_Function("startRestrictedScope", Syntax.Void, "startRestrictedScope() - Starts a RestrictedScope", 0)]
+		public static Any startRestrictedScope(Any[] parameters){
 			if (rs != null)
 				CowSpeak.FATAL_ERROR("RestrictedScope is already active. End it first before starting it again by using endRestrictedScope()");
 
 			rs = new RestrictedScope();
 			return new Any(VarType.Integer, 0);
 		}
-		public static Any endRestrictedScope(params Any[] parameters){
+
+		[_Function("endRestrictedScope", Syntax.Void, "endRestrictedScope() - Ends a RestrictedScope (Any variables or definitions created in this scope will be deleted)", 0)]
+		public static Any endRestrictedScope(Any[] parameters){
 			if (rs == null)
 				CowSpeak.FATAL_ERROR("RestrictedScope is not started, activate start it first with startRestrictedScope()");
 
@@ -74,13 +97,14 @@ namespace CowSpeak{
 			return new Any(VarType.Integer, 0);
 		}
 
-		public static Any define(params Any[] parameters) {
+		[_Function("define", Syntax.Void, "define(string from, string to) - Replaces all occurences of 'from' with 'to' in the code", 2)]
+		public static Any define(Any[] parameters) {
 			CowSpeak.Definitions.Add(new string[]{parameters[0].Get().ToString(), parameters[1].Get().ToString()});
 			return new Any(VarType.Integer, 0);
 		}
 
-		public static Any _Evaluate(params Any[] parameters) {
-			//Console.WriteLine(parameters[0].Get().ToString() + " | as");
+		[_Function("Evaluate", Syntax.Decimal, "Evaluate(string toExec) - Evaluates toExec as an expression and returns the result", 1)]
+		public static Any _Evaluate(Any[] parameters) {
 			Any evaluatedValue = new Any();
 			try{
 				evaluatedValue.vType = VarType.Decimal;
@@ -96,27 +120,35 @@ namespace CowSpeak{
 		}
 
 		private static string toStr(Any toPrep){
-			return toPrep.Get().ToString().Replace("True", "1").Replace("False", "0");
+			return toPrep.Get().ToString().Replace(Syntax.True, "1").Replace(Syntax.False, "0");
 		}
 
-		public static Any isEqual(params Any[] parameters){
+		[_Function("isEqual", Syntax.Boolean, "isEqual(left, right) - Returns whether left and right are equal", 2)]
+		public static Any isEqual(Any[] parameters){
 			return new Any(VarType.Boolean, toStr(parameters[0]) == toStr(parameters[1]));
 		}
-		public static Any isNotEqual(params Any[] parameters){
+
+		[_Function("isNotEqual", Syntax.Boolean, "isNotEqual(left, right) - Returns whether left and right are not equal", 2)]
+		public static Any isNotEqual(Any[] parameters){
 			return new Any(VarType.Boolean, toStr(parameters[0]) != toStr(parameters[1]));
 		}
-		public static Any isLessThan(params Any[] parameters){
+
+		[_Function("isLessThan", Syntax.Boolean, "isLessThan(left, right) - Returns whether left is less than right", 2)]
+		public static Any isLessThan(Any[] parameters){
 			string param0 = parameters[0].Get().ToString();
 			string param1 = parameters[1].Get().ToString();
 			return new Any(VarType.Boolean, Convert.ToDouble(param0) < Convert.ToDouble(param1));
 		}
-		public static Any isGreaterThan(params Any[] parameters){
+
+		[_Function("isGreaterThan", Syntax.Boolean, "isGreaterThan(left, right) - Returns whether left is greater than right", 2)]
+		public static Any isGreaterThan(Any[] parameters){
 			string param0 = parameters[0].Get().ToString();
 			string param1 = parameters[1].Get().ToString();
 			return new Any(VarType.Boolean, Convert.ToDouble(param0) > Convert.ToDouble(param1));
 		}
 
-		public static Any randomInteger(params Any[] parameters){
+		[_Function("randomInteger", Syntax.Integer, "randomInteger(integer minimum, integer maximum) - Returns a random integer with a minimum of 'minimum' and a maximum of 'maximum'", 2)]
+		public static Any randomInteger(Any[] parameters){
 			int minimum = (int)parameters[0].Get();
 			int maximum = (int)parameters[1].Get() + 1;
 
@@ -126,12 +158,14 @@ namespace CowSpeak{
 			return new Any(VarType.Integer, Utils.rand.Next(minimum, maximum));
 		}
 
-		public static Any print(params Any[] parameters){
+		[_Function("print", Syntax.Void, "print(string text) - Prints 'text' to the console", 1)]
+		public static Any print(Any[] parameters){
 			Console.Write(parameters[0].Get().ToString());
 			return new Any(VarType.Integer, 0);
 		}
 
-		public static Any run(params Any[] parameters){
+		[_Function("run", Syntax.Void, "run(string fileName) - Executes a cowfile with the name 'fileName'", 1)]
+		public static Any run(Any[] parameters){
 			string currentFile = CowSpeak.currentFile;
 			string fileName = parameters[0].Get().ToString();
 			if (File.Exists(fileName))
@@ -142,26 +176,31 @@ namespace CowSpeak{
 			return new Any(VarType.Integer, 0);
 		}
 
-		public static Any clearMem(params Any[] parameters){
+		[_Function("clearMem", Syntax.Void, "clearMem() - Deletes all variables from memory")]
+		public static Any clearMem(Any[] parameters){
 			CowSpeak.Vars.Clear();
 			return new Any(VarType.Integer, 0);
 		}
 
-		public static Any exit(params Any[] parameters) {
+		[_Function("exit", Syntax.Void, "exit() - Exits the program")]
+		public static Any exit(Any[] parameters) {
 			Environment.Exit(0);
 			return new Any(VarType.Integer, 0);
 		}
 
-		public static Any clrConsole(params Any[] parameters){
+		[_Function("clrConsole", Syntax.Void, "clrConsole() - Clears all text from the console")]
+		public static Any clrConsole(Any[] parameters){
 			Console.Clear();
 			return new Any(VarType.Integer, 0);
 		}
 
-		public static Any inputString(params Any[] parameters){
+		[_Function("inputString", Syntax.String, "inputString() - Allows the user to input a string")]
+		public static Any inputString(Any[] parameters){
 			return new Any(VarType.String, Console.ReadLine());	
 		}
 
-		public static Any inputInt(params Any[] parameters){
+		[_Function("inputInteger", Syntax.Integer, "inputInteger() - Allows the user to input a integer")]
+		public static Any inputInteger(Any[] parameters){
 			string built = "";
 			ConsoleKeyInfo key = new ConsoleKeyInfo();
 			while (key.Key != ConsoleKey.Enter){
@@ -180,11 +219,13 @@ namespace CowSpeak{
 			return new Any(VarType.Integer, _out);
 		}
 
-		public static Any inputCharacter(params Any[] parameters){
+		[_Function("inputCharacter", Syntax.Character, "inputCharacter() - Allows the user to input a character")]
+		public static Any inputCharacter(Any[] parameters){
 			return new Any(VarType.Character, Console.ReadKey().KeyChar);
 		}
 
-		public static Any inputDecimal(params Any[] parameters){
+		[_Function("inputDecimal", Syntax.Decimal, "inputDecimal() - Allows the user to input a decimal")]
+		public static Any inputDecimal(Any[] parameters){
 			string built = "";
 			ConsoleKeyInfo key = new ConsoleKeyInfo();
 			while (key.Key != ConsoleKey.Enter){

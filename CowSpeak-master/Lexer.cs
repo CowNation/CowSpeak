@@ -31,7 +31,7 @@ namespace CowSpeak{
 		}
 
 		public static Token ParseToken(string token, bool _throw = true){
-			token = token.Replace("True", "1").Replace("False", "0");
+			token = token.Replace(Syntax.True, "1").Replace(Syntax.False, "0");
 
 			foreach (VarType type in VarType.GetTypes()){
 				if (type.Name == token){
@@ -47,29 +47,29 @@ namespace CowSpeak{
 				return new Token(TokenType.EndBracket, token);
 			else if (token.IndexOf("(") != -1 && token[token.Length - 1] == ')')
 				return new Token(TokenType.FunctionCall, token);
-			else if (token.IndexOf("if(") == 0 && token[token.Length - 1] == '{' && token[token.Length - 2] == ')')
+			else if (token.IndexOf(Syntax.If + "(") == 0 && token[token.Length - 1] == '{' && token[token.Length - 2] == ')')
 				return new Token(TokenType.IfConditional, token);
-			else if (token.IndexOf("else") == 0 && token[token.Length - 1] == '{')
+			else if (token.IndexOf(Syntax.Else) == 0 && token[token.Length - 1] == '{')
 				return new Token(TokenType.ElseConditional, token);
-			else if (token.IndexOf("while(") == 0 && token[token.Length - 1] == '{' && token[token.Length - 2] == ')')
+			else if (token.IndexOf(Syntax.While + "(") == 0 && token[token.Length - 1] == '{' && token[token.Length - 2] == ')')
 				return new Token(TokenType.WhileConditional, token);
-			else if (token.IndexOf("loop(") == 0 && token[token.Length - 1] == '{' && token[token.Length - 2] == ')')
+			else if (token.IndexOf(Syntax.Loop + "(") == 0 && token[token.Length - 1] == '{' && token[token.Length - 2] == ')')
 				return new Token(TokenType.LoopConditional, token);
-			else if (token == "-")
-				return new Token(TokenType.SubtractOperator, token);
 			else if (Utils.IsDigitsOnly(token))
 				return new Token(TokenType.Number, token);
-			else if (token == "+")
+			else if (token == Syntax.Add)
 				return new Token(TokenType.AddOperator, token);
-			else if (token == "*")
+			else if (token == Syntax.Subtract)
+				return new Token(TokenType.SubtractOperator, token);
+			else if (token == Syntax.Multiply)
 				return new Token(TokenType.MultiplyOperator, token);
-			else if (token == "/")
+			else if (token == Syntax.Divide)
 				return new Token(TokenType.DivideOperator, token);
-			else if (token == "^")
+			else if (token == Syntax.Power)
 				return new Token(TokenType.PowerOperator, token);
-			else if (token == "%")
+			else if (token == Syntax.Modulo)
 				return new Token(TokenType.ModuloOperator, token);
-			else if (token == "=")
+			else if (token == Syntax.Equal)
 				return new Token(TokenType.EqualOperator, token);
 			else if (Utils.IsLettersOnly(token))
 				return new Token(TokenType.VariableIdentifier, token);
@@ -109,7 +109,7 @@ namespace CowSpeak{
 			for (int i = 0; i < fileLines.Count; i++) {
 				CowSpeak.currentLine = i + 1 + currentLineOffset;
 
-				fileLines[i] = fileLines[i].Replace(@"\n", Environment.NewLine).Replace("True", "1").Replace("False", "0"); // \n is not interpreted as a newline in strings & support for setting booleans using true and false
+				fileLines[i] = fileLines[i].Replace(@"\n", Environment.NewLine).Replace(Syntax.True, "1").Replace(Syntax.False, "0"); // \n is not interpreted as a newline in strings & support for setting booleans using true and false
 
 				while (fileLines[i].IndexOf("	") == 0 || fileLines[i].IndexOf(" ") == 0){
 					fileLines[i] = fileLines[i].Remove(0, 1);
@@ -119,8 +119,8 @@ namespace CowSpeak{
 					fileLines[i] = fileLines[i].Replace(Definition[0], Definition[1]);
 				}
 
-				while (fileLines[i].IndexOf("#") != -1){
-					int pos = fileLines[i].IndexOf("#");
+				while (fileLines[i].IndexOf(Syntax.Comment) != -1){
+					int pos = fileLines[i].IndexOf(Syntax.Comment);
 					if (Utils.isBetween(fileLines[i], pos, '"', '"') || Utils.isBetween(fileLines[i], pos, '\'', '\'')){
 						StringBuilder fileLine = new StringBuilder(fileLines[i]);
 						fileLine[pos] = (char)0x1f;
@@ -130,9 +130,9 @@ namespace CowSpeak{
 					}
 
 					fileLines[i] = fileLines[i].Remove(pos, fileLines[i].Length - pos);
-				} // get rid of all '#' and anything after it (but it cannot be enclosed in quotes or apostrophes)
+				} // get rid of all CommentIdentifiers and anything after it (but it cannot be enclosed in quotes or apostrophes)
 
-				fileLines[i] = fileLines[i].Replace(((char)0x1f).ToString(), "#"); // replace placeholders back with comment token
+				fileLines[i] = fileLines[i].Replace(((char)0x1f).ToString(), Syntax.Comment); // replace placeholders back with comment token
 
 				if (string.IsNullOrWhiteSpace(fileLines[i])){
 					Lines.Add(new TokenLine(new List<Token>()));

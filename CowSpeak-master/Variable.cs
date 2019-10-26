@@ -4,27 +4,21 @@ namespace CowSpeak{
 	public class VarType {
 		public string Name; // how the type is referenced
 		public Type rep; // C# represtation of type
-		public Function[] methods = new Function[0]{};
 
-		public VarType(string Name, Type rep, Function[] methods = null){
+		public VarType(string Name, Type rep){
 			this.Name = Name;
 			this.rep = rep;
-
-			if (methods != null)
-				this.methods = methods;
-			else
-				this.methods = new Function[0]{};
 		}
 
-		public static VarType Void = new VarType("void", typeof(void));
-		public static VarType Integer = new VarType("integer", typeof(int));
-		public static VarType Decimal = new VarType("decimal", typeof(double));
-		public static VarType String = new VarType("string", typeof(string));
-		public static VarType Boolean = new VarType("boolean", typeof(bool));
-		public static VarType Character = new VarType("character", typeof(char));
+		public static VarType Void = new VarType(Syntax.Void, typeof(void));
+		public static VarType Integer = new VarType(Syntax.Integer, typeof(int));
+		public static VarType Decimal = new VarType(Syntax.Decimal, typeof(double));
+		public static VarType String = new VarType(Syntax.String, typeof(string));
+		public static VarType Boolean = new VarType(Syntax.Boolean, typeof(bool));
+		public static VarType Character = new VarType(Syntax.Character, typeof(char));
 
 		public static VarType[] GetTypes(){
-			return new VarType[]{Integer, Decimal, String, Character, Boolean};
+			return new VarType[]{Void, Integer, Decimal, String, Character, Boolean};
 		} // returns array of all static types
 
 		public static VarType GetType(string typeName){

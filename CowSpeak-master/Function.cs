@@ -5,14 +5,16 @@ using System.Text;
 using System.IO;
 using System.Linq;
 
+using System.Reflection;
+
 namespace CowSpeak{
 	public class Function {
-		public Func<Any[], Any> FuncDef;
-		public string funcName;
+		public MethodInfo Definition;
+		public string Name;
 		public VarType type;
 		public int requiredParams;
-		public string properUsage = "";
-		public bool isMethod = false;
+		public string properUsage;
+		public bool isMethod;
 
 		public bool isVoid(){
 			return type == VarType.Void;
@@ -91,11 +93,11 @@ namespace CowSpeak{
 			return parameters.ToArray();
 		}
 
-		public Function(string FunctionName, Func<Any[], Any> FunctionDefinition, VarType type, string properUsage, int requiredParams = 0, bool isMethod = false) {
+		public Function(string Name, MethodInfo Definition, VarType type, string properUsage, int requiredParams = 0, bool isMethod = false) {
 			this.type = type;
-			FuncDef = FunctionDefinition;
-			this.properUsage = properUsage;
-			funcName = FunctionName;
+			this.Definition = Definition;
+   			this.properUsage = properUsage;
+			this.Name = Name;
 			this.requiredParams = requiredParams;
 			this.isMethod = isMethod;
 		}
@@ -114,14 +116,14 @@ namespace CowSpeak{
 				parameters.Insert(0, new Any(VarType.String, methodVar.Get()));
 
 			if (requiredParams != parameters.Count && (!isMethod || requiredParams != parameters.Count - 1))
-				CowSpeak.FATAL_ERROR("Invalid number of parameters passed in FunctionCall: '" + funcName + "'. Proper Usage: " + properUsage + " (" + parameters.Count + " given)");
+				CowSpeak.FATAL_ERROR("Invalid number of parameters passed in FunctionCall: '" + Name + "'. Proper Usage: " + properUsage + " (" + parameters.Count + " given)");
 
 			try{
-				return FuncDef(parameters.ToArray());
+				return Definition.Invoke(null, new object[]{ parameters.ToArray() }) as Any; // obj is null because the function should be static
 			}
 			catch (Exception ex) {
 				if (ex.GetType().IsAssignableFrom(typeof(InvalidCastException))){
-					string givenParams = funcName + "(";
+					string givenParams = Name + "(";
 					int i = 0;
 					foreach (Any _param in parameters){
 						if (i == 0 && isMethod){
@@ -134,14 +136,55 @@ namespace CowSpeak{
 						i++;
 					}
 					givenParams += ")";
-					CowSpeak.FATAL_ERROR("Invalid parameter types passed in FunctionCall: '" + funcName + "'. \nProper Usage: \n" + properUsage + "\nGiven Parameter Types: \n" + givenParams);
+					CowSpeak.FATAL_ERROR("Invalid parameter types passed in FunctionCall: '" + Name + "'. \nProper Usage: \n" + properUsage + "\nGiven Parameter Types: \n" + givenParams);
 				}
 				else{
-					CowSpeak.FATAL_ERROR("There was an unknown error when executing function: '" + funcName + "'. \nProper Usage: \n" + properUsage);
+					CowSpeak.FATAL_ERROR("There was an unknown error when executing function: '" + Name + "'. \nProper Usage: \n" + properUsage + "\nError: " + ex.Message);
 				}
 
 				return null;
 			}
 		}
 	};
+
+	public class _Function : Attribute {
+		public string Name;
+		public VarType vType;
+		public int requiredParams;
+		public string properUsage;
+		public bool isMethod;
+
+		public _Function(string Name, string typeName, string properUsage, int requiredParams = 0, bool isMethod = false){
+			foreach (VarType type in VarType.GetTypes()){
+				if (type.Name == typeName){
+					vType = type;
+					break;
+				}
+			}
+
+			this.Name = Name;
+			this.properUsage = properUsage;
+			this.requiredParams = requiredParams;
+			this.isMethod = isMethod;
+		}
+
+		public static List< Function > GetFunctions()
+        {
+            List< Function > functions = new List< Function >();
+
+            MethodInfo[] funcMethods = typeof(Functions).GetMethods(); // Get all methods from the Functions class
+
+            foreach (MethodInfo method in funcMethods)
+            {
+				_Function functionAttr = (_Function)Attribute.GetCustomAttribute(method, typeof(_Function)); // get attribute for method
+
+                if (functionAttr == null || method == null)
+                    continue; // skip method, it does not have this attribute
+
+                functions.Add(new Function(functionAttr.Name, method, functionAttr.vType, functionAttr.properUsage, functionAttr.requiredParams, functionAttr.isMethod));
+            }
+
+            return functions;
+        } // get a list of all methods from the Functions class that have this attribute
+	}
 }

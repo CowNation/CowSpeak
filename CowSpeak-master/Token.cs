@@ -19,7 +19,6 @@ namespace CowSpeak{
 		ElseConditional,
 		WhileConditional,
 		LoopConditional,
-		CommentIdentifier,
 		EndBracket
 	};
 

@@ -28,12 +28,6 @@ namespace CowConfig{
 			return -1;
 		}
 
-		private static T TryParse<T>(string inValue)
-		{
-			TypeConverter converter = TypeDescriptor.GetConverter(typeof(T));
-			return (T)converter.ConvertFromString(null, CultureInfo.InvariantCulture, inValue);
-		}
-
 		public List< string > GetLines(){
 			return Lines;
 		}
@@ -53,7 +47,7 @@ namespace CowConfig{
 			try{
 				string temp = Lines[lineIndex];
 				temp = temp.Replace(offsetText, "");
-				return TryParse<T>(temp);
+				return CowSpeak.Utils.TryParse<T>(temp);
 			}
 			catch {
 				return default(T);
