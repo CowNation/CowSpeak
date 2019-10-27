@@ -4,7 +4,7 @@ A pointless programming language programmed in C#
 This program uses csharp-CowConfig. To see the GH repo of CowConfig go to https://github.com/CowNation/csharp-CowConfig
 ## Features
 Primitive data types: boolean, integer, string, and decimal
-Most standard operators you would expect (+, -, *, /, =, ^, %)
+Most standard operators you would expect (+, -, \*, /, =, ^, %)
 Single line comments
 Conditionals (if, else, loop, while)
 Functions
