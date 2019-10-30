@@ -16,11 +16,12 @@ namespace CowSpeak{
 
 		// Identifiers
 		public const string Comment = "#";
-
-		// Shortcuts
-		public const string True = "True";
-		public const string False = "False";
-
+		
+		// Comparison Operators
+		public const string IsEqual = "==";
+		public const string IsNotEqual = "!=";
+		public const string IsGreaterThan = ">";
+		public const string IsLessThan = "<";
 		// Operators
 		public const string Add = "+";
 		public const string Subtract = "-";

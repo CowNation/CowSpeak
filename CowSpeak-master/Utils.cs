@@ -50,6 +50,23 @@ namespace CowSpeak{
 				return starts % 2 != 0;
 		}
 
+		public static string FixBoolean(string str){
+			if (str.IndexOf("True") == -1 && str.IndexOf("False") == -1)
+				return str; 
+
+			for (int i = 0; i < str.Length; i++){
+				string trueSub = i + 4 <= str.Length ? str.Substring(i, 4) : "";
+				string falseSub = i + 5 <= str.Length ? str.Substring(i, 5) : "";
+
+				if (trueSub == "True" && !isBetween(str, i, '\"', '\"'))
+					str = str.Remove(i, 4).Insert(i, "1");
+				else if (falseSub == "False" && !isBetween(str, i, '\"', '\"'))
+					str = str.Remove(i, 5).Insert(i, "0");
+			}
+
+			return str;
+		}
+
 		public static string substituteBetween(string str, char toSub, char start, char end, char substitution = (char)0x1a){
 			int i = 0;
 			string _str = str;

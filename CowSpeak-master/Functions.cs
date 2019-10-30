@@ -120,31 +120,7 @@ namespace CowSpeak{
 		}
 
 		private static string toStr(Any toPrep){
-			return toPrep.Get().ToString().Replace(Syntax.True, "1").Replace(Syntax.False, "0");
-		}
-
-		[_Function("isEqual", Syntax.Boolean, "isEqual(left, right) - Returns whether left and right are equal", 2)]
-		public static Any isEqual(Any[] parameters){
-			return new Any(VarType.Boolean, toStr(parameters[0]) == toStr(parameters[1]));
-		}
-
-		[_Function("isNotEqual", Syntax.Boolean, "isNotEqual(left, right) - Returns whether left and right are not equal", 2)]
-		public static Any isNotEqual(Any[] parameters){
-			return new Any(VarType.Boolean, toStr(parameters[0]) != toStr(parameters[1]));
-		}
-
-		[_Function("isLessThan", Syntax.Boolean, "isLessThan(left, right) - Returns whether left is less than right", 2)]
-		public static Any isLessThan(Any[] parameters){
-			string param0 = parameters[0].Get().ToString();
-			string param1 = parameters[1].Get().ToString();
-			return new Any(VarType.Boolean, Convert.ToDouble(param0) < Convert.ToDouble(param1));
-		}
-
-		[_Function("isGreaterThan", Syntax.Boolean, "isGreaterThan(left, right) - Returns whether left is greater than right", 2)]
-		public static Any isGreaterThan(Any[] parameters){
-			string param0 = parameters[0].Get().ToString();
-			string param1 = parameters[1].Get().ToString();
-			return new Any(VarType.Boolean, Convert.ToDouble(param0) > Convert.ToDouble(param1));
+			return Utils.FixBoolean(toPrep.Get().ToString());
 		}
 
 		[_Function("randomInteger", Syntax.Integer, "randomInteger(integer minimum, integer maximum) - Returns a random integer with a minimum of 'minimum' and a maximum of 'maximum'", 2)]

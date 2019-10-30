@@ -19,7 +19,11 @@ namespace CowSpeak{
 		ElseConditional,
 		WhileConditional,
 		LoopConditional,
-		EndBracket
+		EndBracket,
+		IsEqualOperator,
+		IsNotEqualOperator,
+		IsGreaterThanOperator,
+		IsLessThanOperator
 	};
 
 	public class Token {
@@ -163,7 +167,7 @@ namespace CowSpeak{
 					identifier = func.Execute(identifier).Get().ToString(); // replace function call with it's return value
 				}
 				
-				Evaluated.Add(new Token(type, identifier));
+				Evaluated.Add(new Token(type, Utils.FixBoolean(identifier)));
 			}
 
 			if (Evaluated.Count == 0)

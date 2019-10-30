@@ -8,23 +8,23 @@ namespace CowSpeak{
 			this.text = text.Substring(text.IndexOf("(") + 1, text.LastIndexOf(")") - text.IndexOf("(") - 1); // Reduce it to the text in between parenthesis
 		}
 
-		public bool Evaluate(){
-			Token token = Lexer.ParseToken(text);
+		public bool EvaluateBoolean(){
+			Token token = Lexer.ParseToken(text, false);
 
-			string evaluation = "";
+			string Evaluated = "";
 
-			if (token.type == TokenType.FunctionCall){
-				Function func = CowSpeak.findFunction(token.identifier);
-				evaluation = func.Execute(token.identifier).Get().ToString();
+			if (token == null)
+				Evaluated = Evaluate.EvaluateBoolean(Lexer.ParseLine(text.Replace(((char)0x1D).ToString(), " "))).ToString();
+			else{
+				if (token.type == TokenType.VariableIdentifier)
+					Evaluated = CowSpeak.getVariable(token.identifier).Get().ToString();
+				else if (token.type == TokenType.FunctionCall)
+					Evaluated = CowSpeak.findFunction(token.identifier).Execute(token.identifier).Get().ToString();
+				else
+					Evaluated = token.identifier;
 			}
-			else if (token.type == TokenType.VariableIdentifier){
-				Variable _var = CowSpeak.getVariable(token.identifier);
-				evaluation = _var.Get().ToString();
-			}
-			else
-				evaluation = token.identifier;
 
-			return evaluation == "1" || evaluation == "True"; // is true
+			return Evaluated == "True" || Evaluated == "1";
 		}
 	};
 

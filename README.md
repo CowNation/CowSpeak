@@ -1,15 +1,15 @@
 # CowSpeak
 A pointless programming language programmed in C#
 ## Info
-This program uses [CowConfig](https://github.com/CowNation/CowConfig)
+This program uses csharp-CowConfig. To see the GH repo of CowConfig go to https://github.com/CowNation/csharp-CowConfig
 ## Features
-* Primitive data types: boolean, integer, string, and decimal
-* Most standard operators you would expect (+, -, \*, /, =, ^, %)
-* Single line comments
-* Conditionals (if, else, loop, while)
-* Functions
-* Methods
-* Simple per-line token debugging
+Primitive data types: boolean, integer, string, and decimal
+Most standard operators you would expect (+, -, *, /, =, ^, %)
+Single line comments
+Conditionals (if, else, loop, while)
+Functions
+Methods
+Simple per-line token debugging
 ## Previous Versions
 [v1 (Initial release on May 17, 2019)](https://github.com/CowNation/CowSpeak/tree/295d57e0a54622b5fc0483c6d1f163408d728aaf)
 

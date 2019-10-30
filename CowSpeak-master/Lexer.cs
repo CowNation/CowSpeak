@@ -31,7 +31,7 @@ namespace CowSpeak{
 		}
 
 		public static Token ParseToken(string token, bool _throw = true){
-			token = token.Replace(Syntax.True, "1").Replace(Syntax.False, "0");
+			token = Utils.FixBoolean(token);
 
 			foreach (VarType type in VarType.GetTypes()){
 				if (type.Name == token){
@@ -57,6 +57,14 @@ namespace CowSpeak{
 				return new Token(TokenType.LoopConditional, token);
 			else if (Utils.IsDigitsOnly(token))
 				return new Token(TokenType.Number, token);
+			else if (token == Syntax.IsEqual)
+				return new Token(TokenType.IsEqualOperator, token);
+			else if (token == Syntax.IsNotEqual)
+				return new Token(TokenType.IsNotEqualOperator, token);
+			else if (token == Syntax.IsGreaterThan)
+				return new Token(TokenType.IsGreaterThanOperator, token);
+			else if (token == Syntax.IsLessThan)
+				return new Token(TokenType.IsLessThanOperator, token);
 			else if (token == Syntax.Add)
 				return new Token(TokenType.AddOperator, token);
 			else if (token == Syntax.Subtract)
@@ -109,7 +117,7 @@ namespace CowSpeak{
 			for (int i = 0; i < fileLines.Count; i++) {
 				CowSpeak.currentLine = i + 1 + currentLineOffset;
 
-				fileLines[i] = fileLines[i].Replace(@"\n", Environment.NewLine).Replace(Syntax.True, "1").Replace(Syntax.False, "0"); // \n is not interpreted as a newline in strings & support for setting booleans using true and false
+				fileLines[i] = Utils.FixBoolean(fileLines[i].Replace(@"\n", Environment.NewLine)); // \n is not interpreted as a newline in strings & support for setting booleans using true and false
 
 				while (fileLines[i].IndexOf("	") == 0 || fileLines[i].IndexOf(" ") == 0){
 					fileLines[i] = fileLines[i].Remove(0, 1);
@@ -153,7 +161,7 @@ namespace CowSpeak{
 				if (Lines[i].tokens.Count > 0 && Lines[i].tokens[0].type == TokenType.IfConditional){
 					int endingBracket = findClosingBracket(i);
 
-					if (new Conditional(Lines[i].tokens[0].identifier).Evaluate()){
+					if (new Conditional(Lines[i].tokens[0].identifier).EvaluateBoolean()){
 						RestrictedScope scope = new RestrictedScope();
 
 						new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), shouldDebug, i + 1);
@@ -183,7 +191,7 @@ namespace CowSpeak{
 
 					int endingBracket = findClosingBracket(i);
 
-					if (!new Conditional(Lines[parentIf].tokens[0].identifier).Evaluate()){
+					if (!new Conditional(Lines[parentIf].tokens[0].identifier).EvaluateBoolean()){
 						RestrictedScope scope = new RestrictedScope();
 
 						new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), shouldDebug, i + 1);
@@ -198,7 +206,7 @@ namespace CowSpeak{
 
 					Conditional whileStatement = new Conditional(Lines[i].tokens[0].identifier);
 					
-					while (whileStatement.Evaluate()){
+					while (whileStatement.EvaluateBoolean()){
 						RestrictedScope scope = new RestrictedScope();
 
 						new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), shouldDebug, i + 1);

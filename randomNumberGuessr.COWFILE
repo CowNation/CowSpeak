@@ -3,17 +3,17 @@ integer guess = -1
 integer tries = 0
 boolean firstTime = True
 
-while(isNotEqual(correctGuess, guess)){
+while(correctGuess != guess){
 	tries = tries + 1
 
-	if(isEqual(firstTime, False)){
+	if(firstTime == False){
 		print("Wrong Answer - ")
 
-		if(isLessThan(guess, correctGuess)){
+		if(guess < correctGuess){
 			print("Too Low!!")
 		}
 
-		if(isGreaterThan(guess, correctGuess)){
+		if(guess > correctGuess){
 			print("Too High!!")
 		}
 
