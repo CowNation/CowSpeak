@@ -23,7 +23,7 @@ namespace CowSpeak{
 
 			if (_throw){
 				FATAL_ERROR("Function '" + functionName + "' not found");
-				Functions.exit(null);
+				return null;
 			}
 			return null;
 		} // find fuction with matching name
@@ -50,7 +50,7 @@ namespace CowSpeak{
 			}
 			if (_throw){
 				FATAL_ERROR("Could not find variable: " + varName);
-				Environment.Exit(-1);
+				return null;
 			}
 			return null;
 		}

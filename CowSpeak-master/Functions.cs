@@ -158,9 +158,9 @@ namespace CowSpeak{
 			return new Any(VarType.Integer, 0);
 		}
 
-		[_Function("exit", Syntax.Void, "exit() - Exits the program")]
+		[_Function("exit", Syntax.Void, "exit(integer exitCode) - Exits the program, returning 'exitCode'", 1)]
 		public static Any exit(Any[] parameters) {
-			Environment.Exit(0);
+			Environment.Exit((int)parameters[0].Get());
 			return new Any(VarType.Integer, 0);
 		}
 

@@ -1,4 +1,5 @@
 string cs = "CowSpeak is literally the best language in the world!" # just kidding
+print(string.SubString(cs, 0, 8) + "\n")
 print(cs.SubString(0,8) + "\n")
 
 # make a word out of a string

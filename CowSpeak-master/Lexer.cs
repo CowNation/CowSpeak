@@ -117,7 +117,7 @@ namespace CowSpeak{
 			for (int i = 0; i < fileLines.Count; i++) {
 				CowSpeak.currentLine = i + 1 + currentLineOffset;
 
-				fileLines[i] = Utils.FixBoolean(fileLines[i].Replace(@"\n", Environment.NewLine)); // \n is not interpreted as a newline in strings & support for setting booleans using true and false
+				fileLines[i] = Utils.FixBoolean(fileLines[i].Replace(@"\n", Environment.NewLine)); // interpret \n as a newline in strings & support for setting booleans using true and false
 
 				while (fileLines[i].IndexOf("	") == 0 || fileLines[i].IndexOf(" ") == 0){
 					fileLines[i] = fileLines[i].Remove(0, 1);
@@ -265,6 +265,9 @@ namespace CowSpeak{
 
 				bool shouldBeSet = false; // the most recent variable in list should be set after exec
 				if (Lines[i].tokens.Count >= 3 && Lines[i].tokens[0].type == TokenType.TypeIdentifier && Lines[i].tokens[1].type == TokenType.VariableIdentifier && Lines[i].tokens[2].type == TokenType.EqualOperator){
+					if (CowSpeak.isVarDefined(Lines[i].tokens[1].identifier))
+						CowSpeak.FATAL_ERROR("Redefinition of variable '" + Lines[i].tokens[1].identifier + "', cannot define a variable twice");
+
 					CowSpeak.Vars.Add(new Variable(VarType.GetType(Lines[i].tokens[0].identifier), Lines[i].tokens[1].identifier));
 					shouldBeSet = true;
 				} // variable must be created before exec is called so that it may be accessed

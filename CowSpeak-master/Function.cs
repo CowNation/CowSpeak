@@ -103,17 +103,16 @@ namespace CowSpeak{
 		}
 
 		public Any Execute(string usage) {
-			Variable methodVar = null;
-			if (isMethod)
-				methodVar = CowSpeak.getVariable(usage.Substring(0, usage.IndexOf(".")));
-
 			if (usage.IndexOf("(") == -1 || usage.IndexOf(")") == -1)
 				CowSpeak.FATAL_ERROR("Invalid usage of function: '" + usage + "'. Proper Usage: " + properUsage);
 
+			string usage_temp = usage;
 			usage = usage.Substring(usage.IndexOf("(")); // reduce it to parentheses and params inside of them
 			List< Any > parameters = parseParameters(usage).ToList();
-			if (isMethod)
-				parameters.Insert(0, new Any(VarType.String, methodVar.Get()));
+			if (isMethod && requiredParams != parameters.Count - 1){
+				Variable methodVar = CowSpeak.getVariable(usage_temp.Substring(0, usage_temp.IndexOf(".")));
+				parameters.Insert(0, new Any(methodVar.vType, methodVar.Get()));
+			}
 
 			if (requiredParams != parameters.Count && (!isMethod || requiredParams != parameters.Count - 1))
 				CowSpeak.FATAL_ERROR("Invalid number of parameters passed in FunctionCall: '" + Name + "'. Proper Usage: " + properUsage + " (" + parameters.Count + " given)");
