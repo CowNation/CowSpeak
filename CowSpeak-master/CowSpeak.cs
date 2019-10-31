@@ -70,9 +70,9 @@ namespace CowSpeak{
 			shouldDebug = ishouldDebug;
 
 			if (!File.Exists(fileName))
-				FATAL_ERROR("Cannot execute file '" + fileName + "', it doesn't exist");
-			else if (fileName.IndexOf(".COWFILE") == -1)
-				FATAL_ERROR("Cannot execute file '" + fileName + "', it doesn't have the .COWFILE file extension");
+				FATAL_ERROR("Cannot execute COWFILE '" + fileName + "', it doesn't exist");
+			else if (fileName.IndexOf(".cf") == -1)
+				FATAL_ERROR("Cannot execute COWFILE '" + fileName + "', it doesn't have the .cf file extension");
 
 			new Lexer(new CowConfig.readConfig(fileName).GetLines(), shouldDebug);
 		}

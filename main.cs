@@ -5,9 +5,9 @@ using System.Diagnostics;
 
 class MainClass {
 	public static void Main(string[] args) {
-		CowSpeak.CowSpeak.Run("stringThings.COWFILE", false);
-		CowSpeak.CowSpeak.Run("calculator.COWFILE", false);
-		CowSpeak.CowSpeak.Run("stairsMaker.COWFILE", false);
-		CowSpeak.CowSpeak.Run("randomNumberGuessr.COWFILE", false);
+		CowSpeak.CowSpeak.Run("stringThings.cf", false);
+		CowSpeak.CowSpeak.Run("calculator.cf", false);
+		CowSpeak.CowSpeak.Run("stairsMaker.cf", false);
+		CowSpeak.CowSpeak.Run("randomNumberGuessr.cf", false);
 	}
 }
