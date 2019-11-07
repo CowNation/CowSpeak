@@ -55,6 +55,8 @@ namespace CowSpeak{
 				return new Token(TokenType.WhileConditional, token);
 			else if (token.IndexOf(Syntax.Loop + "(") == 0 && token[token.Length - 1] == '{' && token[token.Length - 2] == ')')
 				return new Token(TokenType.LoopConditional, token);
+			else if (token == Syntax.Delete)
+				return new Token(TokenType.DeleteIdentifier, token);
 			else if (Utils.IsDigitsOnly(token))
 				return new Token(TokenType.Number, token);
 			else if (token == Syntax.IsEqual)
@@ -259,6 +261,17 @@ namespace CowSpeak{
 						Console.WriteLine(token.type.ToString() + " - " + token.identifier.Replace(Environment.NewLine, @"\n").Replace(((char)0x1f).ToString(), " "));
 					}
 				}
+
+				if (Lines[i].tokens.Count == 2 && Lines[i].tokens[0].type == TokenType.DeleteIdentifier && Lines[i].tokens[1].type == TokenType.VariableIdentifier) {
+					Variable target = CowSpeak.getVariable(Lines[i].tokens[1].identifier);
+					for (int z = 0; z < CowSpeak.Vars.Count; z++){
+						if (CowSpeak.Vars[z].Name == target.Name){
+							CowSpeak.Vars.RemoveAt(z);
+							break;
+						}	
+					}
+					continue; // prevent execution
+				} // must handle this before the other lines are evaluated to avoid wrong exceptions
 
 				if (Lines[i].tokens.Count >= 2 && Lines[i].tokens[0].type == TokenType.VariableIdentifier && Lines[i].tokens[1].type == TokenType.VariableIdentifier) // first token is interpreted as a variable because the type does not exist
 					CowSpeak.FATAL_ERROR("Type '" + Lines[i].tokens[0].identifier + "' does not exist");

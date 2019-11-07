@@ -23,7 +23,8 @@ namespace CowSpeak{
 		IsEqualOperator,
 		IsNotEqualOperator,
 		IsGreaterThanOperator,
-		IsLessThanOperator
+		IsLessThanOperator,
+		DeleteIdentifier
 	};
 
 	public class Token {

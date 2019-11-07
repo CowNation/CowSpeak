@@ -176,12 +176,6 @@ namespace CowSpeak{
 			return new Any(VarType.Integer, 0);
 		}
 
-		[_Function("clearMem", Syntax.Void, "clearMem() - Deletes all variables from memory")]
-		public static Any clearMem(Any[] parameters){
-			CowSpeak.Vars.Clear();
-			return new Any(VarType.Integer, 0);
-		}
-
 		[_Function("exit", Syntax.Void, "exit(" + Syntax.Integer + " exitCode) - Exits the program, returning 'exitCode'", 1)]
 		public static Any exit(Any[] parameters) {
 			Environment.Exit((int)parameters[0].Get());

@@ -9,7 +9,9 @@ This program uses csharp-CowConfig. To see the GH repo of CowConfig go to https:
 * Conditionals (if, else, loop, while)
 * Functions
 * Methods
+* Detailed error throwing
 * Simple per-line token debugging
+* Scopes & manual variable deletion
 ## Previous Versions
 [v1 (Initial release on May 17, 2019)](https://github.com/CowNation/CowSpeak/tree/295d57e0a54622b5fc0483c6d1f163408d728aaf)
 

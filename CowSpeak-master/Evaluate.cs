@@ -51,8 +51,11 @@ namespace CowSpeak{
 								CowSpeak.FATAL_ERROR("Cannot divide by 0");
 							answer.identifier = (_left / _right).ToString();
 						}
-						else if (_operator.type == TokenType.ModuloOperator)
+						else if (_operator.type == TokenType.ModuloOperator){
+							if (_right == 0)
+								CowSpeak.FATAL_ERROR("Cannot divide by 0");
 							answer.identifier = (_left % _right).ToString();
+						}
 
 						Tokens.RemoveAt(index + 1);
 						Tokens.RemoveAt(index);

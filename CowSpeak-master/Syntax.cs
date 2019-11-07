@@ -22,6 +22,7 @@ namespace CowSpeak{
 
 		// Identifiers
 		public const string Comment = "#";
+		public const string Delete = "delete";
 		
 		// Comparison Operators
 		public const string IsEqual = "==";
