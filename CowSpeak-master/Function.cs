@@ -148,7 +148,7 @@ namespace CowSpeak{
 
 	public class _Function : Attribute {
 		public string Name;
-		public VarType vType;
+		public VarType vType = null;
 		public int requiredParams;
 		public string properUsage;
 		public bool isMethod;
@@ -160,6 +160,8 @@ namespace CowSpeak{
 					break;
 				}
 			}
+			if (typeName == VarType.Void.Name)
+				vType = VarType.Void;
 
 			this.Name = Name;
 			this.properUsage = properUsage;

@@ -2,11 +2,17 @@ namespace CowSpeak{
 	public static class Syntax {
 		// Types
 		public const string Void = "void";
-		public const string Integer = "integer";
+		public const string c_Void = "Void";
 		public const string Decimal = "decimal";
+		public const string c_Decimal = "Decimal";
+		public const string Integer = "integer";
+		public const string c_Integer = "Integer";
 		public const string String = "string";
+		public const string c_String = "String";
 		public const string Boolean = "boolean";
+		public const string c_Boolean = "Boolean";
 		public const string Character = "character";
+		public const string c_Character = "Character";
 
 		// Conditionals
 		public const string If = "if";

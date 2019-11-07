@@ -18,7 +18,7 @@ namespace CowSpeak{
 		public static VarType Character = new VarType(Syntax.Character, typeof(char));
 
 		public static VarType[] GetTypes(){
-			return new VarType[]{Void, Integer, Decimal, String, Character, Boolean};
+			return new VarType[]{Integer, Decimal, String, Character, Boolean};
 		} // returns array of all static types
 
 		public static VarType GetType(string typeName){
