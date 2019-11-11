@@ -52,7 +52,7 @@ namespace CowSpeak{
 			return new Any(VarType.String, parameters[0].Get().ToString().LastIndexOf(toSearchFor));
 		}
 
-		[_Function(Syntax.String + ".to" + Syntax.c_Integer, Syntax.Integer, Syntax.String + ".to" + Syntax.c_Integer + "() - Returns the " + Syntax.String + " converted to an " + Syntax.Integer + ", if not possible, an error is thrown", 0, true)]
+		[_Function(Syntax.String + ".To" + Syntax.c_Integer, Syntax.Integer, Syntax.String + ".To" + Syntax.c_Integer + "() - Returns the " + Syntax.String + " converted to an " + Syntax.Integer + ", if not possible, an error is thrown", 0, true)]
 		public static Any ToInteger(Any[] parameters){
 			int o;
 			string str = parameters[0].Get().ToString();
@@ -64,7 +64,7 @@ namespace CowSpeak{
 			}
 		}
 
-		[_Function(Syntax.String + ".to" + Syntax.c_Decimal, Syntax.Decimal, Syntax.String + ".to" + Syntax.c_Decimal + "() - Returns the " + Syntax.String + " converted to a " + Syntax.Decimal + ", if not possible, an error is thrown", 0, true)]
+		[_Function(Syntax.String + ".To" + Syntax.c_Decimal, Syntax.Decimal, Syntax.String + ".To" + Syntax.c_Decimal + "() - Returns the " + Syntax.String + " converted to a " + Syntax.Decimal + ", if not possible, an error is thrown", 0, true)]
 		public static Any ToDecimal(Any[] parameters){
 			double o;
 			string str = parameters[0].Get().ToString();
@@ -188,7 +188,13 @@ namespace CowSpeak{
 			return new Any(VarType.Integer, 0);
 		}
 
-		[_Function("input" + Syntax.String, Syntax.String, "input" + Syntax.String + "() - Allows the user to input a " + Syntax.String)]
+		[_Function("FATAL_ERROR", Syntax.Void, "FATAL_ERROR(" + Syntax.String + " errorText) - throws a FATAL_ERROR with the message 'errorText'", 1)]
+		public static Any FATAL_ERROR(Any[] parameters){
+			CowSpeak.FATAL_ERROR(parameters[0].Get().ToString());
+			return new Any(VarType.Integer, 0);	
+		}
+
+		[_Function("input" + Syntax.c_String, Syntax.String, "input" + Syntax.String + "() - Allows the user to input a " + Syntax.String)]
 		public static Any inputString(Any[] parameters){
 			return new Any(VarType.String, Console.ReadLine());	
 		}

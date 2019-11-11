@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CowSpeak{
 	public class Conditional {
@@ -9,22 +10,29 @@ namespace CowSpeak{
 		}
 
 		public bool EvaluateBoolean(){
-			Token token = Lexer.ParseToken(text, false);
+			List< string > Expressions = text.Split(Syntax.And).ToList();
+			bool Evaluated = true;
 
-			string Evaluated = "";
-
-			if (token == null)
-				Evaluated = Evaluate.EvaluateBoolean(Lexer.ParseLine(text.Replace(((char)0x1D).ToString(), " "))).ToString();
-			else{
-				if (token.type == TokenType.VariableIdentifier)
-					Evaluated = CowSpeak.getVariable(token.identifier).Get().ToString();
-				else if (token.type == TokenType.FunctionCall)
-					Evaluated = CowSpeak.findFunction(token.identifier).Execute(token.identifier).Get().ToString();
-				else
-					Evaluated = token.identifier;
+			foreach (string Expression in Expressions){
+				bool _Evaluated = false;
+				Token token = Lexer.ParseToken(text, false);
+				if (token == null)
+					_Evaluated = Evaluate.EvaluateBoolean(Lexer.ParseLine(Expression.Replace(((char)0x1D).ToString(), " ")));
+				else{
+					string simplified = "";
+					if (token.type == TokenType.VariableIdentifier)
+						simplified = CowSpeak.getVariable(token.identifier).Get().ToString();
+					else if (token.type == TokenType.FunctionCall)
+						simplified = CowSpeak.findFunction(token.identifier).Execute(token.identifier).Get().ToString();
+					else
+						simplified = token.identifier;
+					_Evaluated = simplified == "True" || simplified == "1";
+				}
+				if (!_Evaluated)
+					Evaluated = false;
 			}
 
-			return Evaluated == "True" || Evaluated == "1";
+			return Evaluated;
 		}
 	};
 

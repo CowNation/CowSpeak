@@ -1,5 +1,5 @@
 string myn = "67.56"
-print("" + myn.toDecimal() + "\n")
+print("" + myn.ToDecimal() + "\n")
 delete myn # we don't need this var anymore
 
 string cs = "CowSpeak is literally the best language in the world!" # just kidding

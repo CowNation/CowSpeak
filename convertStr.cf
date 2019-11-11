@@ -1,0 +1,24 @@
+print("Enter the target string: ")
+string target = inputString()
+string output = ""
+print("Convert ToUpper(1) or ToLower(0): ")
+integer toDo = inputInteger()
+
+loop("index", target.Length()){
+	character char = target.CharacterAt(index)
+
+	if(toDo != 1 && toDo != 0){
+		FATAL_ERROR("Invalid input (Not 1 or 0)")
+	}
+
+	if(toDo == 1){
+		output = output + char.ToUpper()
+	}
+	else{
+		if(toDo == 0){
+			output = output + char.ToUpper()
+		}
+	}
+}
+
+print(output + "\n")
