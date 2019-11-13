@@ -6,17 +6,24 @@ using System.IO;
 
 namespace CowSpeak{
 	public static class Functions{
+		#region ALL_METHODS
+		[_Function("Any.ToString", Syntax.String, "Any.ToString() - Returns a string that represents the object of any type", 0, true)]
+		public static Any ToString(Any[] parameters){
+			return new Any(VarType.String, parameters[0].Get().ToString());
+		}
+		#endregion
+
 		#region STRING_METHODS
-		[_Function(Syntax.String + ".Sub" + Syntax.c_String, Syntax.String, Syntax.String + ".Sub" + Syntax.String + "(" + Syntax.Integer + " startIndex, " + Syntax.Integer + " length) - Retrieves a substring from this instance starting at a specified character position and has a specified length", 2, true)]
+		[_Function(Syntax.String + ".Sub" + Syntax.c_String, Syntax.String, Syntax.String + ".Sub" + Syntax.String + "(" + Syntax.Integer + " startIndex, " + Syntax.Integer + " endIndex) - Retrieves a substring beginning at the specified 'startIndex' and extends to the character at index 'endIndex' – 1", 2, true)]
 		public static Any SubString(Any[] parameters){
 			string str = parameters[0].Get().ToString();
-			int index = (int)parameters[1].Get();
-			int length = (int)parameters[2].Get();
+			int startIndex = (int)parameters[1].Get();
+			int endIndex = (int)parameters[2].Get();
 
-			return new Any(VarType.String, str.Substring(index, length));
+			return new Any(VarType.String, str.Substring(startIndex, endIndex - startIndex));
 		}
 
-		[_Function(Syntax.String + "." + Syntax.c_Character + "At", Syntax.Character, Syntax.String + "." + Syntax.c_Character + "At(" + Syntax.Integer + " index) - Returns a character at 'index'", 1, true)]
+		[_Function(Syntax.String + "." + Syntax.c_Character + "At", Syntax.Character, Syntax.String + "." + Syntax.c_Character + "At(" + Syntax.Integer + " index) - Returns a " + Syntax.Character + " at 'index'", 1, true)]
 		public static Any CharacterAt(Any[] parameters){
 			return new Any(VarType.Character, parameters[0].Get().ToString()[(int)parameters[1].Get()]);
 		}
@@ -26,11 +33,11 @@ namespace CowSpeak{
 			return new Any(VarType.Integer, parameters[0].Get().ToString().Length);
 		}
 
-		[_Function(Syntax.String + ".Remove", Syntax.String, Syntax.String + ".Remove(" + Syntax.Integer + " startIndex, " + Syntax.Integer + " Count) - Returns a new string in which a specified number of characters from the current string are deleted", 2, true)]
+		[_Function(Syntax.String + ".Remove", Syntax.String, Syntax.String + ".Remove(" + Syntax.Integer + " startIndex, " + Syntax.Integer + " endIndex) - Returns a new string in which all of the characters between 'startIndex' and 'endIndex' are removed", 2, true)]
 		public static Any Remove(Any[] parameters){
-			int index = (int)parameters[1].Get();
-			int length = (int)parameters[2].Get();
-			return new Any(VarType.String, parameters[0].Get().ToString().Remove(index, length));
+			int startIndex = (int)parameters[1].Get();
+			int endIndex = (int)parameters[2].Get();
+			return new Any(VarType.String, parameters[0].Get().ToString().Remove(startIndex, endIndex - startIndex));
 		}
 
 		[_Function(Syntax.String + ".Insert", Syntax.String, Syntax.String + ".Insert(" + Syntax.Integer + " startIndex, " + Syntax.String + " value) - Returns a new " + Syntax.String + " in which a specified " + Syntax.String + " is inserted at a specified index position in this instance", 2, true)]
@@ -100,27 +107,6 @@ namespace CowSpeak{
 			return new Any(VarType.Integer, 0);
 		}
 
-		private static RestrictedScope rs = null;
-
-		[_Function("startRestrictedScope", Syntax.Void, "startRestrictedScope() - Starts a RestrictedScope", 0)]
-		public static Any startRestrictedScope(Any[] parameters){
-			if (rs != null)
-				CowSpeak.FATAL_ERROR("RestrictedScope is already active. End it first before starting it again by using endRestrictedScope()");
-
-			rs = new RestrictedScope();
-			return new Any(VarType.Integer, 0);
-		}
-
-		[_Function("endRestrictedScope", Syntax.Void, "endRestrictedScope() - Ends a RestrictedScope (Any variables or definitions created in this scope will be deleted)", 0)]
-		public static Any endRestrictedScope(Any[] parameters){
-			if (rs == null)
-				CowSpeak.FATAL_ERROR("RestrictedScope is not started, activate start it first with startRestrictedScope()");
-
-			rs.End();
-			rs = null;
-			return new Any(VarType.Integer, 0);
-		}
-
 		[_Function("define", Syntax.Void, "define(" + Syntax.String + " from, " + Syntax.String + " to) - Replaces all occurences of 'from' with 'to' in the code", 2)]
 		public static Any define(Any[] parameters) {
 			CowSpeak.Definitions.Add(new string[]{parameters[0].Get().ToString(), parameters[1].Get().ToString()});
@@ -179,12 +165,6 @@ namespace CowSpeak{
 		[_Function("exit", Syntax.Void, "exit(" + Syntax.Integer + " exitCode) - Exits the program, returning 'exitCode'", 1)]
 		public static Any exit(Any[] parameters) {
 			Environment.Exit((int)parameters[0].Get());
-			return new Any(VarType.Integer, 0);
-		}
-
-		[_Function("clrConsole", Syntax.Void, "clrConsole() - Clears all text from the console")]
-		public static Any clrConsole(Any[] parameters){
-			Console.Clear();
 			return new Any(VarType.Integer, 0);
 		}
 

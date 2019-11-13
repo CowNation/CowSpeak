@@ -21,6 +21,12 @@ namespace CowSpeak{
 					return staticFX[i];
 			}
 
+			if (functionName.IndexOf(".") != -1){
+				Function found = findFunction("Any" + functionName.Substring(functionName.IndexOf(".")), false);
+				if (found != null)
+					return found;
+			} // try to see if it's an 'Any' method
+
 			if (_throw){
 				FATAL_ERROR("Function '" + functionName + "' not found");
 				return null;
