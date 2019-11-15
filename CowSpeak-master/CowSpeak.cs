@@ -1,10 +1,11 @@
 using System.Collections.Generic;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace CowSpeak{
 	public class CowSpeak{
-		public static List< Function > staticFX = _Function.GetFunctions();
+		public static List< Function > staticFX = FunctionAttr.GetFunctions();
 
 		public static List< string[] > Definitions = new List< string[] >();
 
@@ -65,13 +66,7 @@ namespace CowSpeak{
 			return getVariable(varName, false) != null;
 		}
 
-		public static void Run(string fileName, bool ishouldDebug = false){
-			Exec(fileName, ishouldDebug);
-			Vars.Clear();
-			Definitions.Clear();
-		}
-
-		public static void Exec(string fileName, bool ishouldDebug = false){
+		public static void Exec(string fileName, bool ishouldDebug){
 			currentFile = fileName;
 			shouldDebug = ishouldDebug;
 
@@ -81,6 +76,25 @@ namespace CowSpeak{
 				FATAL_ERROR("Cannot execute COWFILE '" + fileName + "', it doesn't have the .cf file extension");
 
 			new Lexer(new CowConfig.readConfig(fileName).GetLines(), shouldDebug);
+		}
+
+		public static void Exec(string[] lines, bool ishouldDebug){
+			currentFile = "";
+			shouldDebug = ishouldDebug;
+
+			new Lexer(lines.ToList(), shouldDebug);
+		}
+
+		public static void Run(string fileName, bool ishouldDebug = false){
+			Exec(fileName, ishouldDebug);
+			Vars.Clear();
+			Definitions.Clear();
+		}
+
+		public static void Run(string[] lines, bool ishouldDebug = false){
+			Exec(lines, ishouldDebug);
+			Vars.Clear();
+			Definitions.Clear();
 		}
 	}
 }

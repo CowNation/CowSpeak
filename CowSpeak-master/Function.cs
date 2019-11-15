@@ -146,14 +146,14 @@ namespace CowSpeak{
 		}
 	};
 
-	public class _Function : Attribute {
+	public class FunctionAttr : Attribute {
 		public string Name;
 		public VarType vType = null;
 		public int requiredParams;
 		public string properUsage;
 		public bool isMethod;
 
-		public _Function(string Name, string typeName, string properUsage, int requiredParams = 0, bool isMethod = false){
+		public FunctionAttr(string Name, string typeName, string properUsage, int requiredParams = 0, bool isMethod = false){
 			foreach (VarType type in VarType.GetTypes()){
 				if (type.Name == typeName){
 					vType = type;
@@ -164,7 +164,7 @@ namespace CowSpeak{
 				vType = VarType.Void;
 
 			this.Name = Name;
-			this.properUsage = properUsage;
+			this.properUsage = typeName + " " + properUsage;
 			this.requiredParams = requiredParams;
 			this.isMethod = isMethod;
 		}
@@ -177,7 +177,7 @@ namespace CowSpeak{
 
             foreach (MethodInfo method in funcMethods)
             {
-				_Function functionAttr = (_Function)Attribute.GetCustomAttribute(method, typeof(_Function)); // get attribute for method
+				FunctionAttr functionAttr = (FunctionAttr)Attribute.GetCustomAttribute(method, typeof(FunctionAttr)); // get attribute for method
 
                 if (functionAttr == null || method == null)
                     continue; // skip method, it does not have this attribute

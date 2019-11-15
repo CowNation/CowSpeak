@@ -140,7 +140,7 @@ namespace CowSpeak{
 					}
 
 					fileLines[i] = fileLines[i].Remove(pos, fileLines[i].Length - pos);
-				} // get rid of all CommentIdentifiers and anything after it (but it cannot be enclosed in quotes or apostrophes)
+				} // get rid of all Comments and anything after it (but it cannot be enclosed in quotes or apostrophes)
 
 				fileLines[i] = fileLines[i].Replace(((char)0x1f).ToString(), Syntax.Comment); // replace placeholders back with comment token
 
@@ -155,7 +155,14 @@ namespace CowSpeak{
 					CowSpeak.findFunction("define(").Execute(Lines[Lines.Count - 1].tokens[0].identifier);
 					Lines[Lines.Count - 1] = new TokenLine(new List<Token>()); // line was already handled, clear line
 				} // must handle this function before the other lines are compiled to avoid errors
-			}
+
+				if (shouldDebug && Lines[Lines.Count - 1].tokens.Count > 0){
+					Console.WriteLine("\n(" + CowSpeak.currentFile + ") Line " + (i + 1) + ": ");
+					foreach (var token in Lines[Lines.Count - 1].tokens){
+						Console.WriteLine(token.type.ToString() + " - " + token.identifier.Replace(Environment.NewLine, @"\n").Replace(((char)0x1f).ToString(), " "));
+					}
+				}
+			} // COMPILATION
 
 			for (int i = 0; i < fileLines.Count; i++){
 				CowSpeak.currentLine = i + 1 + currentLineOffset;
@@ -255,13 +262,6 @@ namespace CowSpeak{
 				if (i >= fileLines.Count)
 					break;
 
-				if (shouldDebug && Lines[i].tokens.Count > 0){
-					Console.WriteLine("\n(" + CowSpeak.currentFile + ") Line " + (i + 1) + ": ");
-					foreach (var token in Lines[i].tokens){
-						Console.WriteLine(token.type.ToString() + " - " + token.identifier.Replace(Environment.NewLine, @"\n").Replace(((char)0x1f).ToString(), " "));
-					}
-				}
-
 				if (Lines[i].tokens.Count == 2 && Lines[i].tokens[0].type == TokenType.DeleteIdentifier && Lines[i].tokens[1].type == TokenType.VariableIdentifier) {
 					Variable target = CowSpeak.getVariable(Lines[i].tokens[1].identifier);
 					for (int z = 0; z < CowSpeak.Vars.Count; z++){
@@ -299,7 +299,7 @@ namespace CowSpeak{
 							CowSpeak.Vars[v].byteArr = retVal.byteArr;
 					} // using getVariable does not work for this
 				} // type is not specified, var must be defined
-			}
+			} // EXECUTION
 		}
 	}
 }

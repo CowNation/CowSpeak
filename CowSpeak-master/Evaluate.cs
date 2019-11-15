@@ -3,6 +3,46 @@ using System;
 
 namespace CowSpeak{
 	public static class Evaluate{
+		public static List< Token > EvaluateMD(List< Token > Tokens){
+			int index = 0;
+			while (true){
+				Token token = Tokens[index];
+
+				if ((token.type == TokenType.MultiplyOperator || token.type == TokenType.DivideOperator || token.type == TokenType.ModuloOperator) && Utils.isIndexValid(index - 1, Tokens) && Utils.isIndexValid(index + 1, Tokens)){
+					Token _operator = Tokens[index];
+					double _left = Convert.ToDouble(Tokens[index - 1].identifier);
+					double _right = Convert.ToDouble(Tokens[index + 1].identifier);
+
+					Token answer = new Token(TokenType.Number, "");
+					if (_operator.type == TokenType.MultiplyOperator)
+						answer.identifier = (_left * _right).ToString();
+					else if (_operator.type == TokenType.DivideOperator){
+						if (_right == 0)
+							CowSpeak.FATAL_ERROR("Cannot divide by 0");
+						answer.identifier = (_left / _right).ToString();
+					}
+					else if (_operator.type == TokenType.ModuloOperator){
+						if (_right == 0)
+							CowSpeak.FATAL_ERROR("Cannot divide by 0");
+						answer.identifier = (_left % _right).ToString();
+					}
+
+					Tokens.RemoveAt(index + 1);
+					Tokens.RemoveAt(index);
+					Tokens.RemoveAt(index - 1);
+					Tokens.Insert(index - 1, answer);
+
+					index = 0;			
+				}
+
+				if (Utils.isIndexValid(index + 1, Tokens))
+					index++;
+				else
+					break;	
+			} // can't do a traditional for loop because we are modifing the collection
+			return Tokens;
+		}
+
 		public static double EvaluateTokens(List< Token > Tokens){
 			int index = 0;
 
@@ -35,42 +75,7 @@ namespace CowSpeak{
 				index = 0;
 
 				// Order of operations: solve Multiply, Divide, and Modulus first
-				while (true){
-					Token token = Tokens[index];
-
-					if ((token.type == TokenType.MultiplyOperator || token.type == TokenType.DivideOperator || token.type == TokenType.ModuloOperator) && Utils.isIndexValid(index - 1, Tokens) && Utils.isIndexValid(index + 1, Tokens)){
-						Token _operator = Tokens[index];
-						double _left = Convert.ToDouble(Tokens[index - 1].identifier);
-						double _right = Convert.ToDouble(Tokens[index + 1].identifier);
-
-						Token answer = new Token(TokenType.Number, "");
-						if (_operator.type == TokenType.MultiplyOperator)
-							answer.identifier = (_left * _right).ToString();
-						else if (_operator.type == TokenType.DivideOperator){
-							if (_right == 0)
-								CowSpeak.FATAL_ERROR("Cannot divide by 0");
-							answer.identifier = (_left / _right).ToString();
-						}
-						else if (_operator.type == TokenType.ModuloOperator){
-							if (_right == 0)
-								CowSpeak.FATAL_ERROR("Cannot divide by 0");
-							answer.identifier = (_left % _right).ToString();
-						}
-
-						Tokens.RemoveAt(index + 1);
-						Tokens.RemoveAt(index);
-						Tokens.RemoveAt(index - 1);
-						Tokens.Insert(index - 1, answer);
-
-						index = 0;			
-					}
-
-					if (Utils.isIndexValid(index + 1, Tokens))
-						index++;
-					else
-						break;	
-				} // can't do a traditional for loop because we are modifing the collection
-				index = 0;
+				Tokens = EvaluateMD(Tokens);
 
 				while (Tokens.Count > 1){
 					Token token = Tokens[index];
