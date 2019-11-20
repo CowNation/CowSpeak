@@ -24,3 +24,5 @@ This program uses csharp-CowConfig. To see CowConfig go to https://github.com/Co
 [v4 (Added support for different variable types on September 30, 2019)](https://github.com/CowNation/CowSpeak/tree/90227f3c37685d1286094b6b637fd45f392e4ff5)
 
 [v5 (Added support for parameters and conditional statements on October 8, 2019)](https://github.com/CowNation/CowSpeak/tree/72e3cfb9407a0c6485eb1945b61467331320e43f)
+
+[v6 (Added support for user defined functions and recoded function system on November 20, 2019)](https://github.com/CowNation/CowSpeak/tree/b6c29a7e948dfcfc52dbf721a62bf82a8de469c1)
