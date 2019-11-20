@@ -13,6 +13,11 @@ namespace CowSpeak{
 		public const string c_Boolean = "Boolean";
 		public const string Character = "character";
 		public const string c_Character = "Character";
+		public const string Any = "any";
+
+		// Statements
+		public const string Return = "return";
+		public const string Delete = "delete";
 
 		// Conditionals
 		public const string If = "if";
@@ -22,13 +27,13 @@ namespace CowSpeak{
 
 		// Identifiers
 		public const string Comment = "#";
-		public const string Delete = "delete";
 		
 		// Comparison Operators
 		public const string IsEqual = "==";
 		public const string IsNotEqual = "!=";
 		public const string IsGreaterThan = ">";
 		public const string IsLessThan = "<";
+
 		// Operators
 		public const string Add = "+";
 		public const string Subtract = "-";

@@ -5,43 +5,50 @@ using System.Linq;
 
 namespace CowSpeak{
 	public class CowSpeak{
-		public static List< Function > staticFX = FunctionAttr.GetFunctions();
+		public static List< FunctionBase > Functions = FunctionAttr.GetStaticFunctions();
 
 		public static List< string[] > Definitions = new List< string[] >();
 
-		public static Function findFunction(string functionName, bool _throw = true){
+		public static FunctionBase GetFunction(string functionName, bool _throw = true){
 			if (functionName.IndexOf(".") != -1){
-				Variable obj = getVariable(functionName.Substring(0, functionName.IndexOf(".")), false); // interpret variable name to the left of the period as a variable
+				Variable obj = GetVariable(functionName.Substring(0, functionName.IndexOf(".")), false); // interpret variable name to the left of the period as a variable
 
 				if (obj != null)
 					functionName = obj.vType.Name + functionName.Substring(functionName.IndexOf("."));
 			} // if it has a period, it's probably a method
 
-			for (int i = 0; i < staticFX.Count; i++){
-				if (functionName.IndexOf(staticFX[i].Name) == 0)
-					return staticFX[i];
+			for (int i = 0; i < Functions.Count; i++){
+				if (functionName.IndexOf(Functions[i].Name) == 0)
+					return Functions[i];
 			}
 
 			if (functionName.IndexOf(".") != -1){
-				Function found = findFunction("Any" + functionName.Substring(functionName.IndexOf(".")), false);
+				FunctionBase found = GetFunction("Any" + functionName.Substring(functionName.IndexOf(".")), false);
 				if (found != null)
 					return found;
 			} // try to see if it's an 'Any' method
 
 			if (_throw){
-				FATAL_ERROR("Function '" + functionName + "' not found");
+				FatalError("Function '" + functionName + "' not found");
 				return null;
 			}
 			return null;
-		} // find fuction with matching name
+		}
+
+		public static void ClearUserFunctions(){
+			for (int i = 0; i < Functions.Count; i++){
+				if (Functions[i].definitionType == DefinitionType.User)
+					Functions.RemoveAt(i);
+			}
+		}
 
 		public static bool shouldDebug = false;
 
 		public static int currentLine = -1;
 		public static string currentFile = "";
 
-		public static void FATAL_ERROR(string errorStr) {
-			Console.WriteLine("\n(" + currentFile + ", " + currentLine + ") FATAL_ERROR: " + errorStr);
+		public static void FatalError(string errorStr) {
+			Console.WriteLine("\n(" + currentFile + ", " + currentLine + ") Fatal Error: " + errorStr);
 			Console.ReadKey(); // prevent immediate closure
 			currentFile = "";
 			currentLine = -1;
@@ -50,20 +57,23 @@ namespace CowSpeak{
 
 		public static List< Variable > Vars = new List< Variable >();
 
-		public static Variable getVariable(string varName, bool _throw = true) {
+		public static void CreateVariable(Variable variable){
+			if (GetVariable(variable.Name, false) != null) // already exists
+				FatalError("Cannot create variable '" + variable.Name + "', a variable by that name already exists");
+			
+			Vars.Add(variable);
+		}
+
+		public static Variable GetVariable(string varName, bool _throw = true) {
 			for (int i = 0; i < Vars.Count; i++) {
 				if (Vars[i].Name == varName)
 					return Vars[i];
 			}
 			if (_throw){
-				FATAL_ERROR("Could not find variable: " + varName);
+				FatalError("Could not find variable: " + varName);
 				return null;
 			}
 			return null;
-		}
-
-		public static bool isVarDefined(string varName) {
-			return getVariable(varName, false) != null;
 		}
 
 		public static void Exec(string fileName, bool ishouldDebug){
@@ -71,11 +81,11 @@ namespace CowSpeak{
 			shouldDebug = ishouldDebug;
 
 			if (!File.Exists(fileName))
-				FATAL_ERROR("Cannot execute COWFILE '" + fileName + "', it doesn't exist");
+				FatalError("Cannot execute COWFILE '" + fileName + "', it doesn't exist");
 			else if (fileName.IndexOf(".cf") == -1)
-				FATAL_ERROR("Cannot execute COWFILE '" + fileName + "', it doesn't have the .cf file extension");
+				FatalError("Cannot execute COWFILE '" + fileName + "', it doesn't have the .cf file extension");
 
-			new Lexer(new CowConfig.readConfig(fileName).GetLines(), shouldDebug);
+			new Lexer(new CowConfig.ReadConfig(fileName).GetLines(), shouldDebug);
 		}
 
 		public static void Exec(string[] lines, bool ishouldDebug){
@@ -89,12 +99,14 @@ namespace CowSpeak{
 			Exec(fileName, ishouldDebug);
 			Vars.Clear();
 			Definitions.Clear();
+			ClearUserFunctions();
 		}
 
 		public static void Run(string[] lines, bool ishouldDebug = false){
 			Exec(lines, ishouldDebug);
 			Vars.Clear();
 			Definitions.Clear();
+			ClearUserFunctions();
 		}
 	}
 }

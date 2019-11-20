@@ -3,6 +3,7 @@ using System.Collections.Generic;
 namespace CowSpeak{
 	public enum TokenType {
 		FunctionCall,
+		FunctionDefinition,
 		Number,
 		AddOperator,
 		SubtractOperator,
@@ -24,7 +25,8 @@ namespace CowSpeak{
 		IsNotEqualOperator,
 		IsGreaterThanOperator,
 		IsLessThanOperator,
-		DeleteIdentifier
+		DeleteIdentifier,
+		ReturnStatement
 	};
 
 	public class Token {
@@ -46,42 +48,42 @@ namespace CowSpeak{
 		private static bool isStringableVar(Token token){
 			if (token.type != TokenType.VariableIdentifier)
 				return false;
-			Variable _var = CowSpeak.getVariable(token.identifier, false);
-			return _var != null && _var.vType == VarType.String;
+			Variable _var = CowSpeak.GetVariable(token.identifier, false);
+			return _var != null && _var.vType == Type.String;
 		}
 
 		private static bool isStringableFunc(Token token){
 			if (token.type != TokenType.FunctionCall)
 				return false;
-			Function func = CowSpeak.findFunction(token.identifier, false);
-			return func != null && func.type == VarType.String;	
+			FunctionBase func = CowSpeak.GetFunction(token.identifier, false);
+			return func != null && func.type == Type.String;	
 		}
 
 		private static bool isCharableVar(Token token){
 			if (token.type != TokenType.VariableIdentifier)
 				return false;
-			Variable _var = CowSpeak.getVariable(token.identifier, false);
-			return _var != null && _var.vType == VarType.Character;
+			Variable _var = CowSpeak.GetVariable(token.identifier, false);
+			return _var != null && _var.vType == Type.Character;
 		}
 
 		private static bool isCharableFunc(Token token){
 			if (token.type != TokenType.FunctionCall)
 				return false;
-			Function func = CowSpeak.findFunction(token.identifier, false);
-			return func != null && func.type == VarType.Character;	
+			FunctionBase func = CowSpeak.GetFunction(token.identifier, false);
+			return func != null && func.type == Type.Character;	
 		}
 
 		private static Any FixCharChain(List< Token > toEval, int i, string identifier){
 			if ((toEval[i].type == TokenType.Character || isCharableFunc(toEval[i]) || isCharableVar(toEval[i])) && i == toEval.Count - 1){
 				Any result = new Any();
-				result.vType = VarType.Character;
+				result.vType = Type.Character;
 
 				if (toEval[i].type == TokenType.Character)
 					result.Set(toEval[i].identifier[0]);
 				else if (toEval[i].type == TokenType.FunctionCall)
-					result.Set((char)CowSpeak.findFunction(identifier).Execute(identifier).Get());
+					result.Set((char)CowSpeak.GetFunction(identifier).Execute(identifier).Get());
 				else
-					result.Set((char)CowSpeak.getVariable(toEval[i].identifier).Get()); // stringable variable
+					result.Set((char)CowSpeak.GetVariable(toEval[i].identifier).Get()); // stringable variable
 
 				return result;
 			}
@@ -93,17 +95,17 @@ namespace CowSpeak{
 			if (toEval[i].type == TokenType.String || isStringableVar(toEval[i]) || isStringableFunc(toEval[i]) || toEval[i].type == TokenType.Character || isCharableVar(toEval[i]) || isCharableFunc(toEval[i])){
 				// who wants some spaghetti?
 				Any result = new Any();
-				result.vType = VarType.String;
+				result.vType = Type.String;
 				List< string > additors = new List< string >();
 
 				if (toEval[i].type == TokenType.String || toEval[i].type == TokenType.Character)
 					additors.Add(toEval[i].identifier);
 				else if (toEval[i].type == TokenType.VariableIdentifier)
-					additors.Add(CowSpeak.getVariable(toEval[i].identifier).Get().ToString()); // stringable variable
+					additors.Add(CowSpeak.GetVariable(toEval[i].identifier).Get().ToString()); // stringable variable
 				else if (toEval[i].type == TokenType.FunctionCall)
-					additors.Add(CowSpeak.findFunction(identifier).Execute(identifier).Get().ToString());
+					additors.Add(CowSpeak.GetFunction(identifier).Execute(identifier).Get().ToString());
 				else
-					CowSpeak.FATAL_ERROR("An unknown error has occured in 'TryStrChain'");
+					CowSpeak.FatalError("An unknown error has occured in 'TryStrChain'");
 
 				int index = i;
 				while (true){
@@ -111,15 +113,15 @@ namespace CowSpeak{
 					if (index != i + 1)
 						index++;
 					
-					if (!Utils.isIndexValid(index + 1, toEval) || !Utils.isIndexValid(index, toEval) || toEval[index].type != TokenType.AddOperator)
+					if (!Utils.IsIndexValid(index + 1, toEval) || !Utils.IsIndexValid(index, toEval) || toEval[index].type != TokenType.AddOperator)
 						break;
 					
 					if (toEval[index + 1].type == TokenType.VariableIdentifier)
-						additors.Add(CowSpeak.getVariable(toEval[index + 1].identifier).Get().ToString());
+						additors.Add(CowSpeak.GetVariable(toEval[index + 1].identifier).Get().ToString());
 					else if (toEval[index + 1].type == TokenType.String || toEval[index + 1].type == TokenType.Number || toEval[index + 1].type == TokenType.Character)
 						additors.Add(toEval[index + 1].identifier);
 					else if (toEval[index + 1].type == TokenType.FunctionCall)
-						additors.Add(CowSpeak.findFunction(toEval[index + 1].identifier).Execute(toEval[index + 1].identifier).Get().ToString()); // stringable func
+						additors.Add(CowSpeak.GetFunction(toEval[index + 1].identifier).Execute(toEval[index + 1].identifier).Get().ToString()); // stringable func
 					else 
 						break;
 				}
@@ -140,12 +142,12 @@ namespace CowSpeak{
 
 			for (int i = 0; i < tokens.Count; i++){
 				if (tokens[i].type == TokenType.FunctionCall){
-					if (CowSpeak.findFunction(tokens[i].identifier).isVoid()){
-						if (Utils.isIndexValid(i - 1, tokens) && Utils.isOperator(tokens[i-1].type)){
-							CowSpeak.FATAL_ERROR("Cannot perform operation: '" + tokens[i-1].identifier + "' on void function");
+					if (CowSpeak.GetFunction(tokens[i].identifier).isVoid()){
+						if (Utils.IsIndexValid(i - 1, tokens) && Utils.IsOperator(tokens[i-1].type)){
+							CowSpeak.FatalError("Cannot perform operation: '" + tokens[i-1].identifier + "' on void function");
 						}
-						if (Utils.isIndexValid(i + 1, tokens) && Utils.isOperator(tokens[i+1].type)){
-							CowSpeak.FATAL_ERROR("Cannot perform operation: '" + tokens[i+1].identifier + "' on void function");
+						if (Utils.IsIndexValid(i + 1, tokens) && Utils.IsOperator(tokens[i+1].type)){
+							CowSpeak.FatalError("Cannot perform operation: '" + tokens[i+1].identifier + "' on void function");
 						}
 					}
 				
@@ -174,13 +176,13 @@ namespace CowSpeak{
 
 				if (toEval[i].type == TokenType.VariableIdentifier){
 					type = TokenType.Number;
-					identifier = CowSpeak.getVariable(identifier).Get().ToString(); // replace variable name with it's value
+					identifier = CowSpeak.GetVariable(identifier).Get().ToString(); // replace variable name with it's value
 				} // TOFIX
 				if (toEval[i].type == TokenType.WhileConditional || toEval[i].type == TokenType.IfConditional || toEval[i].type == TokenType.EndBracket)
 					continue;
 				else if (toEval[i].type == TokenType.FunctionCall){
 					type = TokenType.Number;
-					Function func = CowSpeak.findFunction(identifier);
+					FunctionBase func = CowSpeak.GetFunction(identifier);
 					if (toEval.Count == 1)
 						return new Any(func.type, func.Execute(identifier).Get());
 					identifier = func.Execute(identifier).Get().ToString(); // replace function call with it's return value
@@ -190,13 +192,13 @@ namespace CowSpeak{
 			}
 
 			if (Evaluated.Count == 0)
-				return new Any(VarType.Integer, 0);
+				return new Any(Type.Integer, 0);
 
 			Any evaluatedValue = new Any();
-			evaluatedValue.vType = VarType.Decimal;
+			evaluatedValue.vType = Type.Decimal;
 			evaluatedValue.Set(Evaluate.EvaluateTokens(Evaluated));
 			if (((double)evaluatedValue.Get()).ToString().IndexOf(".") == -1)
-				evaluatedValue.vType = VarType.Integer; // decimal not found, we can convert to int
+				evaluatedValue.vType = Type.Integer; // decimal not found, we can convert to int
 
 			return evaluatedValue;
 		}

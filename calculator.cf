@@ -1,3 +1,5 @@
+print("Calculator:\n")
+
 print("Enter number left of symbol: ")
 decimal left = inputDecimal()
 

@@ -1,0 +1,26 @@
+# This is a demo of how language defined functions COULD be directly defined in CowSpeak and not C#
+
+decimal abs(decimal in){
+	if(in > 0.0){
+		return in
+	}
+	else{
+		return in * -1
+	}
+}
+
+print("abs:\n" + abs(152.12) + "\n" + abs(-56.1) + "\n")
+
+integer round(decimal in){
+	integer closestInt = in
+	in = in - closestInt
+	if(in < 0.5){
+		return closestInt
+	}
+	else{
+		reutrn closestInt + 1
+	}
+}
+
+print("round:\n" + round(15.49) + "\n" + round(15.5) + "\n")
+

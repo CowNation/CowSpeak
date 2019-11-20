@@ -1,48 +1,47 @@
-using System;
-
 namespace CowSpeak{
-	public class VarType {
-		public string Name; // how the type is referenced
-		public Type rep; // C# represtation of type
+	public class Type {
+		public string Name; // how the type is referenced in the code
+		public System.Type rep; // C# represtation of type
 
-		public VarType(string Name, Type rep){
+		public Type(string Name, System.Type rep){
 			this.Name = Name;
 			this.rep = rep;
 		}
 
-		public static VarType Void = new VarType(Syntax.Void, typeof(void));
-		public static VarType Integer = new VarType(Syntax.Integer, typeof(int));
-		public static VarType Decimal = new VarType(Syntax.Decimal, typeof(double));
-		public static VarType String = new VarType(Syntax.String, typeof(string));
-		public static VarType Boolean = new VarType(Syntax.Boolean, typeof(bool));
-		public static VarType Character = new VarType(Syntax.Character, typeof(char));
+		public static Type Any = new Type(Syntax.Any, typeof(void));
+		public static Type Void = new Type(Syntax.Void, typeof(void));
+		public static Type Integer = new Type(Syntax.Integer, typeof(int));
+		public static Type Decimal = new Type(Syntax.Decimal, typeof(double));
+		public static Type String = new Type(Syntax.String, typeof(string));
+		public static Type Boolean = new Type(Syntax.Boolean, typeof(bool));
+		public static Type Character = new Type(Syntax.Character, typeof(char));
 
-		public static VarType[] GetTypes(){
-			return new VarType[]{Integer, Decimal, String, Character, Boolean};
+		public static Type[] GetTypes(){
+			return new Type[]{Integer, Decimal, String, Character, Boolean, Void, Any};
 		} // returns array of all static types
 
-		public static VarType GetType(string typeName){
-			foreach (VarType type in GetTypes()){
+		public static Type GetType(string typeName){
+			foreach (Type type in GetTypes()){
 				if (type.Name == typeName)
 					return type;
 			}	
 
-			CowSpeak.FATAL_ERROR("Type '" + typeName + "' does not exist");
+			CowSpeak.FatalError("Type '" + typeName + "' does not exist");
 			return null;
 		}
 	}
 
 	public class Any {
 		public ByteArray byteArr = new ByteArray();
-		public VarType vType;
+		public Type vType;
 
 		public Any(){}
 		
-		public Any(VarType vType) {
+		public Any(Type vType) {
 			this.vType = vType;
 		}
 
-		public Any(VarType vType, object initialValue) {
+		public Any(Type vType, object initialValue) {
 			this.vType = vType;
 			Set(initialValue);
 		}
@@ -53,10 +52,10 @@ namespace CowSpeak{
 
 		public object Get(){
 			try {
-				return Convert.ChangeType(byteArr.Get(), vType.rep);
+				return System.Convert.ChangeType(byteArr.Get(), vType.rep);
 			}
 			catch {
-				CowSpeak.FATAL_ERROR("Could not read variable '" + (this as Variable).Name + "', it may be corrupted");
+				CowSpeak.FatalError("Could not read variable '" + (this as Variable).Name + "', it may be corrupted");
 				return null;
 			} // lazy coder's way out
 		}
@@ -65,8 +64,13 @@ namespace CowSpeak{
 	public class Variable : Any {
 		public string Name;
 
-		public Variable(VarType vType, string Name) : base(vType) {
+		public Variable(Type vType, string Name) : base(vType) {
 			this.Name = Name;
+		}
+
+		public Variable(Type varType, string Name, object Value) : base(varType) {
+			this.Name = Name;
+			Set(Value);
 		}
 	};
 }

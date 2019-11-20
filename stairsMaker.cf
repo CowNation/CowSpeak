@@ -1,3 +1,5 @@
+print("Stairs Maker:\n")
+
 print("Enter the number of stairs: ")
 integer steps = inputInteger()
 

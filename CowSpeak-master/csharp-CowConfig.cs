@@ -7,7 +7,7 @@ using System.Globalization;
 using System.Text;
 
 namespace CowConfig{
-	class readConfig{
+	class ReadConfig{
 		private List< string > Lines = new List< string >();
 
 		private void ReadAllLines(string FileName){
@@ -18,7 +18,7 @@ namespace CowConfig{
 			Section = "[" + Section + "]";
 			bool SectionFound = false;
 			for (int i = 0; i < Lines.Count(); i++){
-				if (Lines[i] == Section)
+				if (Lines[i] == Section || Section == "[]")
 					SectionFound = true;
 				else if (SectionFound && Lines[i].IndexOf("[") != -1 && Lines[i].IndexOf("]") != -1)
 					break;
@@ -28,15 +28,21 @@ namespace CowConfig{
 			return -1;
 		}
 
-		public List< string > GetLines(){
-			return Lines;
+		private static T TryParse<T>(string inValue)
+		{
+			TypeConverter converter = TypeDescriptor.GetConverter(typeof(T));
+			return (T)converter.ConvertFromString(null, CultureInfo.InvariantCulture, inValue);
 		}
 
-		public readConfig(string FileName){
-			if (!File.Exists(FileName))
-				throw new Exception(FileName + " does not exist");
+		public ReadConfig(string fileName){
+			if (!File.Exists(fileName))
+				throw new Exception(fileName + " does not exist");
 
-			ReadAllLines(FileName);
+			ReadAllLines(fileName);
+		}
+
+		public List< string > GetLines(){
+			return Lines;
 		}
 
 		public T Read<T>(string Section, string offsetText){
@@ -47,7 +53,7 @@ namespace CowConfig{
 			try{
 				string temp = Lines[lineIndex];
 				temp = temp.Replace(offsetText, "");
-				return CowSpeak.Utils.TryParse<T>(temp);
+				return TryParse<T>(temp);
 			}
 			catch {
 				return default(T);
@@ -55,16 +61,16 @@ namespace CowConfig{
 		}
 	};
 
-	class writeConfig{
+	class WriteConfig{
 		private FileStream writeStream;
 
-		public writeConfig(string FileName){
-			if (!File.Exists(FileName))
-				File.Create(FileName).Close();
+		public WriteConfig(string fileName){
+			if (!File.Exists(fileName))
+				File.Create(fileName).Close();
 
-			writeStream = File.OpenWrite(FileName);
+			writeStream = File.OpenWrite(fileName);
 		}
-		~writeConfig(){
+		~WriteConfig(){
 			Close();
 		}
 
@@ -72,10 +78,10 @@ namespace CowConfig{
 			writeStream.Close();
 		}
 
-		private static void AddText(FileStream fs, string value)
+		private static void AddText(FileStream fileStream, string value)
 		{
 			byte[] info = new UTF8Encoding(true).GetBytes(value);
-			fs.Write(info, 0, info.Length);
+			fileStream.Write(info, 0, info.Length);
 		}
 
 		public void Section(string Text){

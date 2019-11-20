@@ -8,7 +8,7 @@ namespace CowSpeak{
 			while (true){
 				Token token = Tokens[index];
 
-				if ((token.type == TokenType.MultiplyOperator || token.type == TokenType.DivideOperator || token.type == TokenType.ModuloOperator) && Utils.isIndexValid(index - 1, Tokens) && Utils.isIndexValid(index + 1, Tokens)){
+				if ((token.type == TokenType.MultiplyOperator || token.type == TokenType.DivideOperator || token.type == TokenType.ModuloOperator) && Utils.IsIndexValid(index - 1, Tokens) && Utils.IsIndexValid(index + 1, Tokens)){
 					Token _operator = Tokens[index];
 					double _left = Convert.ToDouble(Tokens[index - 1].identifier);
 					double _right = Convert.ToDouble(Tokens[index + 1].identifier);
@@ -18,12 +18,12 @@ namespace CowSpeak{
 						answer.identifier = (_left * _right).ToString();
 					else if (_operator.type == TokenType.DivideOperator){
 						if (_right == 0)
-							CowSpeak.FATAL_ERROR("Cannot divide by 0");
+							CowSpeak.FatalError("Cannot divide by 0");
 						answer.identifier = (_left / _right).ToString();
 					}
 					else if (_operator.type == TokenType.ModuloOperator){
 						if (_right == 0)
-							CowSpeak.FATAL_ERROR("Cannot divide by 0");
+							CowSpeak.FatalError("Cannot divide by 0");
 						answer.identifier = (_left % _right).ToString();
 					}
 
@@ -35,7 +35,7 @@ namespace CowSpeak{
 					index = 0;			
 				}
 
-				if (Utils.isIndexValid(index + 1, Tokens))
+				if (Utils.IsIndexValid(index + 1, Tokens))
 					index++;
 				else
 					break;	
@@ -51,7 +51,7 @@ namespace CowSpeak{
 				while (true){
 					Token token = Tokens[index];
 
-					if (token.type == TokenType.PowerOperator && Utils.isIndexValid(index - 1, Tokens) && Utils.isIndexValid(index + 1, Tokens)){
+					if (token.type == TokenType.PowerOperator && Utils.IsIndexValid(index - 1, Tokens) && Utils.IsIndexValid(index + 1, Tokens)){
 						Token _operator = Tokens[index];
 						double _left = Convert.ToDouble(Tokens[index - 1].identifier);
 						double _right = Convert.ToDouble(Tokens[index + 1].identifier);
@@ -67,7 +67,7 @@ namespace CowSpeak{
 						index = 0;			
 					}
 
-					if (Utils.isIndexValid(index + 1, Tokens))
+					if (Utils.IsIndexValid(index + 1, Tokens))
 						index++;
 					else
 						break;	
@@ -80,10 +80,10 @@ namespace CowSpeak{
 				while (Tokens.Count > 1){
 					Token token = Tokens[index];
 
-					if (token.type != TokenType.Number && !Utils.isOperator(token.type))
-						CowSpeak.FATAL_ERROR("Illegal token type '" + token.type.ToString() + "' in EvaluateTokens");
+					if (token.type != TokenType.Number && !Utils.IsOperator(token.type))
+						CowSpeak.FatalError("Illegal token type '" + token.type.ToString() + "' in EvaluateTokens");
 
-					if (Utils.isIndexValid(index - 1, Tokens) && Utils.isIndexValid(index - 2, Tokens)){
+					if (Utils.IsIndexValid(index - 1, Tokens) && Utils.IsIndexValid(index - 2, Tokens)){
 						Token _operator = Tokens[index - 1];
 
 						double _left = Convert.ToDouble(Tokens[index - 2].identifier);
@@ -95,7 +95,7 @@ namespace CowSpeak{
 						else if (_operator.type == TokenType.SubtractOperator)
 							answer.identifier = (_left - _right).ToString();
 						else
-							CowSpeak.FATAL_ERROR("Cannot evaluate non-operator token: " + answer.type.ToString());
+							CowSpeak.FatalError("Cannot evaluate non-operator token: " + answer.type.ToString());
 
 						Tokens.RemoveAt(index);
 						Tokens.RemoveAt(index - 1);
@@ -105,7 +105,7 @@ namespace CowSpeak{
 						index = 0;
 					}
 
-					if (Utils.isIndexValid(index + 1, Tokens))
+					if (Utils.IsIndexValid(index + 1, Tokens))
 						index++;
 					else
 						break;
@@ -117,7 +117,7 @@ namespace CowSpeak{
 						errMsg += token.identifier + " ";
 					}
 					errMsg += "'";
-					CowSpeak.FATAL_ERROR(errMsg);
+					CowSpeak.FatalError(errMsg);
 				}
 
 				return Convert.ToDouble(Tokens[0].identifier);
@@ -128,7 +128,7 @@ namespace CowSpeak{
 					errMsg += token.identifier + " ";
 				}
 				errMsg += "'\nError: " + ex.Message;
-				CowSpeak.FATAL_ERROR(errMsg);
+				CowSpeak.FatalError(errMsg);
 				return 0;
 			}
 		} 
@@ -140,7 +140,7 @@ namespace CowSpeak{
 				while (Tokens.Count > 1){
 					Token token = Tokens[index];
 
-					if (Utils.isIndexValid(index - 1, Tokens) && Utils.isIndexValid(index + 1, Tokens) && token.type.ToString().IndexOf("Is") != -1){
+					if (Utils.IsIndexValid(index - 1, Tokens) && Utils.IsIndexValid(index + 1, Tokens) && token.type.ToString().IndexOf("Is") != -1){
 						Token _operator = token;
 
 						Any _left = new TokenLine(new List< Token >{ Tokens[index - 1] }).Exec();
@@ -153,7 +153,7 @@ namespace CowSpeak{
 							answer.identifier = (_left.Get().ToString() != _right.Get().ToString()).ToString();
 						else if (_operator.type == TokenType.IsGreaterThanOperator || _operator.type == TokenType.IsLessThanOperator){
 							if (!Utils.IsDigitsOnly(_left.Get().ToString()) || !Utils.IsDigitsOnly(_right.Get().ToString()))
-								CowSpeak.FATAL_ERROR("Cannot perform '" + _operator.type.ToString() + "' with non-number operands");
+								CowSpeak.FatalError("Cannot perform '" + _operator.type.ToString() + "' with non-number operands");
 
 							if (_operator.type == TokenType.IsGreaterThanOperator)
 								answer.identifier = (Convert.ToDouble(_left.Get()) > Convert.ToDouble(_right.Get())).ToString();
@@ -161,7 +161,7 @@ namespace CowSpeak{
 								answer.identifier = (Convert.ToDouble(_left.Get()) < Convert.ToDouble(_right.Get())).ToString();
 						}
 						else
-							CowSpeak.FATAL_ERROR("Cannot evaluate non-comparison token: " + answer.type.ToString());
+							CowSpeak.FatalError("Cannot evaluate non-comparison token: " + answer.type.ToString());
 
 						answer.identifier = Utils.FixBoolean(answer.identifier);
 
@@ -173,7 +173,7 @@ namespace CowSpeak{
 						index = 0;
 					}
 
-					if (Utils.isIndexValid(index + 1, Tokens))
+					if (Utils.IsIndexValid(index + 1, Tokens))
 						index++;
 					else
 						break;
@@ -184,7 +184,7 @@ namespace CowSpeak{
 					foreach (Token token in Tokens)
 						errMsg += token.identifier + " ";
 					errMsg += "'";
-					CowSpeak.FATAL_ERROR(errMsg);
+					CowSpeak.FatalError(errMsg);
 				}
 
 				return Tokens[0].identifier == "1" || Tokens[0].identifier == "True";
@@ -194,7 +194,7 @@ namespace CowSpeak{
 				foreach (Token token in Tokens)
 					errMsg += token.identifier + " ";
 				errMsg += "'\nError: " + ex.Message;
-				CowSpeak.FATAL_ERROR(errMsg);
+				CowSpeak.FatalError(errMsg);
 				return false;
 			}
 		} 

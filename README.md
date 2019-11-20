@@ -7,11 +7,13 @@ This program uses csharp-CowConfig. To see CowConfig go to https://github.com/Co
 * Most standard operators you would expect (+, -, *, /, =, ^, %)
 * Single line comments
 * Conditionals (if, else, loop, while)
-* Functions
+* Language defined functions
+* User defined functions
 * Methods
 * Detailed error throwing
 * Simple per-line token debugging
 * Scopes & manual variable deletion
+* Easily modifiable syntax
 ## Previous Versions
 [v1 (Initial release on May 17, 2019)](https://github.com/CowNation/CowSpeak/tree/295d57e0a54622b5fc0483c6d1f163408d728aaf)
 
