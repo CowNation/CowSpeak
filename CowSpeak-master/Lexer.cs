@@ -169,8 +169,12 @@ namespace CowSpeak{
 			for (int i = 0; i < fileLines.Count; i++){
 				CowSpeak.currentLine = i + 1 + currentLineOffset;
 
-				if (isNestedInFunction && Lines[i].tokens.Count > 1 && Lines[i].tokens[0].type == TokenType.ReturnStatement)
-					return; // ReturnStatement to be handled by UserFunction.ExecuteLines
+				if (Lines[i].tokens.Count > 1 && Lines[i].tokens[0].type == TokenType.ReturnStatement){
+					if (isNestedInFunction)
+						return; // ReturnStatement to be handled by UserFunction.ExecuteLines
+					else
+						CowSpeak.FatalError("ReturnStatement must be located inside of a FunctionDefinition");
+				}
 
 
 				if (Lines[i].tokens.Count > 1 && Lines[i].tokens[0].type == TokenType.TypeIdentifier && Lines[i].tokens[1].type == TokenType.FunctionDefinition){
@@ -291,7 +295,7 @@ namespace CowSpeak{
 					continue; // prevent execution
 				} // must handle this before the other lines are evaluated to avoid wrong exceptions
 
-				bool shouldBeSet = false; // the most recent variable in list should be set after exec
+				bool shouldBeSet = false; // topmost variable in list should be set after exec
 				if (Lines[i].tokens.Count >= 3 && Lines[i].tokens[0].type == TokenType.TypeIdentifier && Lines[i].tokens[1].type == TokenType.VariableIdentifier && Lines[i].tokens[2].type == TokenType.EqualOperator){
 					CowSpeak.CreateVariable(new Variable(Type.GetType(Lines[i].tokens[0].identifier), Lines[i].tokens[1].identifier));
 
@@ -299,6 +303,11 @@ namespace CowSpeak{
 				} // variable must be created before exec is called so that it may be accessed
 
 				Any retVal = Lines[i].Exec(); // Execute line
+
+				if (Lines[i].tokens.Count >= 3 && Lines[i].tokens[1].type == TokenType.VariableIdentifier && Lines[i].tokens[2].type == TokenType.EqualOperator && !Conversion.IsCompatible(CowSpeak.GetVariable(Lines[i].tokens[1].identifier).vType, retVal.vType))
+					CowSpeak.FatalError("Cannot set '" + Lines[i].tokens[1].identifier + "', type '" + CowSpeak.GetVariable(Lines[i].tokens[1].identifier).vType.Name + "' is incompatible with '" + retVal.vType.Name + "'"); // check if types are compatible
+				else if (Lines[i].tokens.Count >= 2 && Lines[i].tokens[0].type == TokenType.VariableIdentifier && Lines[i].tokens[1].type == TokenType.EqualOperator && !Conversion.IsCompatible(CowSpeak.GetVariable(Lines[i].tokens[0].identifier).vType, retVal.vType))
+					CowSpeak.FatalError("Cannot set '" + Lines[i].tokens[0].identifier + "', type '" + CowSpeak.GetVariable(Lines[i].tokens[0].identifier).vType.Name + "' is incompatible with '" + retVal.vType.Name + "'"); // check if types are compatible
 
 				if (shouldBeSet)
 					CowSpeak.Vars[CowSpeak.Vars.Count - 1].byteArr = retVal.byteArr;
@@ -311,7 +320,7 @@ namespace CowSpeak{
 						if (Lines[i].tokens[0].identifier == CowSpeak.Vars[v].Name)
 							CowSpeak.Vars[v].byteArr = retVal.byteArr;
 					} // using GetVariable does not work for this
-				} // type is not specified, var must be defined
+				} // type is not specified, var must already be defined
 			} // EXECUTION
 		}
 	}

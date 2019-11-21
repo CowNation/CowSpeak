@@ -21,15 +21,14 @@ string ToLower(string str){
 		result = result + char.ToLower()
 	}
 
-
 	return result
 }
 
 print("Enter the target string: ")
-string target = inputString()
+string target = InputString()
 
 print("Convert ToUpper(1) or ToLower(0): ")
-integer ToUpper = inputInteger()
+integer ToUpper = InputInteger()
 
 if(ToUpper == 1){
 	print(ToUpper(target) + "\n")

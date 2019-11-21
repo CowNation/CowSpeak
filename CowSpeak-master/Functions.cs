@@ -94,14 +94,19 @@ namespace CowSpeak{
 		}
 		#endregion
 
-		[FunctionAttr("abs", Syntax.Decimal, Syntax.Decimal + " value")]
-		public static Any abs(Any[] parameters){
+		[FunctionAttr("Abs", Syntax.Decimal, Syntax.Decimal + " value")]
+		public static Any Abs(Any[] parameters){
 			return new Any(Type.Decimal, System.Math.Abs((double)parameters[0].Get()));
 		}
 
-		[FunctionAttr("round", Syntax.Integer, Syntax.Decimal + " value")]
-		public static Any round(Any[] parameters){
+		[FunctionAttr("Round", Syntax.Integer, Syntax.Decimal + " value")]
+		public static Any Round(Any[] parameters){
 			return new Any(Type.Integer, System.Math.Round((double)parameters[0].Get()));
+		}
+
+		[FunctionAttr("Sqrt", Syntax.Decimal, Syntax.Decimal + " value")]
+		public static Any Sqrt(Any[] parameters){
+			return new Any(Type.Integer, System.Math.Sqrt((double)parameters[0].Get()));
 		}
 
 		[FunctionAttr("sleep", Syntax.Void, Syntax.Integer + " ms")]
@@ -142,8 +147,8 @@ namespace CowSpeak{
 			return Utils.FixBoolean(toPrep.Get().ToString());
 		}
 
-		[FunctionAttr("random" + Syntax.c_Integer, Syntax.Integer, Syntax.Integer + " minimum, " + Syntax.Integer + " maximum")]
-		public static Any randomInteger(Any[] parameters){
+		[FunctionAttr("Random" + Syntax.c_Integer, Syntax.Integer, Syntax.Integer + " minimum, " + Syntax.Integer + " maximum")]
+		public static Any RandomInteger(Any[] parameters){
 			int minimum = (int)parameters[0].Get();
 			int maximum = (int)parameters[1].Get() + 1;
 
@@ -183,13 +188,13 @@ namespace CowSpeak{
 			return new Any(Type.Integer, 0);	
 		}
 
-		[FunctionAttr("input" + Syntax.c_String, Syntax.String, "")]
-		public static Any inputString(Any[] parameters){
+		[FunctionAttr("Input" + Syntax.c_String, Syntax.String, "")]
+		public static Any InputString(Any[] parameters){
 			return new Any(Type.String, System.Console.ReadLine());	
 		}
 
-		[FunctionAttr("input" + Syntax.c_Integer, Syntax.Integer, "")]
-		public static Any inputInteger(Any[] parameters){
+		[FunctionAttr("Input" + Syntax.c_Integer, Syntax.Integer, "")]
+		public static Any InputInteger(Any[] parameters){
 			string built = "";
 			System.ConsoleKeyInfo key = new System.ConsoleKeyInfo();
 			while (key.Key != System.ConsoleKey.Enter){
@@ -208,13 +213,13 @@ namespace CowSpeak{
 			return new Any(Type.Integer, _out);
 		}
 
-		[FunctionAttr("input" + Syntax.c_Character, Syntax.Character, "")]
-		public static Any inputCharacter(Any[] parameters){
+		[FunctionAttr("Input" + Syntax.c_Character, Syntax.Character, "")]
+		public static Any InputCharacter(Any[] parameters){
 			return new Any(Type.Character, System.Console.ReadKey().KeyChar);
 		}
 
-		[FunctionAttr("input" + Syntax.c_Decimal, Syntax.Decimal, "")]
-		public static Any inputDecimal(Any[] parameters){
+		[FunctionAttr("Input" + Syntax.c_Decimal, Syntax.Decimal, "")]
+		public static Any InputDecimal(Any[] parameters){
 			string built = "";
 			System.ConsoleKeyInfo key = new System.ConsoleKeyInfo();
 			while (key.Key != System.ConsoleKey.Enter){

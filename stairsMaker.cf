@@ -1,10 +1,10 @@
 print("Stairs Maker:\n")
 
 print("Enter the number of stairs: ")
-integer steps = inputInteger()
+integer steps = InputInteger()
 
 print("Enter the symbol: ")
-character symbol = inputCharacter()
+character symbol = InputCharacter()
 
 print("\n")
 
