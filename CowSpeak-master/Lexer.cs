@@ -64,6 +64,10 @@ namespace CowSpeak{
 				return new Token(TokenType.IsGreaterThanOperator, token);
 			else if (token == Syntax.IsLessThan)
 				return new Token(TokenType.IsLessThanOperator, token);
+			else if (token == Syntax.IsGreaterThanOrEqual)
+				return new Token(TokenType.IsGreaterThanOrEqualOperator, token);
+			else if (token == Syntax.IsLessThanOrEqual)
+				return new Token(TokenType.IsLessThanOrEqualOperator, token);
 			else if (token == Syntax.Add)
 				return new Token(TokenType.AddOperator, token);
 			else if (token == Syntax.Subtract)
@@ -116,7 +120,7 @@ namespace CowSpeak{
 			return ret;
 		}
 
-		public Lexer(List< string > fileLines, bool shouldDebug, int currentLineOffset = 0, bool isNestedInFunction = false) {
+		public Lexer(List< string > fileLines, int currentLineOffset = 0, bool isNestedInFunction = false) {
 			for (int i = 0; i < fileLines.Count; i++) {
 				CowSpeak.currentLine = i + 1 + currentLineOffset;
 
@@ -153,7 +157,7 @@ namespace CowSpeak{
 				Lines.Add(new TokenLine(ParseLine(fileLines[i])));
 				TokenLine recentLine = Lines[Lines.Count - 1];
 
-				if (!isNestedInFunction && shouldDebug && recentLine.tokens.Count > 0){
+				if (!isNestedInFunction && CowSpeak.Debug && recentLine.tokens.Count > 0){
 					System.Console.WriteLine("\n(" + CowSpeak.currentFile + ") Line " + (i + 1) + ": ");
 					foreach (var token in recentLine.tokens){
 						System.Console.WriteLine(token.type.ToString() + " - " + token.identifier.Replace(System.Environment.NewLine, @"\n").Replace(((char)0x1f).ToString(), " "));
@@ -165,6 +169,8 @@ namespace CowSpeak{
 					Lines[Lines.Count - 1] = new TokenLine(new List<Token>()); // line was already handled, clear line
 				} // must handle this function before the other lines are compiled to avoid errors
 			} // COMPILATION
+
+			CowSpeak.Debug = false; // only debug tokens on compilation, needed because many things recurse back to Lexer
 
 			for (int i = 0; i < fileLines.Count; i++){
 				CowSpeak.currentLine = i + 1 + currentLineOffset;
@@ -194,7 +200,7 @@ namespace CowSpeak{
 						if (new Conditional(Lines[i].tokens[0].identifier).EvaluateBoolean()){
 							RestrictedScope scope = new RestrictedScope();
 
-							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), shouldDebug, i + 1);
+							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1);
 
 							scope.End();
 						}
@@ -224,7 +230,7 @@ namespace CowSpeak{
 						if (!new Conditional(Lines[parentIf].tokens[0].identifier).EvaluateBoolean()){
 							RestrictedScope scope = new RestrictedScope();
 
-							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), shouldDebug, i + 1);
+							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1);
 
 							scope.End();
 						}
@@ -239,7 +245,7 @@ namespace CowSpeak{
 						while (whileStatement.EvaluateBoolean()){
 							RestrictedScope scope = new RestrictedScope();
 
-							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), shouldDebug, i + 1);
+							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1);
 
 							scope.End();
 						}
@@ -265,7 +271,7 @@ namespace CowSpeak{
 
 							CowSpeak.GetVariable(varName).Set(p);
 
-							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), shouldDebug, i + 1);
+							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1);
 
 							scope.End();
 						}

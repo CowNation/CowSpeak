@@ -97,13 +97,12 @@ namespace CowSpeak {
 			}
 		}
 
-		public static List< FunctionBase > GetStaticFunctions() {
+		public static List< FunctionBase > GetFunctions() {
             List< FunctionBase > functions = new List< FunctionBase >();
 
-            MethodInfo[] funcMethods = typeof(Functions).GetMethods(); // Get all methods from the Functions class
+			var methods = typeof(Functions).GetMethods().Where(m => m.GetCustomAttributes(typeof(FunctionAttr), false).Length > 0).ToArray(); // Get all methods from the function class with this attribute
 
-            foreach (MethodInfo method in funcMethods)
-            {
+            foreach (MethodInfo method in methods){
 				FunctionAttr functionAttr = (FunctionAttr)Attribute.GetCustomAttribute(method, typeof(FunctionAttr)); // get attribute for method
 
                 if (functionAttr == null || method == null)

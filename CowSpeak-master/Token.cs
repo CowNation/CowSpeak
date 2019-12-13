@@ -2,9 +2,6 @@ using System.Collections.Generic;
 
 namespace CowSpeak{
 	public enum TokenType {
-		FunctionCall,
-		FunctionDefinition,
-		Number,
 		AddOperator,
 		SubtractOperator,
 		MultiplyOperator,
@@ -12,20 +9,31 @@ namespace CowSpeak{
 		PowerOperator,
 		ModuloOperator,
 		EqualOperator,
-		VariableIdentifier,
-		TypeIdentifier,
-		String,
-		Character,
-		IfConditional,
-		ElseConditional,
-		WhileConditional,
-		LoopConditional,
-		EndBracket,
 		IsEqualOperator,
 		IsNotEqualOperator,
 		IsGreaterThanOperator,
 		IsLessThanOperator,
+		IsGreaterThanOrEqualOperator,
+		IsLessThanOrEqualOperator,
+
+		FunctionCall,
+		FunctionDefinition,
+
+		VariableIdentifier,
+		TypeIdentifier,
 		DeleteIdentifier,
+
+		Number,
+		String,
+		Character,
+
+		IfConditional,
+		ElseConditional,
+		WhileConditional,
+		LoopConditional,
+
+		EndBracket,
+
 		ReturnStatement
 	};
 

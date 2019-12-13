@@ -21,7 +21,7 @@ namespace CowSpeak{
 		}
 
 		private Any ExecuteLines(List< string > lines){
-			new Lexer(lines, CowSpeak.shouldDebug, definitionOffset + 1, true);
+			new Lexer(lines, definitionOffset + 1, true);
 			string ReturnedLine = Definition[CowSpeak.currentLine - definitionOffset - 2]; // relative line where Lexer returned
 
 			if (ReturnedLine.IndexOf(Syntax.Return + " ") != 0) // missing ReturnStatement as 1st token

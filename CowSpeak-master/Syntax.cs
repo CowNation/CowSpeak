@@ -33,6 +33,8 @@ namespace CowSpeak{
 		public const string IsNotEqual = "!=";
 		public const string IsGreaterThan = ">";
 		public const string IsLessThan = "<";
+		public const string IsGreaterThanOrEqual = ">=";
+		public const string IsLessThanOrEqual = "<=";
 
 		// Operators
 		public const string Add = "+";

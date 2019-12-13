@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace CowSpeak{
 	public class CowSpeak{
-		public static List< FunctionBase > Functions = FunctionAttr.GetStaticFunctions();
+		public static List< FunctionBase > Functions = FunctionAttr.GetFunctions();
 
 		public static List< string[] > Definitions = new List< string[] >();
 
@@ -42,7 +42,7 @@ namespace CowSpeak{
 			}
 		}
 
-		public static bool shouldDebug = false;
+		public static bool Debug = false;
 
 		public static int currentLine = -1;
 		public static string currentFile = "";
@@ -76,34 +76,34 @@ namespace CowSpeak{
 			return null;
 		}
 
-		public static void Exec(string fileName, bool ishouldDebug){
+		public static void Exec(string fileName, bool _Debug = false){
 			currentFile = fileName;
-			shouldDebug = ishouldDebug;
+			Debug = _Debug;
 
 			if (!File.Exists(fileName))
 				FatalError("Cannot execute COWFILE '" + fileName + "', it doesn't exist");
 			else if (fileName.IndexOf(".cf") == -1)
 				FatalError("Cannot execute COWFILE '" + fileName + "', it doesn't have the .cf file extension");
 
-			new Lexer(new CowConfig.ReadConfig(fileName).GetLines(), shouldDebug);
+			new Lexer(new CowConfig.ReadConfig(fileName).GetLines());
 		}
 
-		public static void Exec(string[] lines, bool ishouldDebug){
+		public static void Exec(string[] lines, bool _Debug = false){
 			currentFile = "";
-			shouldDebug = ishouldDebug;
+			Debug = _Debug;
 
-			new Lexer(lines.ToList(), shouldDebug);
+			new Lexer(lines.ToList());
 		}
 
-		public static void Run(string fileName, bool ishouldDebug = false){
-			Exec(fileName, ishouldDebug);
+		public static void Run(string fileName, bool _Debug = false){
+			Exec(fileName, _Debug);
 			Vars.Clear();
 			Definitions.Clear();
 			ClearUserFunctions();
 		}
 
-		public static void Run(string[] lines, bool ishouldDebug = false){
-			Exec(lines, ishouldDebug);
+		public static void Run(string[] lines, bool _Debug = false){
+			Exec(lines, _Debug);
 			Vars.Clear();
 			Definitions.Clear();
 			ClearUserFunctions();

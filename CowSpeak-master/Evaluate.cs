@@ -151,7 +151,7 @@ namespace CowSpeak{
 							answer.identifier = (_left.Get().ToString() == _right.Get().ToString()).ToString();
 						else if (_operator.type == TokenType.IsNotEqualOperator)
 							answer.identifier = (_left.Get().ToString() != _right.Get().ToString()).ToString();
-						else if (_operator.type == TokenType.IsGreaterThanOperator || _operator.type == TokenType.IsLessThanOperator){
+						else if (_operator.type == TokenType.IsGreaterThanOperator || _operator.type == TokenType.IsLessThanOperator || _operator.type == TokenType.IsGreaterThanOrEqualOperator || _operator.type == TokenType.IsLessThanOrEqualOperator){
 							if (!Utils.IsDigitsOnly(_left.Get().ToString()) || !Utils.IsDigitsOnly(_right.Get().ToString()))
 								CowSpeak.FatalError("Cannot perform '" + _operator.type.ToString() + "' with non-number operands");
 
@@ -159,6 +159,10 @@ namespace CowSpeak{
 								answer.identifier = (Convert.ToDouble(_left.Get()) > Convert.ToDouble(_right.Get())).ToString();
 							else if (_operator.type == TokenType.IsLessThanOperator)
 								answer.identifier = (Convert.ToDouble(_left.Get()) < Convert.ToDouble(_right.Get())).ToString();
+							else if (_operator.type == TokenType.IsGreaterThanOrEqualOperator)
+								answer.identifier = (Convert.ToDouble(_left.Get()) >= Convert.ToDouble(_right.Get())).ToString();
+							else if (_operator.type == TokenType.IsLessThanOrEqualOperator)
+								answer.identifier = (Convert.ToDouble(_left.Get()) <= Convert.ToDouble(_right.Get())).ToString();
 						}
 						else
 							CowSpeak.FatalError("Cannot evaluate non-comparison token: " + answer.type.ToString());

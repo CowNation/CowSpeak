@@ -1,7 +1,7 @@
 namespace CowSpeak{
 	public class Type {
 		public string Name; // how the type is referenced in the code
-		public System.Type rep; // C# represtation of type
+		public System.Type rep; // C# representation of type
 
 		public Type(string Name, System.Type rep){
 			this.Name = Name;

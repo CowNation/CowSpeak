@@ -169,7 +169,7 @@ namespace CowSpeak{
 			string currentFile = CowSpeak.currentFile;
 			string fileName = parameters[0].Get().ToString();
 			if (File.Exists(fileName))
-				CowSpeak.Exec(fileName, CowSpeak.shouldDebug); // Execute file specified
+				CowSpeak.Exec(fileName); // Execute file specified
 			else
 				CowSpeak.FatalError(fileName + " does not exist");
 			CowSpeak.currentFile = currentFile; // curr file is not set back after exec of another file
