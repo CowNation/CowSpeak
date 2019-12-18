@@ -24,7 +24,7 @@ namespace CowSpeak{
 			new Lexer(lines, definitionOffset + 1, true);
 			string ReturnedLine = Definition[CowSpeak.currentLine - definitionOffset - 2]; // relative line where Lexer returned
 
-			if (ReturnedLine.IndexOf(Syntax.Return + " ") != 0) // missing ReturnStatement as 1st token
+			if (ReturnedLine.IndexOf(Syntax.Return + " ") != 0 && type != Type.Void) // missing ReturnStatement as 1st token
 				CowSpeak.FatalError("Function is missing a ReturnStatement");
 
 			ReturnedLine = ReturnedLine.Remove(0, Syntax.Return.Length + 1);
