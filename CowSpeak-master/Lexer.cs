@@ -175,7 +175,7 @@ namespace CowSpeak{
 			for (int i = 0; i < fileLines.Count; i++){
 				CowSpeak.currentLine = i + 1 + currentLineOffset;
 
-				if (Lines[i].tokens.Count > 1 && Lines[i].tokens[0].type == TokenType.ReturnStatement){
+				if (Lines[i].tokens.Count >= 1 && Lines[i].tokens[0].type == TokenType.ReturnStatement){
 					if (isNestedInFunction)
 						return; // ReturnStatement to be handled by UserFunction.ExecuteLines
 					else

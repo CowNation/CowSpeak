@@ -82,6 +82,8 @@ namespace CowSpeak{
 						token.identifier = token.identifier.Remove(0, 1);
 					}
 					FunctionBase func = CowSpeak.GetFunction(token.identifier);
+					if (func.type == Type.Void)
+						CowSpeak.FatalError("Cannot pass void function as a parameter");
 					parameters.Add(new Any(func.type, func.Execute(token.identifier).Get()));
 					continue;
 				}

@@ -9,6 +9,7 @@ namespace CowSpeak{
 	public class UserFunction : FunctionBase {
 		List< string > Definition; // lines contained inside of the function
 		int definitionOffset; // offset of where the definition is so CowSpeak.currentLine is correct
+		string definedIn; // file function was defined in, may be empty
 
 		public UserFunction(string Name, List< string > Definition, Parameter[] Parameters, Type type, string properUsage, int definitionOffset) {
 			this.definitionType = DefinitionType.User;
@@ -18,18 +19,40 @@ namespace CowSpeak{
 			this.Name = Name;
 			this.Parameters = Parameters;
 			this.definitionOffset = definitionOffset;
+			this.definedIn = CowSpeak.currentFile;
 		}
 
 		private Any ExecuteLines(List< string > lines){
+			string currentFile = CowSpeak.currentFile;
+			CowSpeak.currentFile = definedIn;
+
 			new Lexer(lines, definitionOffset + 1, true);
+
 			string ReturnedLine = Definition[CowSpeak.currentLine - definitionOffset - 2]; // relative line where Lexer returned
 
-			if (ReturnedLine.IndexOf(Syntax.Return + " ") != 0 && type != Type.Void) // missing ReturnStatement as 1st token
+			if (type == Type.Void){
+				if (ReturnedLine.IndexOf(Syntax.Return) == 0 && ReturnedLine != Syntax.Return)
+					CowSpeak.FatalError("Cannot return a value from a void function");
+
+				return new Any(Type.Integer, 0);
+			}
+
+			if (ReturnedLine.IndexOf(Syntax.Return + " ") != 0)
 				CowSpeak.FatalError("Function is missing a ReturnStatement");
 
 			ReturnedLine = ReturnedLine.Remove(0, Syntax.Return.Length + 1);
 
-			return new TokenLine(Lexer.ParseLine(ReturnedLine)).Exec();
+			if (ReturnedLine.Length == 0)
+				CowSpeak.FatalError("ReturnStatement requires a value when the function type is not void");
+
+			Any returnedValue = new TokenLine(Lexer.ParseLine(ReturnedLine)).Exec();
+
+			if (!Conversion.IsCompatible(returnedValue.vType, type))
+				CowSpeak.FatalError("Incompatible return type ('" + returnedValue.vType.Name + "' is incompatible with '" + type.Name + "')");
+
+			CowSpeak.currentFile = currentFile;
+
+			return returnedValue;
 		}
 
 		public static Parameter[] ParseDefinitionParams(string s_params){
