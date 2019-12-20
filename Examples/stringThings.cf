@@ -1,0 +1,36 @@
+print("String Things:\n")
+
+string ReplaceFirstOf(string str, string lookFor, string replaceWith){
+	integer index = str.IndexOf(lookFor)
+	str = str.Remove(index, index + lookFor.Length())
+	str = str.Insert(index, replaceWith)
+	return str
+}
+
+string myn = "67.56"
+print("" + myn.ToDecimal() + "\n")
+delete myn # we don't need this var anymore
+
+string cs = "CowSpeak is literally the best language in the world!" # just kidding
+print(string.SubString(cs, 0, 8) + "\n")
+print(cs.SubString(0, 8) + "\n")
+
+# make a word out of a string
+character w = cs.CharacterAt(2)
+print(w.ToUpper() + cs.CharacterAt(1) + w + "ie\n")
+delete w
+
+# split string in two
+integer halfLen = cs.Length() / 2 # decimal to integer for use with some string methods
+print("First Half: " + cs.SubString(0, halfLen) + "\n")
+print("Second Half: " + cs.SubString(halfLen, cs.Length()) + "\n")
+delete halfLen
+
+# replace "world" with "universe"
+#integer worldIndex = cs.IndexOf("world")
+#cs = cs.Remove(worldIndex, worldIndex + 5)
+#cs = cs.Insert(worldIndex, "universe")
+cs = ReplaceFirstOf(cs, "world", "universe")
+print(cs + "\n")
+
+# the rest of vars are deleted on completion of execution of a file

@@ -8,13 +8,13 @@ namespace CowSpeak{
 			this.rep = rep;
 		}
 
-		public static Type Any = new Type(Syntax.Any, typeof(void));
-		public static Type Void = new Type(Syntax.Void, typeof(void));
-		public static Type Integer = new Type(Syntax.Integer, typeof(int));
-		public static Type Decimal = new Type(Syntax.Decimal, typeof(double));
-		public static Type String = new Type(Syntax.String, typeof(string));
-		public static Type Boolean = new Type(Syntax.Boolean, typeof(bool));
-		public static Type Character = new Type(Syntax.Character, typeof(char));
+		public static Type Any = new Type(Syntax.Types.Any, typeof(void));
+		public static Type Void = new Type(Syntax.Types.Void, typeof(void));
+		public static Type Integer = new Type(Syntax.Types.Integer, typeof(int));
+		public static Type Decimal = new Type(Syntax.Types.Decimal, typeof(double));
+		public static Type String = new Type(Syntax.Types.String, typeof(string));
+		public static Type Boolean = new Type(Syntax.Types.Boolean, typeof(bool));
+		public static Type Character = new Type(Syntax.Types.Character, typeof(char));
 
 		public static Type[] GetTypes(){
 			return new Type[]{Integer, Decimal, String, Character, Boolean, Void, Any};

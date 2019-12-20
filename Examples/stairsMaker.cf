@@ -1,0 +1,16 @@
+print("Stairs Maker:\n")
+
+print("Enter the number of stairs: ")
+integer steps = InputInteger()
+
+print("Enter the symbol: ")
+character symbol = InputCharacter()
+
+print("\n")
+
+loop("step", 0, steps){
+	loop("symbolNum", 0, step + 1){
+		print(symbol + " ")
+	}
+	print("\n")
+}

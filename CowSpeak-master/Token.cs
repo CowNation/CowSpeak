@@ -15,6 +15,7 @@ namespace CowSpeak{
 		IsLessThanOperator,
 		IsGreaterThanOrEqualOperator,
 		IsLessThanOrEqualOperator,
+		AndOperator,
 
 		FunctionCall,
 		FunctionDefinition,

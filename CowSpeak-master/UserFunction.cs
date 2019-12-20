@@ -31,16 +31,16 @@ namespace CowSpeak{
 			string ReturnedLine = Definition[CowSpeak.currentLine - definitionOffset - 2]; // relative line where Lexer returned
 
 			if (type == Type.Void){
-				if (ReturnedLine.IndexOf(Syntax.Return) == 0 && ReturnedLine != Syntax.Return)
+				if (ReturnedLine.IndexOf(Syntax.Statements.Return) == 0 && ReturnedLine != Syntax.Statements.Return)
 					CowSpeak.FatalError("Cannot return a value from a void function");
 
 				return new Any(Type.Integer, 0);
 			}
 
-			if (ReturnedLine.IndexOf(Syntax.Return + " ") != 0)
+			if (ReturnedLine.IndexOf(Syntax.Statements.Return + " ") != 0)
 				CowSpeak.FatalError("Function is missing a ReturnStatement");
 
-			ReturnedLine = ReturnedLine.Remove(0, Syntax.Return.Length + 1);
+			ReturnedLine = ReturnedLine.Remove(0, Syntax.Statements.Return.Length + 1);
 
 			if (ReturnedLine.Length == 0)
 				CowSpeak.FatalError("ReturnStatement requires a value when the function type is not void");

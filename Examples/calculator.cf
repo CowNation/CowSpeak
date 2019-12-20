@@ -1,0 +1,13 @@
+print("Calculator:\n")
+
+print("Enter number left of symbol: ")
+decimal left = InputDecimal()
+
+print("Enter symbol: ")
+character symbol = InputCharacter()
+
+print("\nEnter number right of symbol: ")
+decimal right = InputDecimal()
+
+string expression = "" + left + " " + symbol + " " + right
+print("" + expression + " = " + Evaluate(expression) + "\n")

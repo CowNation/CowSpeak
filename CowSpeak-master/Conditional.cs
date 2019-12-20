@@ -10,7 +10,7 @@ namespace CowSpeak{
 		}
 
 		public bool EvaluateBoolean(){
-			List< string > Expressions = text.Split(Syntax.And).ToList();
+			List< string > Expressions = text.Split(Syntax.Operators.And).ToList();
 			bool Evaluated = true;
 
 			foreach (string Expression in Expressions){
@@ -55,8 +55,13 @@ namespace CowSpeak{
 						break;
 					}
 				}
-				if (!matchFound)
+				if (!matchFound){
 					CowSpeak.Vars.RemoveAt(i); // was created in restricted scope because it didn't exist before the restricted scope began
+					i--;
+				}
+
+				if (i < 0 || i >= CowSpeak.Vars.Count)
+					break;
 			}
 
 			for (int i = 0; i < CowSpeak.Definitions.Count; i++){
@@ -67,8 +72,13 @@ namespace CowSpeak{
 						break;
 					}
 				}
-				if (!matchFound)
+				if (!matchFound){
 					CowSpeak.Vars.RemoveAt(i); // was created in restricted scope because it didn't exist before the restricted scope began
+					i--;
+				}
+
+				if (i < 0 || i >= CowSpeak.Vars.Count)
+					break;
 			}
 		} // destroy any new vars & definitions created during the restricted scope
 	}

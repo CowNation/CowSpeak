@@ -1,9 +1,9 @@
 # CowSpeak
-A pointless programming language programmed in C#
+A pointless programming language made in C#
 ## Info
 This program uses csharp-CowConfig. To see CowConfig go to https://github.com/CowNation/CowConfig
 ## Features
-* Primitive data types: boolean, integer, string, and decimal
+* Data types: boolean, integer, string, and decimal
 * Most standard operators you would expect (+, -, *, /, =, ^, %)
 * Single line comments
 * Conditionals (if, else, loop, while)

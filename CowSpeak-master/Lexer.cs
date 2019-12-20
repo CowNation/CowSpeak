@@ -42,45 +42,47 @@ namespace CowSpeak{
 				return new Token(TokenType.Character, token[token.Length - 2].ToString());
 			else if (token == "}")
 				return new Token(TokenType.EndBracket, token);
-			else if (token.IndexOf(Syntax.If + "(") == 0 && token[token.Length - 1] == '{' && token[token.Length - 2] == ')')
+			else if (token.IndexOf(Syntax.Conditionals.If + "(") == 0 && token[token.Length - 1] == '{' && token[token.Length - 2] == ')')
 				return new Token(TokenType.IfConditional, token);
-			else if (token.IndexOf(Syntax.Else) == 0 && token[token.Length - 1] == '{')
+			else if (token.IndexOf(Syntax.Conditionals.Else) == 0 && token[token.Length - 1] == '{')
 				return new Token(TokenType.ElseConditional, token);
-			else if (token.IndexOf(Syntax.While + "(") == 0 && token[token.Length - 1] == '{' && token[token.Length - 2] == ')')
+			else if (token.IndexOf(Syntax.Conditionals.While + "(") == 0 && token[token.Length - 1] == '{' && token[token.Length - 2] == ')')
 				return new Token(TokenType.WhileConditional, token);
-			else if (token.IndexOf(Syntax.Loop + "(") == 0 && token[token.Length - 1] == '{' && token[token.Length - 2] == ')')
+			else if (token.IndexOf(Syntax.Conditionals.Loop + "(") == 0 && token[token.Length - 1] == '{' && token[token.Length - 2] == ')')
 				return new Token(TokenType.LoopConditional, token);
-			else if (token == Syntax.Delete)
+			else if (token == Syntax.Statements.Delete)
 				return new Token(TokenType.DeleteIdentifier, token);
 			else if (Utils.IsDigitsOnly(token))
 				return new Token(TokenType.Number, token);
-			else if (token == Syntax.Return)
+			else if (token == Syntax.Statements.Return)
 				return new Token(TokenType.ReturnStatement, token);
-			else if (token == Syntax.IsEqual)
+			else if (token == Syntax.Comparators.IsEqual)
 				return new Token(TokenType.IsEqualOperator, token);
-			else if (token == Syntax.IsNotEqual)
+			else if (token == Syntax.Comparators.IsNotEqual)
 				return new Token(TokenType.IsNotEqualOperator, token);
-			else if (token == Syntax.IsGreaterThan)
+			else if (token == Syntax.Comparators.IsGreaterThan)
 				return new Token(TokenType.IsGreaterThanOperator, token);
-			else if (token == Syntax.IsLessThan)
+			else if (token == Syntax.Comparators.IsLessThan)
 				return new Token(TokenType.IsLessThanOperator, token);
-			else if (token == Syntax.IsGreaterThanOrEqual)
+			else if (token == Syntax.Comparators.IsGreaterThanOrEqual)
 				return new Token(TokenType.IsGreaterThanOrEqualOperator, token);
-			else if (token == Syntax.IsLessThanOrEqual)
+			else if (token == Syntax.Comparators.IsLessThanOrEqual)
 				return new Token(TokenType.IsLessThanOrEqualOperator, token);
-			else if (token == Syntax.Add)
+			else if (token == Syntax.Operators.Add)
 				return new Token(TokenType.AddOperator, token);
-			else if (token == Syntax.Subtract)
+			else if (token == Syntax.Operators.And)
+				return new Token(TokenType.AndOperator, token);
+			else if (token == Syntax.Operators.Subtract)
 				return new Token(TokenType.SubtractOperator, token);
-			else if (token == Syntax.Multiply)
+			else if (token == Syntax.Operators.Multiply)
 				return new Token(TokenType.MultiplyOperator, token);
-			else if (token == Syntax.Divide)
+			else if (token == Syntax.Operators.Divide)
 				return new Token(TokenType.DivideOperator, token);
-			else if (token == Syntax.Power)
+			else if (token == Syntax.Operators.Power)
 				return new Token(TokenType.PowerOperator, token);
-			else if (token == Syntax.Modulo)
+			else if (token == Syntax.Operators.Modulo)
 				return new Token(TokenType.ModuloOperator, token);
-			else if (token == Syntax.Equal)
+			else if (token == Syntax.Operators.Equal)
 				return new Token(TokenType.EqualOperator, token);
 			else if (token.IndexOf("(") != -1 && token[token.Length - 1] == ')')
 				return new Token(TokenType.FunctionCall, token);
@@ -134,8 +136,8 @@ namespace CowSpeak{
 					fileLines[i] = fileLines[i].Replace(Definition[0], Definition[1]);
 				}
 
-				while (fileLines[i].IndexOf(Syntax.Comment) != -1){
-					int pos = fileLines[i].IndexOf(Syntax.Comment);
+				while (fileLines[i].IndexOf(Syntax.Identifiers.Comment) != -1){
+					int pos = fileLines[i].IndexOf(Syntax.Identifiers.Comment);
 					if (Utils.IsBetween(fileLines[i], pos, '"', '"') || Utils.IsBetween(fileLines[i], pos, '\'', '\'')){
 						StringBuilder fileLine = new StringBuilder(fileLines[i]);
 						fileLine[pos] = (char)0x1f;
@@ -147,7 +149,7 @@ namespace CowSpeak{
 					fileLines[i] = fileLines[i].Remove(pos, fileLines[i].Length - pos);
 				} // get rid of all Comments and anything after it (but it cannot be enclosed in quotes or apostrophes)
 
-				fileLines[i] = fileLines[i].Replace(((char)0x1f).ToString(), Syntax.Comment); // replace placeholders back with comment token
+				fileLines[i] = fileLines[i].Replace(((char)0x1f).ToString(), Syntax.Identifiers.Comment); // replace placeholders back with comment token
 
 				if (string.IsNullOrWhiteSpace(fileLines[i])){
 					Lines.Add(new TokenLine(new List<Token>()));
@@ -258,15 +260,16 @@ namespace CowSpeak{
 						string usage = Lines[i].tokens[0].identifier;
 						Any[] loopParams = StaticFunction.ParseParameters(usage.Substring(usage.IndexOf("("), usage.LastIndexOf(")") - usage.IndexOf("(") + 1));
 
-						if (loopParams.Length < 2)
+						if (loopParams.Length < 3)
 							CowSpeak.FatalError("Incorrect number of parameters for LoopConditional (" + loopParams.Length + ") - ");
 
 						string varName = loopParams[0].Get().ToString();
-						int count = (int)loopParams[1].Get();
+						int start = (int)loopParams[1].Get();
+						int end = (int)loopParams[2].Get();
 
 						CowSpeak.Vars.Add(new Variable(Type.Integer, varName));
 
-						for (int p = 0; p < count; p++){
+						for (int p = start; p < end; p++){
 							RestrictedScope scope = new RestrictedScope();
 
 							CowSpeak.GetVariable(varName).Set(p);

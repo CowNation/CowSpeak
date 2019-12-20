@@ -48,7 +48,7 @@ namespace CowSpeak{
 		public static string currentFile = "";
 
 		public static void FatalError(string errorStr) {
-			Console.WriteLine("\n(" + currentFile + ", " + currentLine + ") Fatal Error: " + errorStr);
+			Console.WriteLine("\n(" + (currentFile.Length != 0 ? currentFile + ", " : "") + currentLine + ") Fatal Error: " + errorStr);
 			Console.ReadKey(); // prevent immediate closure
 			currentFile = "";
 			currentLine = -1;
