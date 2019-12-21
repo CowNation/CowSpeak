@@ -114,7 +114,7 @@ namespace CowSpeak{
 				else if (toEval[i].type == TokenType.FunctionCall)
 					additors.Add(CowSpeak.GetFunction(identifier).Execute(identifier).Get().ToString());
 				else
-					CowSpeak.FatalError("An unknown error has occured in 'TryStrChain'");
+					throw new Exception("An unknown error has occured in 'TryStrChain'");
 
 				int index = i;
 				while (true){
@@ -153,10 +153,10 @@ namespace CowSpeak{
 				if (tokens[i].type == TokenType.FunctionCall){
 					if (CowSpeak.GetFunction(tokens[i].identifier).isVoid()){
 						if (Utils.IsIndexValid(i - 1, tokens) && Utils.IsOperator(tokens[i-1].type)){
-							CowSpeak.FatalError("Cannot perform operation: '" + tokens[i-1].identifier + "' on void function");
+							throw new Exception("Cannot perform operation: '" + tokens[i-1].identifier + "' on void function");
 						}
 						if (Utils.IsIndexValid(i + 1, tokens) && Utils.IsOperator(tokens[i+1].type)){
-							CowSpeak.FatalError("Cannot perform operation: '" + tokens[i+1].identifier + "' on void function");
+							throw new Exception("Cannot perform operation: '" + tokens[i+1].identifier + "' on void function");
 						}
 					}
 				

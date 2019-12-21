@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System;
 using System.IO;
 using System.Linq;
 
@@ -28,10 +27,9 @@ namespace CowSpeak{
 					return found;
 			} // try to see if it's an 'Any' method
 
-			if (_throw){
-				FatalError("Function '" + functionName + "' not found");
-				return null;
-			}
+			if (_throw)
+				throw new Exception("Function '" + functionName + "' not found");
+
 			return null;
 		}
 
@@ -47,19 +45,11 @@ namespace CowSpeak{
 		public static int currentLine = -1;
 		public static string currentFile = "";
 
-		public static void FatalError(string errorStr) {
-			Console.WriteLine("\n(" + (currentFile.Length != 0 ? currentFile + ", " : "") + currentLine + ") Fatal Error: " + errorStr);
-			Console.ReadKey(); // prevent immediate closure
-			currentFile = "";
-			currentLine = -1;
-			Environment.Exit(-1);
-		}
-
 		public static List< Variable > Vars = new List< Variable >();
 
 		public static void CreateVariable(Variable variable){
 			if (GetVariable(variable.Name, false) != null) // already exists
-				FatalError("Cannot create variable '" + variable.Name + "', a variable by that name already exists");
+				throw new Exception("Cannot create variable '" + variable.Name + "', a variable by that name already exists");
 			
 			Vars.Add(variable);
 		}
@@ -69,10 +59,9 @@ namespace CowSpeak{
 				if (Vars[i].Name == varName)
 					return Vars[i];
 			}
-			if (_throw){
-				FatalError("Could not find variable: " + varName);
-				return null;
-			}
+			if (_throw)
+				throw new Exception("Could not find variable: " + varName);
+
 			return null;
 		}
 
@@ -81,9 +70,9 @@ namespace CowSpeak{
 			Debug = _Debug;
 
 			if (!File.Exists(fileName))
-				FatalError("Cannot execute COWFILE '" + fileName + "', it doesn't exist");
+				throw new Exception("Cannot execute COWFILE '" + fileName + "', it doesn't exist");
 			else if (fileName.IndexOf(".cf") == -1)
-				FatalError("Cannot execute COWFILE '" + fileName + "', it doesn't have the .cf file extension");
+				throw new Exception("Cannot execute COWFILE '" + fileName + "', it doesn't have the .cf file extension");
 
 			new Lexer(new CowConfig.ReadConfig(fileName).GetLines());
 		}

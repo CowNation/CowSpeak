@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using System.Collections.Generic;
 using System.Text;
@@ -32,23 +31,23 @@ namespace CowSpeak{
 
 			if (type == Type.Void){
 				if (ReturnedLine.IndexOf(Syntax.Statements.Return) == 0 && ReturnedLine != Syntax.Statements.Return)
-					CowSpeak.FatalError("Cannot return a value from a void function");
+					throw new Exception("Cannot return a value from a void function");
 
 				return new Any(Type.Integer, 0);
 			}
 
 			if (ReturnedLine.IndexOf(Syntax.Statements.Return + " ") != 0)
-				CowSpeak.FatalError("Function is missing a ReturnStatement");
+				throw new Exception("Function is missing a ReturnStatement");
 
 			ReturnedLine = ReturnedLine.Remove(0, Syntax.Statements.Return.Length + 1);
 
 			if (ReturnedLine.Length == 0)
-				CowSpeak.FatalError("ReturnStatement requires a value when the function type is not void");
+				throw new Exception("ReturnStatement requires a value when the function type is not void");
 
 			Any returnedValue = new TokenLine(Lexer.ParseLine(ReturnedLine)).Exec();
 
 			if (!Conversion.IsCompatible(returnedValue.vType, type))
-				CowSpeak.FatalError("Incompatible return type ('" + returnedValue.vType.Name + "' is incompatible with '" + type.Name + "')");
+				throw new Exception("Incompatible return type ('" + returnedValue.vType.Name + "' is incompatible with '" + type.Name + "')");
 
 			CowSpeak.currentFile = currentFile;
 
@@ -70,7 +69,7 @@ namespace CowSpeak{
 
 				List< Token > parameterDefinition = Lexer.ParseLine(parameter);
 				if (parameterDefinition.Count != 2 || parameterDefinition[0].type != TokenType.TypeIdentifier || parameterDefinition[1].type != TokenType.VariableIdentifier)
-					CowSpeak.FatalError("Invalid definition of parameter");
+					throw new Exception("Invalid definition of parameter");
 
 				parameters.Add(new Parameter(Utils.GetType(parameterDefinition[0].identifier), parameterDefinition[1].identifier));
 			}
@@ -88,14 +87,15 @@ namespace CowSpeak{
 
 		public override Any Execute(string usage) {
 			if (usage.IndexOf("(") == -1 || usage.IndexOf(")") == -1)
-				CowSpeak.FatalError("Invalid usage of function: '" + usage + "'\nProper Usage: " + properUsage);
+				throw new Exception("Invalid usage of function: '" + Usage + "'");
 
 			usage = usage.Substring(usage.IndexOf("(")); // reduce it to parentheses and params inside of them
+
 			List< Any > parameters = ParseParameters(usage).ToList();
 
 			CheckParameters(parameters);
 
-			try{
+			try {
 				RestrictedScope scope = new RestrictedScope();
 				for (int i = 0; i < Parameters.Length; i++){
 					Parameter parameter = Parameters[i];
@@ -106,22 +106,12 @@ namespace CowSpeak{
 				return returnedValue;
 			}
 			catch (Exception ex) {
-				if (ex.GetType().IsAssignableFrom(typeof(InvalidCastException))){
-					string givenParams = Name + "(";
-					int i = 0;
-					foreach (Any _param in parameters){
-						givenParams += _param.vType.Name + "(" + _param.Get().ToString() + ")" + (i == parameters.Count - 1 ? "" : ","); // it just works
-
-						i++;
-					}
-					givenParams += ")";
-					CowSpeak.FatalError("Invalid parameter types passed in FunctionCall: '" + Name + "'. \nProper Usage: \n" + properUsage + "\nGiven Parameter Types: \n" + givenParams);
-				}
-				else{
-					CowSpeak.FatalError("There was an unknown error when executing function: '" + Name + "'. \nProper Usage: \n" + properUsage + "\nError: " + ex.Message);
-				}
-
-				return null;
+				if (ex.GetType().IsAssignableFrom(typeof(System.InvalidCastException)))
+					throw new Exception("Invalid parameter types passed in FunctionCall: '" + Usage + "'");
+				else if (ex.GetType().IsAssignableFrom(typeof(Exception)))
+					throw ex as Exception;
+				else
+					throw new Exception("There was an unknown error when executing function: '" + Usage + "'");
 			}
 		}
 	};

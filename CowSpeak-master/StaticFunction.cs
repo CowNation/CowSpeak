@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using System.Collections.Generic;
 using System.Text;
@@ -30,7 +29,7 @@ namespace CowSpeak {
 
 		public override Any Execute(string usage) {
 			if (usage.IndexOf("(") == -1 || usage.IndexOf(")") == -1)
-				CowSpeak.FatalError("Invalid usage of function: '" + usage + "'\nProper Usage: " + properUsage);
+				throw new Exception("Invalid usage of function: '" + usage);
 
 			string usage_temp = usage;
 			usage = usage.Substring(usage.IndexOf("(")); // reduce it to parentheses and params inside of them
@@ -42,11 +41,11 @@ namespace CowSpeak {
 
 			CheckParameters(parameters);
 
-			try{
+			try {
 				return Definition.Invoke(null, new object[]{ parameters.ToArray() }) as Any; // obj is null because the function should be static
 			}
 			catch (Exception ex) {
-				if (ex.GetType().IsAssignableFrom(typeof(InvalidCastException))){
+				if (ex.GetType().IsAssignableFrom(typeof(System.InvalidCastException))){
 					string givenParams = Name + "(";
 					int i = 0;
 					foreach (Any _param in parameters){
@@ -60,18 +59,15 @@ namespace CowSpeak {
 						i++;
 					}
 					givenParams += ")";
-					CowSpeak.FatalError("Invalid parameter types passed in FunctionCall: '" + Name + "'. \nProper Usage: \n" + properUsage + "\nGiven Parameter Types: \n" + givenParams);
+					throw new Exception("Invalid parameter types passed in FunctionCall: '" + Name);
 				}
-				else{
-					CowSpeak.FatalError("There was an unknown error when executing function: '" + Name + "'. \nProper Usage: \n" + properUsage + "\nError: " + ex.Message);
-				}
-
-				return null;
+				else
+					throw new Exception("There was an unknown error when executing function: '" + Usage + "'");
 			}
 		}
 	};
 
-	public class FunctionAttr : Attribute {
+	public class FunctionAttr : System.Attribute {
 		public string Name;
 		public Type vType = null;
 		public bool isMethod;
@@ -103,7 +99,7 @@ namespace CowSpeak {
 			var methods = typeof(Functions).GetMethods().Where(m => m.GetCustomAttributes(typeof(FunctionAttr), false).Length > 0).ToArray(); // Get all methods from the function class with this attribute
 
             foreach (MethodInfo method in methods){
-				FunctionAttr functionAttr = (FunctionAttr)Attribute.GetCustomAttribute(method, typeof(FunctionAttr)); // get attribute for method
+				FunctionAttr functionAttr = (FunctionAttr)System.Attribute.GetCustomAttribute(method, typeof(FunctionAttr)); // get attribute for method
 
                 if (functionAttr == null || method == null)
                     continue; // skip method, it does not have this attribute

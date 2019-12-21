@@ -28,6 +28,17 @@ namespace CowSpeak{
 		public bool isMethod = false;
 		public Parameter[] Parameters; // defined parameters
 		public DefinitionType definitionType;
+		public string Usage{
+			get{
+				string def = Name + "(";
+				for (int i = 0; i < Parameters.Length; i++){
+					def += Parameters[i].Type.Name + " " + Parameters[i].Name;
+					if (i < Parameters.Length - 1)
+						def += ", ";
+				}
+				return def + ")";
+			}
+		}
 
 		public bool isVoid(){
 			return type == Type.Void;
@@ -83,7 +94,7 @@ namespace CowSpeak{
 					}
 					FunctionBase func = CowSpeak.GetFunction(token.identifier);
 					if (func.type == Type.Void)
-						CowSpeak.FatalError("Cannot pass void function as a parameter");
+						throw new Exception("Cannot pass void function as a parameter");
 					parameters.Add(new Any(func.type, func.Execute(token.identifier).Get()));
 					continue;
 				}
@@ -99,7 +110,7 @@ namespace CowSpeak{
 				}
 
 				if (vtype == null)
-					CowSpeak.FatalError("Unknown type passed as parameter: " + parameter);
+					throw new Exception("Unknown type passed as parameter: " + parameter);
 
 
 				parameters.Add(new Any(vtype, System.Convert.ChangeType(cleanedUp, vtype.rep)));
@@ -110,13 +121,13 @@ namespace CowSpeak{
 
 		public void CheckParameters(List< Any > usedParams){
 			if ((isMethod && Parameters.Length != usedParams.Count - 1) || (!isMethod && Parameters.Length != usedParams.Count))
-				CowSpeak.FatalError("Invalid number of parameters passed in FunctionCall: '" + Name + "'\nProper Usage: " + properUsage + " (" + usedParams.Count + " given)");
+				throw new Exception("Invalid number of parameters passed in FunctionCall: '" + Name + "'");
 
 			for (int i = 0; i < Parameters.Length; i++){
 				int usedIndex = isMethod ? i + 1 : i; // first object of usedParams in a method call is the object the method is being called on
 
 				if (!Conversion.IsCompatible(usedParams[usedIndex].vType, Parameters[i].Type))
-					CowSpeak.FatalError("Cannot call '" + Name + "', type '" + usedParams[usedIndex].vType.Name + "' is incompatible with '" + Parameters[i].Type.Name + "'");
+					throw new Exception("Cannot call '" + Name + "', parameter '" + Parameters[i].Type.Name + " " + Parameters[i].Name + "' is incompatible with '" + usedParams[usedIndex].vType.Name + "'");
 			}
 		}
 

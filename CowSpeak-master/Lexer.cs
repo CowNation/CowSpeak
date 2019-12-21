@@ -25,8 +25,7 @@ namespace CowSpeak{
 				}
 			}
 
-			CowSpeak.FatalError("Conditional is missing an ending curly bracket");
-			return -1;
+			throw new Exception("Conditional is missing an ending curly bracket");
 		}
 
 		public static Token ParseToken(string token, bool _throw = true){
@@ -92,7 +91,7 @@ namespace CowSpeak{
 				return new Token(TokenType.VariableIdentifier, token);
 
 			if (_throw)
-				CowSpeak.FatalError("Unknown identifier: " + token.Replace(((char)0x1f).ToString(), " "));
+				throw new Exception("Unknown token: " + token.Replace(((char)0x1f).ToString(), " "));
 
 			return null;
 		}
@@ -162,7 +161,7 @@ namespace CowSpeak{
 				if (!isNestedInFunction && CowSpeak.Debug && recentLine.tokens.Count > 0){
 					System.Console.WriteLine("\n(" + CowSpeak.currentFile + ") Line " + (i + 1) + ": ");
 					foreach (var token in recentLine.tokens){
-						System.Console.WriteLine(token.type.ToString() + " - " + token.identifier.Replace(System.Environment.NewLine, @"\n").Replace(((char)0x1f).ToString(), " "));
+						System.Console.WriteLine(token.type.ToString() + " - " + token.identifier.Replace(System.Environment.NewLine, @"\n").Replace(((char)0x1f).ToString(), " ").Replace(((char)0x1D).ToString(), " "));
 					}
 				}
 
@@ -181,7 +180,7 @@ namespace CowSpeak{
 					if (isNestedInFunction)
 						return; // ReturnStatement to be handled by UserFunction.ExecuteLines
 					else
-						CowSpeak.FatalError("ReturnStatement must be located inside of a FunctionDefinition");
+						throw new Exception("ReturnStatement must be located inside of a FunctionDefinition");
 				}
 
 
@@ -213,7 +212,7 @@ namespace CowSpeak{
 						int parentIf = -1;
 
 						if (i == 0 || (Lines[i - 1].tokens.Count > 0 && Lines[i - 1].tokens[0].type != TokenType.EndBracket))
-							CowSpeak.FatalError("ElseConditional isn't immediately preceding an EndBracket");
+							throw new Exception("ElseConditional isn't immediately preceding an EndBracket");
 
 
 						for (int j = 0; j < i; j++){
@@ -224,7 +223,7 @@ namespace CowSpeak{
 						}
 
 						if (parentIf == -1)
-							CowSpeak.FatalError("ElseConditional isn't immediately preceding an EndBracket");
+							throw new Exception("ElseConditional isn't immediately preceding an EndBracket");
 
 
 						int endingBracket = GetClosingBracket(i);
@@ -260,8 +259,8 @@ namespace CowSpeak{
 						string usage = Lines[i].tokens[0].identifier;
 						Any[] loopParams = StaticFunction.ParseParameters(usage.Substring(usage.IndexOf("("), usage.LastIndexOf(")") - usage.IndexOf("(") + 1));
 
-						if (loopParams.Length < 3)
-							CowSpeak.FatalError("Incorrect number of parameters for LoopConditional (" + loopParams.Length + ") - ");
+						StaticFunction Loop = new StaticFunction("Loop", null, Type.Void, new Parameter[]{ new Parameter(Type.String, "IndexVariableName"), new Parameter(Type.Integer, "StartAt"), new Parameter(Type.Integer, "EndAt") });
+						Loop.CheckParameters(loopParams.ToList()); // throws errors if given parameters are bad
 
 						string varName = loopParams[0].Get().ToString();
 						int start = (int)loopParams[1].Get();
@@ -314,15 +313,15 @@ namespace CowSpeak{
 				Any retVal = Lines[i].Exec(); // Execute line
 
 				if (Lines[i].tokens.Count >= 3 && Lines[i].tokens[1].type == TokenType.VariableIdentifier && Lines[i].tokens[2].type == TokenType.EqualOperator && !Conversion.IsCompatible(CowSpeak.GetVariable(Lines[i].tokens[1].identifier).vType, retVal.vType))
-					CowSpeak.FatalError("Cannot set '" + Lines[i].tokens[1].identifier + "', type '" + CowSpeak.GetVariable(Lines[i].tokens[1].identifier).vType.Name + "' is incompatible with '" + retVal.vType.Name + "'"); // check if types are compatible
+					throw new Exception("Cannot set '" + Lines[i].tokens[1].identifier + "', type '" + CowSpeak.GetVariable(Lines[i].tokens[1].identifier).vType.Name + "' is incompatible with '" + retVal.vType.Name + "'"); // check if types are compatible
 				else if (Lines[i].tokens.Count >= 2 && Lines[i].tokens[0].type == TokenType.VariableIdentifier && Lines[i].tokens[1].type == TokenType.EqualOperator && !Conversion.IsCompatible(CowSpeak.GetVariable(Lines[i].tokens[0].identifier).vType, retVal.vType))
-					CowSpeak.FatalError("Cannot set '" + Lines[i].tokens[0].identifier + "', type '" + CowSpeak.GetVariable(Lines[i].tokens[0].identifier).vType.Name + "' is incompatible with '" + retVal.vType.Name + "'"); // check if types are compatible
+					throw new Exception("Cannot set '" + Lines[i].tokens[0].identifier + "', type '" + CowSpeak.GetVariable(Lines[i].tokens[0].identifier).vType.Name + "' is incompatible with '" + retVal.vType.Name + "'"); // check if types are compatible
 
 				if (shouldBeSet)
 					CowSpeak.Vars[CowSpeak.Vars.Count - 1].byteArr = retVal.byteArr;
 				else if (Lines[i].tokens.Count >= 2 && Lines[i].tokens[0].type == TokenType.VariableIdentifier && Lines[i].tokens[1].type == TokenType.EqualOperator){
 					if (CowSpeak.GetVariable(Lines[i].tokens[0].identifier, false) == null){
-						CowSpeak.FatalError("Variable '" + Lines[i].tokens[0].identifier + "' must be defined before it can be set");
+						throw new Exception("Variable '" + Lines[i].tokens[0].identifier + "' must be defined before it can be set");
 					} // var not found
 
 					for (int v = 0; v < CowSpeak.Vars.Count; v++){

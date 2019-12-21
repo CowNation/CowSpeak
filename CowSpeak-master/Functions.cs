@@ -65,8 +65,7 @@ namespace CowSpeak{
 			if (System.Int32.TryParse(str, out o))
 				return new Any(Type.Integer, o);
 			else{
-				CowSpeak.FatalError("Could not convert " + Syntax.Types.String + " to an " + Syntax.Types.Integer);
-				return null;
+				throw new Exception("Could not convert " + Syntax.Types.String + " to an " + Syntax.Types.Integer);
 			}
 		}
 
@@ -76,10 +75,8 @@ namespace CowSpeak{
 			string str = parameters[0].Get().ToString();
 			if (System.Double.TryParse(str, out o))
 				return new Any(Type.Decimal, o);
-			else{
-				CowSpeak.FatalError("Could not convert " + Syntax.Types.String + " to an " + Syntax.Types.Decimal);
-				return null;
-			}
+			else
+				throw new Exception("Could not convert " + Syntax.Types.String + " to an " + Syntax.Types.Decimal);
 		}
 		#endregion
 
@@ -137,7 +134,7 @@ namespace CowSpeak{
 					evaluatedValue.vType = Type.Integer; // decimal not found, we can convert to int
 			}
 			catch{
-				CowSpeak.FatalError("Could not evaluate expression");
+				throw new Exception("Could not evaluate expression");
 			}
 
 			return evaluatedValue;
@@ -153,7 +150,7 @@ namespace CowSpeak{
 			int maximum = (int)parameters[1].Get() + 1;
 
 			if (minimum > maximum)
-				CowSpeak.FatalError("Minimum may not be greater than the maximum");
+				throw new Exception("Minimum may not be greater than the maximum");
 
 			return new Any(Type.Integer, Utils.rand.Next(minimum, maximum));
 		}
@@ -171,7 +168,7 @@ namespace CowSpeak{
 			if (File.Exists(fileName))
 				CowSpeak.Exec(fileName); // Execute file specified
 			else
-				CowSpeak.FatalError(fileName + " does not exist");
+				throw new Exception(fileName + " does not exist");
 			CowSpeak.currentFile = currentFile; // curr file is not set back after exec of another file
 			return new Any(Type.Integer, 0);
 		}
@@ -184,8 +181,7 @@ namespace CowSpeak{
 
 		[FunctionAttr("ThrowError", Syntax.Types.Void, Syntax.Types.String + " errorText")]
 		public static Any ThrowError(Any[] parameters){
-			CowSpeak.FatalError(parameters[0].Get().ToString());
-			return new Any(Type.Integer, 0);	
+			throw new Exception(parameters[0].Get().ToString());
 		}
 
 		[FunctionAttr("Input" + Syntax.Types.c_String, Syntax.Types.String, "")]

@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +7,7 @@ using System.Text;
 
 namespace CowSpeak{
 	public static class Utils {
-		public static Random rand = new Random();
+		public static System.Random rand = new System.Random();
 
 		public static bool IsOperator(TokenType type){
 			return type.ToString().IndexOf("Operator") != -1;
@@ -28,7 +27,7 @@ namespace CowSpeak{
 			}
 
 			if (_throw)
-				CowSpeak.FatalError("Type '" + usage + "' does not exist");
+				throw new Exception("Type '" + usage + "' does not exist");
 
 			return null;
 		}
@@ -48,7 +47,7 @@ namespace CowSpeak{
 					if (pToken.type == TokenType.String)
 						built += "\"";
 
-					built += pToken.identifier.Replace(Environment.NewLine, @"\n").Replace(((char)0x1f).ToString(), " ").Replace(((char)0x1D).ToString(), " ") + " ";
+					built += pToken.identifier.Replace(System.Environment.NewLine, @"\n").Replace(((char)0x1f).ToString(), " ").Replace(((char)0x1D).ToString(), " ") + " ";
 
 					if (pToken.type == TokenType.String)
 						built += "\"";
@@ -127,7 +126,7 @@ namespace CowSpeak{
 		{
 			foreach (char c in s)
 			{
-				if (!Char.IsLetter(c) && c != '_')
+				if (!System.Char.IsLetter(c) && c != '_')
 					return false;
 			}
 			return true;
@@ -135,6 +134,9 @@ namespace CowSpeak{
 
 		public static bool IsDigitsOnly(string str)
 		{
+			if (str == "-")
+				return false;
+
 			foreach (char c in str)
 			{
 				if ((c < '0' || c > '9') && c != '.' && c != '-')
