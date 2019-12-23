@@ -121,9 +121,9 @@ namespace CowSpeak{
 			return ret;
 		}
 
-		public Lexer(List< string > fileLines, int currentLineOffset = 0, bool isNestedInFunction = false) {
+		public Lexer(List< string > fileLines, int CurrentLineOffset = 0, bool isNestedInFunction = false) {
 			for (int i = 0; i < fileLines.Count; i++) {
-				CowSpeak.currentLine = i + 1 + currentLineOffset;
+				CowSpeak.CurrentLine = i + 1 + CurrentLineOffset;
 
 				fileLines[i] = Utils.FixBoolean(fileLines[i].Replace(@"\n", System.Environment.NewLine)); // interpret \n as a newline in strings & support for setting booleans using true and false
 
@@ -159,7 +159,7 @@ namespace CowSpeak{
 				TokenLine recentLine = Lines[Lines.Count - 1];
 
 				if (!isNestedInFunction && CowSpeak.Debug && recentLine.tokens.Count > 0){
-					System.Console.WriteLine("\n(" + CowSpeak.currentFile + ") Line " + (i + 1) + ": ");
+					System.Console.WriteLine("\n(" + CowSpeak.CurrentFile + ") Line " + (i + 1) + ": ");
 					foreach (var token in recentLine.tokens){
 						System.Console.WriteLine(token.type.ToString() + " - " + token.identifier.Replace(System.Environment.NewLine, @"\n").Replace(((char)0x1f).ToString(), " ").Replace(((char)0x1D).ToString(), " "));
 					}
@@ -174,7 +174,7 @@ namespace CowSpeak{
 			CowSpeak.Debug = false; // only debug tokens on compilation, needed because many things recurse back to Lexer
 
 			for (int i = 0; i < fileLines.Count; i++){
-				CowSpeak.currentLine = i + 1 + currentLineOffset;
+				CowSpeak.CurrentLine = i + 1 + CurrentLineOffset;
 
 				if (Lines[i].tokens.Count >= 1 && Lines[i].tokens[0].type == TokenType.ReturnStatement){
 					if (isNestedInFunction)
@@ -201,7 +201,7 @@ namespace CowSpeak{
 						if (new Conditional(Lines[i].tokens[0].identifier).EvaluateBoolean()){
 							RestrictedScope scope = new RestrictedScope();
 
-							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1);
+							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1, isNestedInFunction);
 
 							scope.End();
 						}
@@ -231,7 +231,7 @@ namespace CowSpeak{
 						if (!new Conditional(Lines[parentIf].tokens[0].identifier).EvaluateBoolean()){
 							RestrictedScope scope = new RestrictedScope();
 
-							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1);
+							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1, isNestedInFunction);
 
 							scope.End();
 						}
@@ -246,7 +246,7 @@ namespace CowSpeak{
 						while (whileStatement.EvaluateBoolean()){
 							RestrictedScope scope = new RestrictedScope();
 
-							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1);
+							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1, isNestedInFunction);
 
 							scope.End();
 						}
@@ -273,7 +273,7 @@ namespace CowSpeak{
 
 							CowSpeak.GetVariable(varName).Set(p);
 
-							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1);
+							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1, isNestedInFunction);
 
 							scope.End();
 						}
