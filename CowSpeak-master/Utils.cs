@@ -9,6 +9,14 @@ namespace CowSpeak{
 	public static class Utils {
 		public static System.Random rand = new System.Random();
 
+		public static bool IsHexadecimal(string str){
+			return Utils.OccurrencesOf(str, "0x") == 1 && str.IndexOf("0x") == 0;
+		}
+
+		public static int OccurrencesOf(string str, string splitter){
+			return str.Split(splitter).Length - 1;
+		}
+
 		public static bool IsOperator(TokenType type){
 			return type.ToString().IndexOf("Operator") != -1;
 		}

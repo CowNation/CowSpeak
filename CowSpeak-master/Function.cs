@@ -24,10 +24,10 @@ namespace CowSpeak{
 	public abstract class FunctionBase {
 		public string Name;
 		public Type type;
-		public string properUsage;
+		public string ProperUsage;
 		public bool isMethod = false;
 		public Parameter[] Parameters; // defined parameters
-		public DefinitionType definitionType;
+		public DefinitionType DefinitionType;
 		public string Usage{
 			get{
 				string def = Name + "(";

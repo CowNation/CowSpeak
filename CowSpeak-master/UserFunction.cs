@@ -7,27 +7,27 @@ using System.Linq;
 namespace CowSpeak{
 	public class UserFunction : FunctionBase {
 		List< string > Definition; // lines contained inside of the function
-		int definitionOffset; // offset of where the definition is so CowSpeak.currentLine is correct
-		string definedIn; // file function was defined in, may be empty
+		int DefinitionOffset; // offset of where the definition is so CowSpeak.CurrentLine is correct
+		string DefinedIn; // file function was defined in, may be empty
 
-		public UserFunction(string Name, List< string > Definition, Parameter[] Parameters, Type type, string properUsage, int definitionOffset) {
-			this.definitionType = DefinitionType.User;
+		public UserFunction(string Name, List< string > Definition, Parameter[] Parameters, Type type, string ProperUsage, int DefinitionOffset) {
+			this.DefinitionType = DefinitionType.User;
 			this.type = type;
 			this.Definition = Definition;
-   			this.properUsage = properUsage;
+   			this.ProperUsage = ProperUsage;
 			this.Name = Name;
 			this.Parameters = Parameters;
-			this.definitionOffset = definitionOffset;
-			this.definedIn = CowSpeak.currentFile;
+			this.DefinitionOffset = DefinitionOffset;
+			this.DefinedIn = CowSpeak.CurrentFile;
 		}
 
 		private Any ExecuteLines(List< string > lines){
-			string currentFile = CowSpeak.currentFile;
-			CowSpeak.currentFile = definedIn;
+			string CurrentFile = CowSpeak.CurrentFile;
+			CowSpeak.CurrentFile = DefinedIn;
 
-			new Lexer(lines, definitionOffset + 1, true);
+			new Lexer(lines, DefinitionOffset + 1, true);
 
-			string ReturnedLine = Definition[CowSpeak.currentLine - definitionOffset - 2]; // relative line where Lexer returned
+			string ReturnedLine = Definition[CowSpeak.CurrentLine - DefinitionOffset - 2]; // relative line where Lexer returned
 
 			if (type == Type.Void){
 				if (ReturnedLine.IndexOf(Syntax.Statements.Return) == 0 && ReturnedLine != Syntax.Statements.Return)
@@ -49,7 +49,7 @@ namespace CowSpeak{
 			if (!Conversion.IsCompatible(returnedValue.vType, type))
 				throw new Exception("Incompatible return type ('" + returnedValue.vType.Name + "' is incompatible with '" + type.Name + "')");
 
-			CowSpeak.currentFile = currentFile;
+			CowSpeak.CurrentFile = CurrentFile;
 
 			return returnedValue;
 		}
@@ -97,12 +97,16 @@ namespace CowSpeak{
 
 			try {
 				RestrictedScope scope = new RestrictedScope();
+
 				for (int i = 0; i < Parameters.Length; i++){
 					Parameter parameter = Parameters[i];
 					CowSpeak.CreateVariable(new Variable(parameter.Type, parameter.Name, parameters[i].Get()));
 				}
+
 				Any returnedValue = ExecuteLines(Definition);
+
 				scope.End();
+
 				return returnedValue;
 			}
 			catch (Exception ex) {

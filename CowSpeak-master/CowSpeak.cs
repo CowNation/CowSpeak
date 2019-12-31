@@ -35,15 +35,15 @@ namespace CowSpeak{
 
 		public static void ClearUserFunctions(){
 			for (int i = 0; i < Functions.Count; i++){
-				if (Functions[i].definitionType == DefinitionType.User)
+				if (Functions[i].DefinitionType == DefinitionType.User)
 					Functions.RemoveAt(i);
 			}
 		}
 
 		public static bool Debug = false;
 
-		public static int currentLine = -1;
-		public static string currentFile = "";
+		public static int CurrentLine = -1;
+		public static string CurrentFile = "";
 
 		public static List< Variable > Vars = new List< Variable >();
 
@@ -52,6 +52,17 @@ namespace CowSpeak{
 				throw new Exception("Cannot create variable '" + variable.Name + "', a variable by that name already exists");
 			
 			Vars.Add(variable);
+		}
+
+		public static void SetVariable(string Name, Any Value, bool _throw = true){
+			for (int i = 0; i < Vars.Count; i++) {
+				if (Vars[i].Name == Name){
+					Vars[i].Set(Value);
+					return;
+				}
+			}
+			if (_throw)
+				throw new Exception("Could not find variable: " + Name);
 		}
 
 		public static Variable GetVariable(string varName, bool _throw = true) {
@@ -66,7 +77,7 @@ namespace CowSpeak{
 		}
 
 		public static void Exec(string fileName, bool _Debug = false){
-			currentFile = fileName;
+			CurrentFile = fileName;
 			Debug = _Debug;
 
 			if (!File.Exists(fileName))
@@ -78,7 +89,7 @@ namespace CowSpeak{
 		}
 
 		public static void Exec(string[] lines, bool _Debug = false){
-			currentFile = "";
+			CurrentFile = "";
 			Debug = _Debug;
 
 			new Lexer(lines.ToList());

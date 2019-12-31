@@ -10,7 +10,7 @@ namespace CowSpeak {
 		public MethodInfo Definition;
 
 		public StaticFunction(string Name, MethodInfo Definition, Type type, Parameter[] Parameters, bool isMethod = false) {
-			this.definitionType = DefinitionType.Language;
+			this.DefinitionType = DefinitionType.Language;
 			this.type = type;
 			this.Definition = Definition;
 
@@ -21,7 +21,7 @@ namespace CowSpeak {
 					Params += ", ";
 			}
 
-   			this.properUsage = type.Name + " " + Name + "(" + Params +  ")";
+   			this.ProperUsage = type.Name + " " + Name + "(" + Params +  ")";
 			this.Name = Name;
 			this.Parameters = Parameters;
 			this.isMethod = isMethod;

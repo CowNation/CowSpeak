@@ -8,7 +8,7 @@ namespace CowSpeak{
 			oldDefs = new List< string[] >(CowSpeak.Definitions);
 		} // any vars created in this scope will be destroyed at the end of the scope
 
-		private List< Variable > oldVars = null;
+		public List< Variable > oldVars = null;
 		private List< string[] > oldDefs = null;
 
 		public void End(){

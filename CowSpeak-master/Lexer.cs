@@ -31,6 +31,9 @@ namespace CowSpeak{
 		public static Token ParseToken(string token, bool _throw = true){
 			token = Utils.FixBoolean(token);
 
+			if (Utils.IsHexadecimal(token))
+				token = int.Parse(token.Substring(2), System.Globalization.NumberStyles.HexNumber).ToString(); // determine if it's a hexadecimal number
+
 			Type type = Utils.GetType(token, false);
 			if (type != null)
 				return new Token(TokenType.TypeIdentifier, token);

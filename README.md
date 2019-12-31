@@ -14,6 +14,7 @@ This program uses csharp-CowConfig. To see CowConfig go to https://github.com/Co
 * Simple per-line token debugging
 * Scopes & manual variable deletion
 * Easily modifiable syntax
+* Full support for hexadecimal numbers
 ## Previous Versions
 [v1 (Initial release on May 17, 2019)](https://github.com/CowNation/CowSpeak/tree/295d57e0a54622b5fc0483c6d1f163408d728aaf)
 

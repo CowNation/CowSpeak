@@ -4,8 +4,8 @@ namespace CowSpeak{
 		public string ErrorFile;
 
 		public Exception(string Message) : base(Message) {
-			ErrorLine = CowSpeak.currentLine;
-			ErrorFile = CowSpeak.currentFile;
+			ErrorLine = CowSpeak.CurrentLine;
+			ErrorFile = CowSpeak.CurrentFile;
 		}
 	};
 }

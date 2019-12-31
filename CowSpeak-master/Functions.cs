@@ -13,6 +13,11 @@ namespace CowSpeak{
 		#endregion
 
 		#region STRING_METHODS
+		[FunctionAttr(Syntax.Types.String + ".OccurrencesOf", Syntax.Types.Integer, Syntax.Types.String + " counter", true)]
+		public static Any OccurrencesOf(Any[] parameters){
+			return new Any(Type.Integer, Utils.OccurrencesOf(parameters[0].Get().ToString(), parameters[1].Get().ToString()));
+		}
+
 		[FunctionAttr(Syntax.Types.String + ".Sub" + Syntax.Types.c_String, Syntax.Types.String, Syntax.Types.Integer + " startIndex, " + Syntax.Types.Integer + " endIndex", true)]
 		public static Any SubString(Any[] parameters){
 			string str = parameters[0].Get().ToString();
@@ -62,6 +67,10 @@ namespace CowSpeak{
 		public static Any ToInteger(Any[] parameters){
 			int o;
 			string str = parameters[0].Get().ToString();
+
+			if (Utils.IsHexadecimal(str))
+				return new Any(Type.Integer, int.Parse(str.Substring(2), System.Globalization.NumberStyles.HexNumber));
+
 			if (System.Int32.TryParse(str, out o))
 				return new Any(Type.Integer, o);
 			else{
@@ -88,6 +97,13 @@ namespace CowSpeak{
 		[FunctionAttr(Syntax.Types.Character + ".ToLower", Syntax.Types.Character, "", true)]
 		public static Any ToLower(Any[] parameters){
 			return new Any(Type.Character, System.Char.ToLower(parameters[0].Get().ToString()[0]));
+		}
+		#endregion
+
+		#region INTEGER_METHODS
+		[FunctionAttr(Syntax.Types.Integer + ".ToHexadecimal", Syntax.Types.String, "", true)]
+		public static Any ToHexadecimal(Any[] parameters){
+			return new Any(Type.String, "0x" + System.Convert.ToString((int)parameters[0].Get(), 16));
 		}
 		#endregion
 
@@ -163,13 +179,13 @@ namespace CowSpeak{
 
 		[FunctionAttr("run", Syntax.Types.Void, Syntax.Types.String + " fileName")]
 		public static Any run(Any[] parameters){
-			string currentFile = CowSpeak.currentFile;
+			string CurrentFile = CowSpeak.CurrentFile;
 			string fileName = parameters[0].Get().ToString();
 			if (File.Exists(fileName))
 				CowSpeak.Exec(fileName); // Execute file specified
 			else
 				throw new Exception(fileName + " does not exist");
-			CowSpeak.currentFile = currentFile; // curr file is not set back after exec of another file
+			CowSpeak.CurrentFile = CurrentFile; // curr file is not set back after exec of another file
 			return new Any(Type.Integer, 0);
 		}
 
