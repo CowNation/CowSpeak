@@ -1,11 +1,18 @@
 using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Runtime.InteropServices;
 
 namespace CowSpeak{
 	public class ByteArray{
 		public ByteArray(){}
 		public byte[] bytes;
+
+		public string GetAddress(){
+			GCHandle handle = GCHandle.Alloc(bytes[0], GCHandleType.WeakTrackResurrection);
+			int address = GCHandle.ToIntPtr(handle).ToInt32();
+			return address.ToString();
+		}
 
 		public static object ByteArrayToObject(byte[] arrBytes)
 		{

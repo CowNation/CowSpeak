@@ -28,8 +28,10 @@ namespace CowSpeak{
 						simplified = token.identifier;
 					_Evaluated = simplified == "True" || simplified == "1";
 				}
-				if (!_Evaluated)
+				if (!_Evaluated){
 					Evaluated = false;
+					break;
+				}
 			}
 
 			return Evaluated;

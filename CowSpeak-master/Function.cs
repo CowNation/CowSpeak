@@ -127,7 +127,7 @@ namespace CowSpeak{
 				int usedIndex = isMethod ? i + 1 : i; // first object of usedParams in a method call is the object the method is being called on
 
 				if (!Conversion.IsCompatible(usedParams[usedIndex].vType, Parameters[i].Type))
-					throw new Exception("Cannot call '" + Name + "', parameter '" + Parameters[i].Type.Name + " " + Parameters[i].Name + "' is incompatible with '" + usedParams[usedIndex].vType.Name + "'");
+					throw new Exception("Parameter '" + Parameters[i].Type.Name + " " + Parameters[i].Name + "' is incompatible with '" + usedParams[usedIndex].vType.Name + "'");
 			}
 		}
 
