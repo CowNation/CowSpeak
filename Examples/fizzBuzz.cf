@@ -1,6 +1,6 @@
 # Shout out to Pinecone by William W Wold
 void fizzBuzz(integer start, integer end){
-	loop("index", start, end + start){
+	loop("index", start, end + 1){
 		integer threeDivisible = index % 3
 		integer fiveDivisible = index % 5
 		if(threeDivisible == 0){
