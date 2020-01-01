@@ -41,9 +41,10 @@ namespace CowSpeak{
 				}
 				if (!matchFound){
 					CowSpeak.Vars.RemoveAt(i); // was created in restricted scope because it didn't exist before the restricted scope began
-					
+
 					if (i > 0)
-						i--;				}
+						i--;				
+				}
 
 				if (i < 0 || i >= CowSpeak.Vars.Count)
 					break;
