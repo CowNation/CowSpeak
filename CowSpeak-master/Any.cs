@@ -19,12 +19,7 @@ namespace CowSpeak {
 		}
 
 		public object Get(){
-			try {
-				return System.Convert.ChangeType(byteArr.Get(), vType.rep);
-			}
-			catch {
-				throw new Exception("Could not read variable '" + (this as Variable).Name + "', it may be corrupted");
-			} // lazy coder's way out
+			return System.Convert.ChangeType(byteArr.Get(), vType.rep);
 		}
 	}
 }
