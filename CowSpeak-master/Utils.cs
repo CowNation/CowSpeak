@@ -44,14 +44,14 @@ namespace CowSpeak{
 			return Lines.GetRange(i + 1, endingBracket - (i + 1));
 		}
 
-		public static List< string > GetContainedLines(List< TokenLine > Lines, int endingBracket, int i){
-			List< TokenLine > _containedLines = new List< TokenLine >();
+		public static List< string > GetContainedLines(List< Line > Lines, int endingBracket, int i){
+			List< Line > _containedLines = new List< Line >();
 			_containedLines = Lines.GetRange(i + 1, endingBracket - (i + 1));
 			List< string > containedLines = new List< string >();
 
-			foreach (TokenLine line in _containedLines){
+			foreach (Line line in _containedLines){
 				string built = "";
-				foreach (Token pToken in line.tokens){
+				foreach (Token pToken in line){
 					if (pToken.type == TokenType.String)
 						built += "\"";
 

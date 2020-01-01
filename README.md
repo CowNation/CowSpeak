@@ -1,3 +1,4 @@
+[![Run on Repl.it](https://repl.it/badge/github/CowNation/CowSpeak)](https://repl.it/github/CowNation/CowSpeak)
 # CowSpeak
 A pointless programming language made in C#
 ## Info

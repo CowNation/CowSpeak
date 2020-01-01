@@ -44,7 +44,7 @@ namespace CowSpeak{
 			if (ReturnedLine.Length == 0)
 				throw new Exception("ReturnStatement requires a value when the function type is not void");
 
-			Any returnedValue = new TokenLine(Lexer.ParseLine(ReturnedLine)).Exec();
+			Any returnedValue = new Line(Lexer.ParseLine(ReturnedLine)).Exec();
 
 			if (!Conversion.IsCompatible(returnedValue.vType, type))
 				throw new Exception("Incompatible return type ('" + returnedValue.vType.Name + "' is incompatible with '" + type.Name + "')");

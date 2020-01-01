@@ -54,15 +54,11 @@ namespace CowSpeak{
 			Vars.Add(variable);
 		}
 
-		public static void SetVariable(string Name, Any Value, bool _throw = true){
-			for (int i = 0; i < Vars.Count; i++) {
-				if (Vars[i].Name == Name){
-					Vars[i].Set(Value);
-					return;
-				}
-			}
-			if (_throw)
-				throw new Exception("Could not find variable: " + Name);
+		public static void CreateFunction(FunctionBase func){
+			if (GetFunction(func.Name, false) != null) // already exists
+				throw new Exception("Cannot create function '" + func.Name + "', a function by that name already exists");
+			
+			Functions.Add(func);
 		}
 
 		public static Variable GetVariable(string varName, bool _throw = true) {

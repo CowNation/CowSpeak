@@ -8,12 +8,6 @@ namespace CowSpeak{
 		public ByteArray(){}
 		public byte[] bytes;
 
-		public string GetAddress(){
-			GCHandle handle = GCHandle.Alloc(bytes[0], GCHandleType.WeakTrackResurrection);
-			int address = GCHandle.ToIntPtr(handle).ToInt32();
-			return address.ToString();
-		}
-
 		public static object ByteArrayToObject(byte[] arrBytes)
 		{
 			using (var memStream = new MemoryStream())

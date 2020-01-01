@@ -6,18 +6,18 @@ using System.Diagnostics;
 
 namespace CowSpeak{
 	public class Lexer {
-		public List< TokenLine > Lines = new List< TokenLine >();
+		public List< Line > Lines = new List< Line >();
 
 		public int GetClosingBracket(int start){
 			int nextSkips = 0; // skip bracket(s) after next Conditional (for nested conditionals)
 			for (int j = start + 1; j < Lines.Count; j++){
-				if (Lines[j].tokens.Count < 1)
+				if (Lines[j].Count < 1)
 					continue;
 
-				if (Lines[j].tokens[0].type.ToString().IndexOf("Conditional") != -1)
+				if (Lines[j][0].type.ToString().IndexOf("Conditional") != -1 || (Lines[j].Count > 1 && Lines[j][1].type.ToString() == "FunctionDefinition"))
 					nextSkips++; // there is a nested conditional, skip the next bracket
 
-				if (Lines[j].tokens[0].type == TokenType.EndBracket){
+				if (Lines[j][0].type == TokenType.EndBracket){
 					if (nextSkips > 0)
 						nextSkips--;
 					else
@@ -25,7 +25,7 @@ namespace CowSpeak{
 				}
 			}
 
-			throw new Exception("Conditional is missing an ending curly bracket");
+			throw new Exception("Conditional or function is missing an ending curly bracket");
 		}
 
 		public static Token ParseToken(string token, bool _throw = true){
@@ -124,19 +124,17 @@ namespace CowSpeak{
 			return ret;
 		}
 
-		public Lexer(List< string > fileLines, int CurrentLineOffset = 0, bool isNestedInFunction = false) {
+		public Lexer(List< string > fileLines, int CurrentLineOffset = 0, bool isNestedInFunction = false, bool isNestedInConditional = false) {
 			for (int i = 0; i < fileLines.Count; i++) {
 				CowSpeak.CurrentLine = i + 1 + CurrentLineOffset;
 
 				fileLines[i] = Utils.FixBoolean(fileLines[i].Replace(@"\n", System.Environment.NewLine)); // interpret \n as a newline in strings & support for setting booleans using true and false
 
-				while (fileLines[i].IndexOf("	") == 0 || fileLines[i].IndexOf(" ") == 0){
+				while (fileLines[i].IndexOf("	") == 0 || fileLines[i].IndexOf(" ") == 0)
 					fileLines[i] = fileLines[i].Remove(0, 1);
-				}
 
-				foreach (string[] Definition in CowSpeak.Definitions){
+				foreach (string[] Definition in CowSpeak.Definitions)
 					fileLines[i] = fileLines[i].Replace(Definition[0], Definition[1]);
-				}
 
 				while (fileLines[i].IndexOf(Syntax.Identifiers.Comment) != -1){
 					int pos = fileLines[i].IndexOf(Syntax.Identifiers.Comment);
@@ -154,23 +152,23 @@ namespace CowSpeak{
 				fileLines[i] = fileLines[i].Replace(((char)0x1f).ToString(), Syntax.Identifiers.Comment); // replace placeholders back with comment token
 
 				if (string.IsNullOrWhiteSpace(fileLines[i])){
-					Lines.Add(new TokenLine(new List<Token>()));
+					Lines.Add(new Line(new List<Token>()));
 					continue;
 				} // no need to parse or evaluate empty line
 
-				Lines.Add(new TokenLine(ParseLine(fileLines[i])));
-				TokenLine recentLine = Lines[Lines.Count - 1];
+				Lines.Add(new Line(ParseLine(fileLines[i])));
+				Line recentLine = Lines[Lines.Count - 1];
 
-				if (!isNestedInFunction && CowSpeak.Debug && recentLine.tokens.Count > 0){
+				if (!isNestedInFunction && CowSpeak.Debug && recentLine.Count > 0){
 					System.Console.WriteLine("\n(" + CowSpeak.CurrentFile + ") Line " + (i + 1) + ": ");
-					foreach (var token in recentLine.tokens){
+					foreach (var token in recentLine){
 						System.Console.WriteLine(token.type.ToString() + " - " + token.identifier.Replace(System.Environment.NewLine, @"\n").Replace(((char)0x1f).ToString(), " ").Replace(((char)0x1D).ToString(), " "));
 					}
 				}
 
-				if (recentLine.tokens.Count > 0 && recentLine.tokens[0].type == TokenType.FunctionCall && recentLine.tokens[0].identifier.IndexOf("define(") == 0){
-					CowSpeak.GetFunction("define(").Execute(recentLine.tokens[0].identifier);
-					Lines[Lines.Count - 1] = new TokenLine(new List<Token>()); // line was already handled, clear line
+				if (recentLine.Count > 0 && recentLine[0].type == TokenType.FunctionCall && recentLine[0].identifier.IndexOf("define(") == 0){
+					CowSpeak.GetFunction("define(").Execute(recentLine[0].identifier);
+					Lines[Lines.Count - 1] = new Line(new List<Token>()); // line was already handled, clear line
 				} // must handle this function before the other lines are compiled to avoid errors
 			} // COMPILATION
 
@@ -179,7 +177,7 @@ namespace CowSpeak{
 			for (int i = 0; i < fileLines.Count; i++){
 				CowSpeak.CurrentLine = i + 1 + CurrentLineOffset;
 
-				if (Lines[i].tokens.Count >= 1 && Lines[i].tokens[0].type == TokenType.ReturnStatement){
+				if (Lines[i].Count >= 1 && Lines[i][0].type == TokenType.ReturnStatement){
 					if (isNestedInFunction)
 						return; // ReturnStatement to be handled by UserFunction.ExecuteLines
 					else
@@ -187,39 +185,42 @@ namespace CowSpeak{
 				}
 
 
-				if (Lines[i].tokens.Count > 1 && Lines[i].tokens[0].type == TokenType.TypeIdentifier && Lines[i].tokens[1].type == TokenType.FunctionDefinition){
-					string usage = Lines[i].tokens[1].identifier.Replace(((char)0x1D).ToString(), " ");
+				if (Lines[i].Count > 1 && Lines[i][0].type == TokenType.TypeIdentifier && Lines[i][1].type == TokenType.FunctionDefinition){
+					if (isNestedInFunction || isNestedInConditional)
+						throw new Exception("Function cannot be defined inside of a function or conditional");
+
+					string usage = Lines[i][1].identifier.Replace(((char)0x1D).ToString(), " ");
 
 					usage = usage.Substring(0, usage.Length - 2); // remove StartBracket
 					string dName = usage.Substring(0, usage.IndexOf("(")); // text before first '('
 
-					CowSpeak.Functions.Add(new UserFunction(dName, Utils.GetContainedLines(fileLines, GetClosingBracket(i), i), UserFunction.ParseDefinitionParams(usage.Substring(usage.IndexOf("("))), Utils.GetType(Lines[i].tokens[0].identifier), Lines[i].tokens[0].identifier + " " + usage + ")", i));
+					CowSpeak.CreateFunction(new UserFunction(dName, Utils.GetContainedLines(fileLines, GetClosingBracket(i), i), UserFunction.ParseDefinitionParams(usage.Substring(usage.IndexOf("("))), Utils.GetType(Lines[i][0].identifier), Lines[i][0].identifier + " " + usage + ")", i));
 
 					i = GetClosingBracket(i); // skip to end of definition
 				}
-				else if (Lines[i].tokens.Count > 0){
-					if (Lines[i].tokens[0].type == TokenType.IfConditional){
+				else if (Lines[i].Count > 0){
+					if (Lines[i][0].type == TokenType.IfConditional){
 						int endingBracket = GetClosingBracket(i);
 
-						if (new Conditional(Lines[i].tokens[0].identifier).EvaluateBoolean()){
+						if (new Conditional(Lines[i][0].identifier).EvaluateBoolean()){
 							RestrictedScope scope = new RestrictedScope();
 
-							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1, isNestedInFunction);
+							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1, isNestedInFunction, true);
 
 							scope.End();
 						}
 
 						i = endingBracket; // IfConditional is over, skip to end of brackets to prevent continedLines to be executed again
 					}
-					else if (Lines[i].tokens[0].type == TokenType.ElseConditional){
+					else if (Lines[i][0].type == TokenType.ElseConditional){
 						int parentIf = -1;
 
-						if (i == 0 || (Lines[i - 1].tokens.Count > 0 && Lines[i - 1].tokens[0].type != TokenType.EndBracket))
+						if (i == 0 || (Lines[i - 1].Count > 0 && Lines[i - 1][0].type != TokenType.EndBracket))
 							throw new Exception("ElseConditional isn't immediately preceding an EndBracket");
 
 
 						for (int j = 0; j < i; j++){
-							if (Lines[j].tokens.Count > 0 && Lines[j].tokens[0].type == TokenType.IfConditional && GetClosingBracket(j) == i - 1){
+							if (Lines[j].Count > 0 && Lines[j][0].type == TokenType.IfConditional && GetClosingBracket(j) == i - 1){
 								parentIf = j;
 								break;
 							}
@@ -231,35 +232,35 @@ namespace CowSpeak{
 
 						int endingBracket = GetClosingBracket(i);
 
-						if (!new Conditional(Lines[parentIf].tokens[0].identifier).EvaluateBoolean()){
+						if (!new Conditional(Lines[parentIf][0].identifier).EvaluateBoolean()){
 							RestrictedScope scope = new RestrictedScope();
 
-							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1, isNestedInFunction);
+							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1, isNestedInFunction, true);
 
 							scope.End();
 						}
 
 						i = endingBracket; // ElseConditional is over, skip to end of brackets to prevent continedLines to be executed again
 					}
-					else if (Lines[i].tokens[0].type == TokenType.WhileConditional){
+					else if (Lines[i][0].type == TokenType.WhileConditional){
 						int endingBracket = GetClosingBracket(i);
 
-						Conditional whileStatement = new Conditional(Lines[i].tokens[0].identifier);
+						Conditional whileStatement = new Conditional(Lines[i][0].identifier);
 						
 						while (whileStatement.EvaluateBoolean()){
 							RestrictedScope scope = new RestrictedScope();
 
-							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1, isNestedInFunction);
+							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1, isNestedInFunction, true);
 
 							scope.End();
 						}
 
 						i = endingBracket; // while loop is over, skip to end of brackets to prevent continedLines to be executed again
 					}
-					else if (Lines[i].tokens[0].type == TokenType.LoopConditional){
+					else if (Lines[i][0].type == TokenType.LoopConditional){
 						int endingBracket = GetClosingBracket(i);
 
-						string usage = Lines[i].tokens[0].identifier;
+						string usage = Lines[i][0].identifier;
 						Any[] loopParams = StaticFunction.ParseParameters(usage.Substring(usage.IndexOf("("), usage.LastIndexOf(")") - usage.IndexOf("(") + 1));
 
 						StaticFunction Loop = new StaticFunction("Loop", null, Type.Void, new Parameter[]{ new Parameter(Type.String, "IndexVariableName"), new Parameter(Type.Integer, "StartAt"), new Parameter(Type.Integer, "EndAt") });
@@ -276,7 +277,7 @@ namespace CowSpeak{
 
 							CowSpeak.GetVariable(varName).Set(p);
 
-							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1, isNestedInFunction);
+							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1, isNestedInFunction, true);
 
 							scope.End();
 						}
@@ -295,8 +296,8 @@ namespace CowSpeak{
 				if (i >= fileLines.Count)
 					break;
 
-				if (Lines[i].tokens.Count == 2 && Lines[i].tokens[0].type == TokenType.DeleteIdentifier && Lines[i].tokens[1].type == TokenType.VariableIdentifier) {
-					Variable target = CowSpeak.GetVariable(Lines[i].tokens[1].identifier);
+				if (Lines[i].Count == 2 && Lines[i][0].type == TokenType.DeleteIdentifier && Lines[i][1].type == TokenType.VariableIdentifier) {
+					Variable target = CowSpeak.GetVariable(Lines[i][1].identifier);
 					for (int z = 0; z < CowSpeak.Vars.Count; z++){
 						if (CowSpeak.Vars[z].Name == target.Name){
 							CowSpeak.Vars.RemoveAt(z);
@@ -307,28 +308,28 @@ namespace CowSpeak{
 				} // must handle this before the other lines are evaluated to avoid wrong exceptions
 
 				bool shouldBeSet = false; // topmost variable in list should be set after exec
-				if (Lines[i].tokens.Count >= 3 && Lines[i].tokens[0].type == TokenType.TypeIdentifier && Lines[i].tokens[1].type == TokenType.VariableIdentifier && Lines[i].tokens[2].type == TokenType.EqualOperator){
-					CowSpeak.CreateVariable(new Variable(Type.GetType(Lines[i].tokens[0].identifier), Lines[i].tokens[1].identifier));
+				if (Lines[i].Count >= 3 && Lines[i][0].type == TokenType.TypeIdentifier && Lines[i][1].type == TokenType.VariableIdentifier && Lines[i][2].type == TokenType.EqualOperator){
+					CowSpeak.CreateVariable(new Variable(Type.GetType(Lines[i][0].identifier), Lines[i][1].identifier));
 
 					shouldBeSet = true;
 				} // variable must be created before exec is called so that it may be accessed
 
 				Any retVal = Lines[i].Exec(); // Execute line
 
-				if (Lines[i].tokens.Count >= 3 && Lines[i].tokens[1].type == TokenType.VariableIdentifier && Lines[i].tokens[2].type == TokenType.EqualOperator && !Conversion.IsCompatible(CowSpeak.GetVariable(Lines[i].tokens[1].identifier).vType, retVal.vType))
-					throw new Exception("Cannot set '" + Lines[i].tokens[1].identifier + "', type '" + CowSpeak.GetVariable(Lines[i].tokens[1].identifier).vType.Name + "' is incompatible with '" + retVal.vType.Name + "'"); // check if types are compatible
-				else if (Lines[i].tokens.Count >= 2 && Lines[i].tokens[0].type == TokenType.VariableIdentifier && Lines[i].tokens[1].type == TokenType.EqualOperator && !Conversion.IsCompatible(CowSpeak.GetVariable(Lines[i].tokens[0].identifier).vType, retVal.vType))
-					throw new Exception("Cannot set '" + Lines[i].tokens[0].identifier + "', type '" + CowSpeak.GetVariable(Lines[i].tokens[0].identifier).vType.Name + "' is incompatible with '" + retVal.vType.Name + "'"); // check if types are compatible
+				if (Lines[i].Count >= 3 && Lines[i][1].type == TokenType.VariableIdentifier && Lines[i][2].type == TokenType.EqualOperator && !Conversion.IsCompatible(CowSpeak.GetVariable(Lines[i][1].identifier).vType, retVal.vType))
+					throw new Exception("Cannot set '" + Lines[i][1].identifier + "', type '" + CowSpeak.GetVariable(Lines[i][1].identifier).vType.Name + "' is incompatible with '" + retVal.vType.Name + "'"); // check if types are compatible
+				else if (Lines[i].Count >= 2 && Lines[i][0].type == TokenType.VariableIdentifier && Lines[i][1].type == TokenType.EqualOperator && !Conversion.IsCompatible(CowSpeak.GetVariable(Lines[i][0].identifier).vType, retVal.vType))
+					throw new Exception("Cannot set '" + Lines[i][0].identifier + "', type '" + CowSpeak.GetVariable(Lines[i][0].identifier).vType.Name + "' is incompatible with '" + retVal.vType.Name + "'"); // check if types are compatible
 
 				if (shouldBeSet)
 					CowSpeak.Vars[CowSpeak.Vars.Count - 1].byteArr = retVal.byteArr;
-				else if (Lines[i].tokens.Count >= 2 && Lines[i].tokens[0].type == TokenType.VariableIdentifier && Lines[i].tokens[1].type == TokenType.EqualOperator){
-					if (CowSpeak.GetVariable(Lines[i].tokens[0].identifier, false) == null){
-						throw new Exception("Variable '" + Lines[i].tokens[0].identifier + "' must be defined before it can be set");
+				else if (Lines[i].Count >= 2 && Lines[i][0].type == TokenType.VariableIdentifier && Lines[i][1].type == TokenType.EqualOperator){
+					if (CowSpeak.GetVariable(Lines[i][0].identifier, false) == null){
+						throw new Exception("Variable '" + Lines[i][0].identifier + "' must be defined before it can be set");
 					} // var not found
 
 					for (int v = 0; v < CowSpeak.Vars.Count; v++){
-						if (Lines[i].tokens[0].identifier == CowSpeak.Vars[v].Name)
+						if (Lines[i][0].identifier == CowSpeak.Vars[v].Name)
 							CowSpeak.Vars[v].byteArr = retVal.byteArr;
 					} // using GetVariable does not work for this
 				} // type is not specified, var must already be defined

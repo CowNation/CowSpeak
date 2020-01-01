@@ -79,7 +79,7 @@ namespace CowSpeak{
 				Type vtype = null;
 
 				if (token == null){
-					TokenLine tl = new TokenLine(Lexer.ParseLine(parameter));
+					Line tl = new Line(Lexer.ParseLine(parameter));
 					parameters.Add(tl.Exec());
 					continue;
 				} // unknown identifier, could be an equation waiting to be solved

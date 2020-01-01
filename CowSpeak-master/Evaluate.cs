@@ -131,8 +131,8 @@ namespace CowSpeak{
 				if (Utils.IsIndexValid(index - 1, Tokens) && Utils.IsIndexValid(index + 1, Tokens) && token.type.ToString().IndexOf("Is") != -1){
 					Token _operator = token;
 
-					Any _left = new TokenLine(new List< Token >{ Tokens[index - 1] }).Exec();
-					Any _right = new TokenLine(new List< Token >{ Tokens[index + 1] }).Exec();
+					Any _left = new Line(new List< Token >{ Tokens[index - 1] }).Exec();
+					Any _right = new Line(new List< Token >{ Tokens[index + 1] }).Exec();
 
 					Token answer = new Token(TokenType.Number, "");
 					if (_operator.type == TokenType.IsEqualOperator)
