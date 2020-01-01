@@ -100,7 +100,7 @@ namespace CowSpeak{
 			for (int i = 0; i < Parameters.Length; i++){
 				Parameter parameter = Parameters[i];
 				CowSpeak.Vars.Insert(0, new Variable(parameter.Type, parameter.Name, parameters[i].Get()));
-				//CowSpeak.CreateVariable();
+				//CowSpeak.CreateVariable(new Variable(parameter.Type, parameter.Name, parameters[i].Get()));
 			}
 
 			Any returnedValue = ExecuteLines(Definition);

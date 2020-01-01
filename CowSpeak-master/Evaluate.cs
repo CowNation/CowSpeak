@@ -133,6 +133,8 @@ namespace CowSpeak{
 
 					Any _left = new Line(new List< Token >{ Tokens[index - 1] }).Exec();
 					Any _right = new Line(new List< Token >{ Tokens[index + 1] }).Exec();
+					if (!Conversion.IsCompatible(_left.vType, _right.vType))
+						throw new Exception(_left.vType.Name + " is incompatible with " + _right.vType.Name);
 
 					Token answer = new Token(TokenType.Number, "");
 					if (_operator.type == TokenType.IsEqualOperator)

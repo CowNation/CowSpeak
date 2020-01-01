@@ -2,6 +2,7 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Net;
 
 namespace CowSpeak{
 	public static class Functions{
@@ -98,6 +99,10 @@ namespace CowSpeak{
 		public static Any ToLower(Any[] parameters){
 			return new Any(Type.Character, System.Char.ToLower(parameters[0].Get().ToString()[0]));
 		}
+		[FunctionAttr(Syntax.Types.Character + ".ToInteger", Syntax.Types.Integer, "", true)]
+		public static Any _ToInteger(Any[] parameters){
+			return new Any(Type.Integer, (int)parameters[0].Get().ToString()[0]);
+		}
 		#endregion
 
 		#region INTEGER_METHODS
@@ -105,7 +110,37 @@ namespace CowSpeak{
 		public static Any ToHexadecimal(Any[] parameters){
 			return new Any(Type.String, "0x" + System.Convert.ToString((int)parameters[0].Get(), 16));
 		}
+		[FunctionAttr(Syntax.Types.Integer + ".ToCharacter", Syntax.Types.Character, "", true)]
+		public static Any ToCharacter(Any[] parameters){
+			return new Any(Type.Character, (char)(int)parameters[0].Get());
+		}
 		#endregion
+
+		[FunctionAttr("GetHtmlFromUrl", Syntax.Types.String, Syntax.Types.String + " url")]
+		public static Any GetHtmlFromUrl(Any[] parameters){
+			string urlAddress = parameters[0].Get().ToString();
+
+			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlAddress);
+			HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
+			if (response.StatusCode == HttpStatusCode.OK){
+				Stream receiveStream = response.GetResponseStream();
+				StreamReader readStream = null;
+
+				if (string.IsNullOrWhiteSpace(response.CharacterSet))
+					readStream = new StreamReader(receiveStream);
+				else
+					readStream = new StreamReader(receiveStream, Encoding.GetEncoding(response.CharacterSet));
+
+				string data = readStream.ReadToEnd();
+
+				response.Close();
+				readStream.Close();
+				return new Any(Type.String, data);
+			}
+
+			throw new Exception("Cannot get a HttpWebResponse from '" + urlAddress + "'");
+		}
 
 		[FunctionAttr("Abs", Syntax.Types.Decimal, Syntax.Types.Decimal + " value")]
 		public static Any Abs(Any[] parameters){

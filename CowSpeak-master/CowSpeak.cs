@@ -22,9 +22,11 @@ namespace CowSpeak{
 			}
 
 			if (functionName.IndexOf(".") != -1){
-				FunctionBase found = GetFunction("Any" + functionName.Substring(functionName.IndexOf(".")), false);
-				if (found != null)
-					return found;
+				string anyMethod = "Any" + functionName.Substring(functionName.IndexOf("."));
+				for (int i = 0; i < Functions.Count; i++){
+					if (anyMethod.IndexOf(Functions[i].Name) == 0)
+						return Functions[i];
+				}
 			} // try to see if it's an 'Any' method
 
 			if (_throw)

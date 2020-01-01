@@ -1,5 +1,11 @@
 print("String Things:\n")
 
+string GetTextBetween(string str, string leftOf, string rightOf){
+	integer leftOccurence = str.IndexOf(leftOf)
+	integer rightOccurence = str.IndexOf(rightOf)
+	return str.SubString(leftOccurence + leftOf.Length(), rightOccurence)
+}
+
 string ReplaceFirstOf(string str, string lookFor, string replaceWith){
 	integer index = str.IndexOf(lookFor)
 	str = str.Remove(index, index + lookFor.Length())
@@ -13,6 +19,10 @@ string ReplaceAllOf(string str, string lookFor, string replaceWith){
 	}
 	return str
 } # replace all OccurrencesOf
+
+string html = GetHtmlFromUrl("http://example.org/")
+print(GetTextBetween(html, "<h1>", "</h1>") + "\n")
+print(ReplaceAllOf(ReplaceAllOf(GetTextBetween(html, "<p>", "</p>"), "\n", ""), "   ", "") + "\n") # get text between paragraph, remove newline & extra spaces in text
 
 string hello = "hey ho hi he he ho hi heah ho ho ho\n"
 print(ReplaceAllOf(hello, "ho", "ha"))

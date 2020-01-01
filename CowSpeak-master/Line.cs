@@ -38,7 +38,7 @@ namespace CowSpeak{
 				result.vType = Type.Character;
 
 				if (toEval[i].type == TokenType.Character)
-					result.Set(toEval[i].identifier[0]);
+					result.Set(toEval[i].identifier != "" ? toEval[i].identifier[0] : (char)0);
 				else if (toEval[i].type == TokenType.FunctionCall)
 					result.Set((char)CowSpeak.GetFunction(identifier).Execute(identifier).Get());
 				else
