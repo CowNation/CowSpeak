@@ -1,15 +1,15 @@
 using System.Collections.Generic;
 
 namespace CowSpeak{
-	public class RestrictedScope {
-		public RestrictedScope(){
+	public class Scope {
+		public Scope(){
 			// get a copy so it's not a reference
 			oldVars = new List< Variable >(CowSpeak.Vars);
 			oldDefs = new List< string[] >(CowSpeak.Definitions);
 		} // any vars created in this scope will be destroyed at the end of the scope
 
 		public List< Variable > oldVars = null;
-		private List< string[] > oldDefs = null;
+		public List< string[] > oldDefs = null;
 
 		public void End(){
 			for (int i = 0; i < CowSpeak.Vars.Count; i++){

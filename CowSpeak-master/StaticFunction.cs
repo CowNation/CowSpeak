@@ -44,25 +44,11 @@ namespace CowSpeak {
 			try {
 				return Definition.Invoke(null, new object[]{ parameters.ToArray() }) as Any; // obj is null because the function should be static
 			}
-			catch (Exception ex) {
-				if (ex.GetType().IsAssignableFrom(typeof(System.InvalidCastException))){
-					string givenParams = Name + "(";
-					int i = 0;
-					foreach (Any _param in parameters){
-						if (i == 0 && isMethod){
-							i++;
-							continue;
-						}
-
-						givenParams += _param.vType.Name + "(" + _param.Get().ToString() + ")" + (i == parameters.Count - 1 ? "" : ",");
-
-						i++;
-					}
-					givenParams += ")";
-					throw new Exception("Invalid parameter types passed in FunctionCall: '" + Name);
-				}
-				else
-					throw new Exception("There was an unknown error when executing function: '" + Usage + "'");
+			catch (System.Reflection.TargetInvocationException ex) {
+				System.Exception baseEx = ex.GetBaseException();
+				if (baseEx is Exception)
+					throw baseEx as Exception;
+				throw new Exception("FunctionCall '" + Name + "' returned an exception: " + baseEx.Message);
 			}
 		}
 	};

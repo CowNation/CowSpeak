@@ -7,6 +7,16 @@ string ReplaceFirstOf(string str, string lookFor, string replaceWith){
 	return str
 }
 
+string ReplaceAllOf(string str, string lookFor, string replaceWith){
+	loop("", 0, str.OccurrencesOf(lookFor)){
+		str = ReplaceFirstOf(str, lookFor, replaceWith)
+	}
+	return str
+} # replace all OccurrencesOf
+
+string hello = "hey ho hi he he ho hi heah ho ho ho\n"
+print(ReplaceAllOf(hello, "ho", "ha"))
+
 string myn = "67.56"
 print("" + myn.ToDecimal() + "\n")
 delete myn # we don't need this var anymore
@@ -27,9 +37,6 @@ print("Second Half: " + cs.SubString(halfLen, cs.Length()) + "\n")
 delete halfLen
 
 # replace "world" with "universe"
-#integer worldIndex = cs.IndexOf("world")
-#cs = cs.Remove(worldIndex, worldIndex + 5)
-#cs = cs.Insert(worldIndex, "universe")
 cs = ReplaceFirstOf(cs, "world", "universe")
 print(cs + "\n")
 

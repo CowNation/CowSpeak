@@ -131,7 +131,7 @@ namespace CowSpeak{
 			}
 		}
 
-		// To be overrode
+		// To be overridden
 		public abstract Any Execute(string usage);
 	};
 }

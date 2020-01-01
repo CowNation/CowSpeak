@@ -203,7 +203,7 @@ namespace CowSpeak{
 						int endingBracket = GetClosingBracket(i);
 
 						if (new Conditional(Lines[i][0].identifier).EvaluateBoolean()){
-							RestrictedScope scope = new RestrictedScope();
+							Scope scope = new Scope();
 
 							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1, isNestedInFunction, true);
 
@@ -233,7 +233,7 @@ namespace CowSpeak{
 						int endingBracket = GetClosingBracket(i);
 
 						if (!new Conditional(Lines[parentIf][0].identifier).EvaluateBoolean()){
-							RestrictedScope scope = new RestrictedScope();
+							Scope scope = new Scope();
 
 							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1, isNestedInFunction, true);
 
@@ -248,7 +248,7 @@ namespace CowSpeak{
 						Conditional whileStatement = new Conditional(Lines[i][0].identifier);
 						
 						while (whileStatement.EvaluateBoolean()){
-							RestrictedScope scope = new RestrictedScope();
+							Scope scope = new Scope();
 
 							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1, isNestedInFunction, true);
 
@@ -273,7 +273,7 @@ namespace CowSpeak{
 						CowSpeak.Vars.Add(new Variable(Type.Integer, varName));
 
 						for (int p = start; p < end; p++){
-							RestrictedScope scope = new RestrictedScope();
+							Scope scope = new Scope();
 
 							CowSpeak.GetVariable(varName).Set(p);
 

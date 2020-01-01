@@ -95,28 +95,19 @@ namespace CowSpeak{
 
 			CheckParameters(parameters);
 
-			try {
-				RestrictedScope scope = new RestrictedScope();
+			Scope scope = new Scope();
 
-				for (int i = 0; i < Parameters.Length; i++){
-					Parameter parameter = Parameters[i];
-					CowSpeak.CreateVariable(new Variable(parameter.Type, parameter.Name, parameters[i].Get()));
-				}
-
-				Any returnedValue = ExecuteLines(Definition);
-
-				scope.End();
-
-				return returnedValue;
+			for (int i = 0; i < Parameters.Length; i++){
+				Parameter parameter = Parameters[i];
+				CowSpeak.Vars.Insert(0, new Variable(parameter.Type, parameter.Name, parameters[i].Get()));
+				//CowSpeak.CreateVariable();
 			}
-			catch (Exception ex) {
-				if (ex.GetType().IsAssignableFrom(typeof(System.InvalidCastException)))
-					throw new Exception("Invalid parameter types passed in FunctionCall: '" + Usage + "'");
-				else if (ex.GetType().IsAssignableFrom(typeof(Exception)))
-					throw ex as Exception;
-				else
-					throw new Exception("There was an unknown error when executing function: '" + Usage + "'");
-			}
+
+			Any returnedValue = ExecuteLines(Definition);
+
+			scope.End();
+
+			return returnedValue;
 		}
 	};
 }
