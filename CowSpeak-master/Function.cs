@@ -16,11 +16,6 @@ namespace CowSpeak{
 		}
 	};
 
-	public enum DefinitionType {
-		Language,
-		User
-	}
-
 	public abstract class FunctionBase {
 		public string Name;
 		public Type type;
@@ -111,7 +106,6 @@ namespace CowSpeak{
 
 				if (vtype == null)
 					throw new Exception("Unknown type passed as parameter: " + parameter);
-
 
 				parameters.Add(new Any(vtype, System.Convert.ChangeType(cleanedUp, vtype.rep)));
 			}

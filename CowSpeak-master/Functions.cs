@@ -157,36 +157,35 @@ namespace CowSpeak{
 			return new Any(Type.Integer, System.Math.Sqrt((double)parameters[0].Get()));
 		}
 
-		[FunctionAttr("sleep", Syntax.Types.Void, Syntax.Types.Integer + " ms")]
-		public static Any sleep(Any[] parameters){
+		[FunctionAttr("Sleep", Syntax.Types.Void, Syntax.Types.Integer + " ms")]
+		public static Any Sleep(Any[] parameters){
 			Thread.Sleep((int)parameters[0].Get());
 			return new Any(Type.Integer, 0);
 		}
 
-		[FunctionAttr("pause", Syntax.Types.Void, "")]
-		public static Any pause(Any[] parameters) {
+		[FunctionAttr("Pause", Syntax.Types.Void, "")]
+		public static Any Pause(Any[] parameters) {
 			System.Console.ReadKey();
 			return new Any(Type.Integer, 0);
 		}
 
-		[FunctionAttr("define", Syntax.Types.Void, Syntax.Types.String + " from, " + Syntax.Types.String + " to")]
-		public static Any define(Any[] parameters) {
-			CowSpeak.Definitions.Add(new string[]{parameters[0].Get().ToString(), parameters[1].Get().ToString()});
+		[FunctionAttr("Define", Syntax.Types.Void, Syntax.Types.String + " from, " + Syntax.Types.String + " to")]
+		public static Any Define(Any[] parameters) {
+			CowSpeak.Definitions.Add(new Definition{
+				from = parameters[0].Get().ToString(),
+				to = parameters[1].Get().ToString(),
+				DefinitionType = DefinitionType.User
+			});
 			return new Any(Type.Integer, 0);
 		}
 
 		[FunctionAttr("Evaluate", Syntax.Types.Decimal, Syntax.Types.String + " toExec")]
 		public static Any _Evaluate(Any[] parameters) {
 			Any evaluatedValue = new Any();
-			try{
-				evaluatedValue.vType = Type.Decimal;
-				evaluatedValue.Set(Evaluate.EvaluateTokens(Lexer.ParseLine(parameters[0].Get().ToString())));
-				if (((double)evaluatedValue.Get()).ToString().IndexOf(".") == -1)
-					evaluatedValue.vType = Type.Integer; // decimal not found, we can convert to int
-			}
-			catch{
-				throw new Exception("Could not evaluate expression");
-			}
+			evaluatedValue.vType = Type.Decimal;
+			evaluatedValue.Set(Evaluate.EvaluateTokens(Lexer.ParseLine(parameters[0].Get().ToString())));
+			if (((double)evaluatedValue.Get()).ToString().IndexOf(".") == -1)
+				evaluatedValue.vType = Type.Integer; // decimal not found, we can convert to int
 
 			return evaluatedValue;
 		}

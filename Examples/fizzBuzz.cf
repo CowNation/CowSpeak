@@ -1,3 +1,7 @@
+Define("int", "integer")
+int myint = 69
+print(myint)
+
 # Shout out to Pinecone by William W Wold
 void fizzBuzz(integer start, integer end){
 	loop("index", start, end + 1){

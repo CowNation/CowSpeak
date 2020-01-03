@@ -29,6 +29,14 @@ namespace CowSpeak{
 		}
 
 		public static Token ParseToken(string token, bool _throw = true){
+			try{
+				foreach (Definition Definition in CowSpeak.Definitions){
+					if (token == Definition.from)
+						token = Definition.to;
+				}
+			}
+			catch (System.NullReferenceException){} // CowSpeak has not been initialized yet, usually means that this func has been called while getting static funcs
+
 			token = Utils.FixBoolean(token);
 
 			if (Utils.IsHexadecimal(token))
@@ -135,9 +143,6 @@ namespace CowSpeak{
 				while (fileLines[i].IndexOf("	") == 0 || fileLines[i].IndexOf(" ") == 0)
 					fileLines[i] = fileLines[i].Remove(0, 1);
 
-				foreach (string[] Definition in CowSpeak.Definitions)
-					fileLines[i] = fileLines[i].Replace(Definition[0], Definition[1]);
-
 				while (fileLines[i].IndexOf(Syntax.Identifiers.Comment) != -1){
 					int pos = fileLines[i].IndexOf(Syntax.Identifiers.Comment);
 					if (Utils.IsBetween(fileLines[i], pos, '"', '"') || Utils.IsBetween(fileLines[i], pos, '\'', '\'')){
@@ -168,8 +173,8 @@ namespace CowSpeak{
 					}
 				}
 
-				if (recentLine.Count > 0 && recentLine[0].type == TokenType.FunctionCall && recentLine[0].identifier.IndexOf("define(") == 0){
-					CowSpeak.GetFunction("define(").Execute(recentLine[0].identifier);
+				if (recentLine.Count > 0 && recentLine[0].type == TokenType.FunctionCall && recentLine[0].identifier.IndexOf("Define(") == 0){
+					CowSpeak.GetFunction("Define(").Execute(recentLine[0].identifier);
 					Lines[Lines.Count - 1] = new Line(new List<Token>()); // line was already handled, clear line
 				} // must handle this function before the other lines are compiled to avoid errors
 			} // COMPILATION

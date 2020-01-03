@@ -6,7 +6,7 @@ namespace CowSpeak{
 	public class CowSpeak{
 		public static List< FunctionBase > Functions = FunctionAttr.GetFunctions();
 
-		public static List< string[] > Definitions = new List< string[] >();
+		public static List< Definition > Definitions = new List< Definition >();
 
 		public static FunctionBase GetFunction(string functionName, bool _throw = true){
 			if (functionName.IndexOf(".") != -1){
