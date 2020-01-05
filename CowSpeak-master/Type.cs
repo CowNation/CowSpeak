@@ -1,9 +1,12 @@
-namespace CowSpeak {
-	public class Type {
+namespace CowSpeak
+{
+	public class Type
+	{
 		public string Name; // how the type is referenced in the code
 		public System.Type rep; // C# representation of type
 
-		public Type(string Name, System.Type rep){
+		public Type(string Name, System.Type rep)
+		{
 			this.Name = Name;
 			this.rep = rep;
 		}
@@ -16,15 +19,16 @@ namespace CowSpeak {
 		public static Type Boolean = new Type(Syntax.Types.Boolean, typeof(bool));
 		public static Type Character = new Type(Syntax.Types.Character, typeof(char));
 
-		public static Type[] GetTypes(){
+		public static Type[] GetTypes()
+		{
 			return new Type[]{Integer, Decimal, String, Character, Boolean, Void, Any};
 		} // returns array of all static types
 
-		public static Type GetType(string typeName){
-			foreach (Type type in GetTypes()){
+		public static Type GetType(string typeName)
+		{
+			foreach (Type type in GetTypes())
 				if (type.Name == typeName)
 					return type;
-			}	
 
 			throw new Exception("Type '" + typeName + "' does not exist");
 		}

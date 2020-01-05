@@ -1,6 +1,9 @@
-namespace CowSpeak{
-	namespace Syntax{
-		public static class Types {
+namespace CowSpeak
+{
+	namespace Syntax
+	{
+		public static class Types
+		{
 			public const string Void = "void";
 			public const string c_Void = "Void";
 			public const string Decimal = "decimal";
@@ -16,23 +19,27 @@ namespace CowSpeak{
 			public const string Any = "any";
 		}
 
-		public static class Statements {
+		public static class Statements
+		{
 			public const string Return = "return";
 			public const string Delete = "delete";
 		}
 
-		public static class Conditionals {
+		public static class Conditionals
+		{
 			public const string If = "if";
 			public const string Else = "else";
 			public const string While = "while";
 			public const string Loop = "loop";
 		}
 
-		public static class Identifiers {
+		public static class Identifiers
+		{
 			public const string Comment = "#";
 		}
 
-		public static class Comparators {
+		public static class Comparators
+		{
 			public const string IsEqual = "==";
 			public const string IsNotEqual = "!=";
 			public const string IsGreaterThan = ">";
@@ -41,7 +48,8 @@ namespace CowSpeak{
 			public const string IsLessThanOrEqual = "<=";
 		}
 
-		public static class Operators {
+		public static class Operators
+		{
 			public const string Add = "+";
 			public const string Subtract = "-";
 			public const string Multiply = "*";

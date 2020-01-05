@@ -1,5 +1,7 @@
-namespace CowSpeak{
-	public enum TokenType {
+namespace CowSpeak
+{
+	public enum TokenType
+	{
 		AddOperator,
 		SubtractOperator,
 		MultiplyOperator,
@@ -34,14 +36,17 @@ namespace CowSpeak{
 		EndBracket,
 
 		ReturnStatement
-	};
+	}
 
-	public class Token {
+	public class Token
+	{
 		public TokenType type;
 		public string identifier;
-		public Token(TokenType tt, string id){
+		
+		public Token(TokenType tt, string id)
+		{
 			type = tt;
 			identifier = id;
 		}
-	};
+	}
 }

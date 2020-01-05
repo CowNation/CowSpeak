@@ -5,19 +5,24 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Text;
 
-namespace CowSpeak{
-	public static class Utils {
+namespace CowSpeak
+{
+	public static class Utils
+	{
 		public static System.Random rand = new System.Random();
 
-		public static bool IsHexadecimal(string str){
+		public static bool IsHexadecimal(string str)
+		{
 			return Utils.OccurrencesOf(str, "0x") == 1 && str.IndexOf("0x") == 0;
 		}
 
-		public static int OccurrencesOf(string str, string splitter){
+		public static int OccurrencesOf(string str, string splitter)
+		{
 			return str.Split(splitter).Length - 1;
 		}
 
-		public static bool IsOperator(TokenType type){
+		public static bool IsOperator(TokenType type)
+		{
 			return type.ToString().IndexOf("Operator") != -1;
 		}
 
@@ -27,12 +32,11 @@ namespace CowSpeak{
 			return (T)converter.ConvertFromString(null, CultureInfo.InvariantCulture, inValue);
 		}
 
-		public static Type GetType(string usage, bool _throw = true){
-			foreach (Type type in Type.GetTypes()){
-				if (type.Name == usage){
+		public static Type GetType(string usage, bool _throw = true)
+		{
+			foreach (Type type in Type.GetTypes())
+				if (type.Name == usage)
 					return type;
-				}
-			}
 
 			if (_throw)
 				throw new Exception("Type '" + usage + "' does not exist");
@@ -49,9 +53,11 @@ namespace CowSpeak{
 			_containedLines = Lines.GetRange(i + 1, endingBracket - (i + 1));
 			List< string > containedLines = new List< string >();
 
-			foreach (Line line in _containedLines){
+			foreach (Line line in _containedLines)
+			{
 				string built = "";
-				foreach (Token pToken in line){
+				foreach (Token pToken in line)
+				{
 					if (pToken.type == TokenType.String)
 						built += "\"";
 
@@ -70,7 +76,8 @@ namespace CowSpeak{
 			string leftOf = str.Substring(0, index);
 			int starts = leftOf.Split(start).Length - 1;
 
-			if (start != end){
+			if (start != end)
+			{
 				int lastStart = leftOf.LastIndexOf(start);
 				int lastEnd = leftOf.LastIndexOf(end);
 				int ends = leftOf.Split(end).Length - 1;
@@ -80,11 +87,13 @@ namespace CowSpeak{
 				return starts % 2 != 0;
 		}
 
-		public static string FixBoolean(string str){
+		public static string FixBoolean(string str)
+		{
 			if (str.IndexOf("True") == -1 && str.IndexOf("False") == -1)
 				return str; 
 
-			for (int i = 0; i < str.Length; i++){
+			for (int i = 0; i < str.Length; i++)
+			{
 				string trueSub = i + 4 <= str.Length ? str.Substring(i, 4) : "";
 				string falseSub = i + 5 <= str.Length ? str.Substring(i, 5) : "";
 
@@ -100,12 +109,14 @@ namespace CowSpeak{
 		public static string SubstituteBetween(string str, char toSub, char start, char end, char substitution = (char)0x1a){
 			int i = 0;
 			string _str = str;
-			foreach (char letter in str){
-				if (letter == toSub && IsBetween(str, i, start, end)){
-					if (substitution == (char)0x0){
+			foreach (char letter in str)
+			{
+				if (letter == toSub && IsBetween(str, i, start, end))
+				{
+					if (substitution == (char)0x0)
 						_str = _str.Remove(i, 1);
-					}
-					else{
+					else
+					{
 						StringBuilder fileLine = new StringBuilder(_str);
 						fileLine[i] = substitution;
 						_str = fileLine.ToString(); 
@@ -117,12 +128,11 @@ namespace CowSpeak{
 			return _str;
 		} // so you don't have to do it very inefficently with IsBetween on each char
 
-		public static string AddStrings(List< string > toAdd){
-			// example input is "hello ", "world", "!"
+		public static string AddStrings(List< string > toAdd)
+		{
 			string result = "";
-			foreach (string _add in toAdd){
+			foreach (string _add in toAdd)
 				result += _add;
-			}
 			return result;
 		}
 
@@ -133,10 +143,8 @@ namespace CowSpeak{
 		public static bool IsLettersOnly(string s)
 		{
 			foreach (char c in s)
-			{
 				if (!System.Char.IsLetter(c) && c != '_')
 					return false;
-			}
 			return true;
 		}
 
@@ -146,10 +154,8 @@ namespace CowSpeak{
 				return false;
 
 			foreach (char c in str)
-			{
 				if ((c < '0' || c > '9') && c != '.' && c != '-')
 					return false;
-			}
 
 			return true;
 		}

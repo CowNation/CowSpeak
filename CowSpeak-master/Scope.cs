@@ -1,8 +1,11 @@
 using System.Collections.Generic;
 
-namespace CowSpeak{
-	public class Scope {
-		public Scope(){
+namespace CowSpeak
+{
+	public class Scope
+	{
+		public Scope()
+		{
 			// get a copy so it's not a reference
 			oldVars = new List< Variable >(CowSpeak.Vars);
 			oldDefs = new List< Definition >(CowSpeak.Definitions);
@@ -11,16 +14,21 @@ namespace CowSpeak{
 		public List< Variable > oldVars = null;
 		public List< Definition > oldDefs = null;
 
-		public void End(){
-			for (int i = 0; i < CowSpeak.Vars.Count; i++){
+		public void End()
+		{
+			for (int i = 0; i < CowSpeak.Vars.Count; i++)
+			{
 				bool matchFound = false;
-				foreach (Variable oldVar in oldVars){
-					if (oldVar.Name == CowSpeak.Vars[i].Name){
+				foreach (Variable oldVar in oldVars)
+				{
+					if (oldVar.Name == CowSpeak.Vars[i].Name)
+					{
 						matchFound = true;
 						break;
 					}
 				}
-				if (!matchFound){
+				if (!matchFound)
+				{
 					CowSpeak.Vars.RemoveAt(i); // was created in restricted scope because it didn't exist before the restricted scope began
 					
 					if (i > 0)
@@ -31,9 +39,11 @@ namespace CowSpeak{
 					break;
 			}
 
-			for (int i = 0; i < CowSpeak.Definitions.Count; i++){
+			for (int i = 0; i < CowSpeak.Definitions.Count; i++)
+			{
 				bool matchFound = false;
-				foreach (Definition oldDef in oldDefs){
+				foreach (Definition oldDef in oldDefs)
+				{
 					if (oldDef.from == CowSpeak.Definitions[i].from && oldDef.to == CowSpeak.Definitions[i].to){
 						matchFound = true;
 						break;

@@ -4,13 +4,16 @@ using System.Text;
 using System.IO;
 using System.Linq;
 
-namespace CowSpeak{
-	public class UserFunction : FunctionBase {
+namespace CowSpeak
+{
+	public class UserFunction : FunctionBase
+	{
 		List< string > Definition; // lines contained inside of the function
 		int DefinitionOffset; // offset of where the definition is so CowSpeak.CurrentLine is correct
 		string DefinedIn; // file function was defined in, may be empty
 
-		public UserFunction(string Name, List< string > Definition, Parameter[] Parameters, Type type, string ProperUsage, int DefinitionOffset) {
+		public UserFunction(string Name, List< string > Definition, Parameter[] Parameters, Type type, string ProperUsage, int DefinitionOffset)
+		{
 			this.DefinitionType = DefinitionType.User;
 			this.type = type;
 			this.Definition = Definition;
@@ -21,7 +24,8 @@ namespace CowSpeak{
 			this.DefinedIn = CowSpeak.CurrentFile;
 		}
 
-		private Any ExecuteLines(List< string > lines){
+		private Any ExecuteLines(List< string > lines)
+		{
 			string CurrentFile = CowSpeak.CurrentFile;
 			CowSpeak.CurrentFile = DefinedIn;
 
@@ -29,7 +33,8 @@ namespace CowSpeak{
 
 			string ReturnedLine = Definition[CowSpeak.CurrentLine - DefinitionOffset - 2]; // relative line where Lexer returned
 
-			if (type == Type.Void){
+			if (type == Type.Void)
+			{
 				if (ReturnedLine.IndexOf(Syntax.Statements.Return) == 0 && ReturnedLine != Syntax.Statements.Return)
 					throw new Exception("Cannot return a value from a void function");
 
@@ -54,7 +59,8 @@ namespace CowSpeak{
 			return returnedValue;
 		}
 
-		public static Parameter[] ParseDefinitionParams(string s_params){
+		public static Parameter[] ParseDefinitionParams(string s_params)
+		{
 			if (s_params == "()")
 				return null; // no parameters
 
@@ -63,7 +69,8 @@ namespace CowSpeak{
 
 			string[] splitParams = s_params.Split(","); // split by each comma (each item is a parameter)
 
-			foreach (string parameter in splitParams){
+			foreach (string parameter in splitParams)
+			{
 				if (parameter == "")
 					continue;
 
@@ -77,7 +84,8 @@ namespace CowSpeak{
 			return parameters.ToArray();
 		}
 
-		public static UserFunction ParseDefinition(Lexer owner, int definitionLine, Token returnType, string usage){
+		public static UserFunction ParseDefinition(Lexer owner, int definitionLine, Token returnType, string usage)
+		{
 			usage = usage.Substring(0, usage.Length - 2); // remove StartBracket
 
 			string dName = usage.Substring(0, usage.IndexOf("(")); // text before first '('
@@ -85,7 +93,8 @@ namespace CowSpeak{
 			return new UserFunction(dName, Utils.GetContainedLines(owner.Lines, owner.GetClosingBracket(definitionLine), definitionLine), ParseDefinitionParams(usage.Substring(usage.IndexOf("("))), Utils.GetType(returnType.identifier), returnType.identifier + " " + usage, definitionLine);
 		}
 
-		public override Any Execute(string usage) {
+		public override Any Execute(string usage)
+		{
 			if (usage.IndexOf("(") == -1 || usage.IndexOf(")") == -1)
 				throw new Exception("Invalid usage of function: '" + Usage + "'");
 
@@ -97,7 +106,8 @@ namespace CowSpeak{
 
 			Scope scope = new Scope();
 
-			for (int i = 0; i < Parameters.Length; i++){
+			for (int i = 0; i < Parameters.Length; i++)
+			{
 				Parameter parameter = Parameters[i];
 				CowSpeak.Vars.Insert(0, new Variable(parameter.Type, parameter.Name, parameters[i].Get()));
 				//CowSpeak.CreateVariable(new Variable(parameter.Type, parameter.Name, parameters[i].Get()));
@@ -109,5 +119,5 @@ namespace CowSpeak{
 
 			return returnedValue;
 		}
-	};
+	}
 }

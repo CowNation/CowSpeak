@@ -1,10 +1,14 @@
 using System.Collections.Generic;
 
-namespace CowSpeak{
-	public static class Evaluate{
-		public static List< Token > EvaluateMD(List< Token > Tokens){
+namespace CowSpeak
+{
+	public static class Evaluate
+	{
+		public static List< Token > EvaluateMD(List< Token > Tokens)
+		{
 			int index = 0;
-			while (true){
+			while (true)
+			{
 				Token token = Tokens[index];
 
 				if ((token.type == TokenType.MultiplyOperator || token.type == TokenType.DivideOperator || token.type == TokenType.ModuloOperator) && Utils.IsIndexValid(index - 1, Tokens) && Utils.IsIndexValid(index + 1, Tokens)){
@@ -15,12 +19,14 @@ namespace CowSpeak{
 					Token answer = new Token(TokenType.Number, "");
 					if (_operator.type == TokenType.MultiplyOperator)
 						answer.identifier = (_left * _right).ToString();
-					else if (_operator.type == TokenType.DivideOperator){
+					else if (_operator.type == TokenType.DivideOperator)
+					{
 						if (_right == 0)
 							throw new Exception("Cannot divide by 0");
 						answer.identifier = (_left / _right).ToString();
 					}
-					else if (_operator.type == TokenType.ModuloOperator){
+					else if (_operator.type == TokenType.ModuloOperator)
+					{
 						if (_right == 0)
 							throw new Exception("Cannot divide by 0");
 						answer.identifier = (_left % _right).ToString();
@@ -42,14 +48,17 @@ namespace CowSpeak{
 			return Tokens;
 		}
 
-		public static double EvaluateTokens(List< Token > Tokens){
+		public static double EvaluateTokens(List< Token > Tokens)
+		{
 			int index = 0;
 
 			// Order of operations: solve exponents first
-			while (true){
+			while (true)
+			{
 				Token token = Tokens[index];
 
-				if (token.type == TokenType.PowerOperator && Utils.IsIndexValid(index - 1, Tokens) && Utils.IsIndexValid(index + 1, Tokens)){
+				if (token.type == TokenType.PowerOperator && Utils.IsIndexValid(index - 1, Tokens) && Utils.IsIndexValid(index + 1, Tokens))
+				{
 					Token _operator = Tokens[index];
 					double _left = System.Convert.ToDouble(Tokens[index - 1].identifier);
 					double _right = System.Convert.ToDouble(Tokens[index + 1].identifier);
@@ -75,13 +84,15 @@ namespace CowSpeak{
 			// Order of operations: solve Multiply, Divide, and Modulus first
 			Tokens = EvaluateMD(Tokens);
 
-			while (Tokens.Count > 1){
+			while (Tokens.Count > 1)
+			{
 				Token token = Tokens[index];
 
 				if (token.type != TokenType.Number && !Utils.IsOperator(token.type))
 					throw new Exception("Illegal token type '" + token.type.ToString() + "' in EvaluateTokens");
 
-				if (Utils.IsIndexValid(index - 1, Tokens) && Utils.IsIndexValid(index - 2, Tokens)){
+				if (Utils.IsIndexValid(index - 1, Tokens) && Utils.IsIndexValid(index - 2, Tokens))
+				{
 					
 					Token _operator = Tokens[index - 1];
 
@@ -110,11 +121,11 @@ namespace CowSpeak{
 					break;
 			}
 
-			if (Tokens.Count > 1){
+			if (Tokens.Count > 1)
+			{
 				string errMsg = "Could not evaluate expression: '";
-				foreach (Token token in Tokens){
+				foreach (Token token in Tokens)
 					errMsg += token.identifier + " ";
-				}
 				errMsg += "'";
 				throw new Exception(errMsg);
 			}
@@ -122,13 +133,16 @@ namespace CowSpeak{
 			return System.Convert.ToDouble(Tokens[0].identifier);
 		}
 
-		public static bool EvaluateBoolean(List< Token > Tokens){
+		public static bool EvaluateBoolean(List< Token > Tokens)
+		{
 			int index = 0;
 
-			while (Tokens.Count > 1){
+			while (Tokens.Count > 1)
+			{
 				Token token = Tokens[index];
 
-				if (Utils.IsIndexValid(index - 1, Tokens) && Utils.IsIndexValid(index + 1, Tokens) && token.type.ToString().IndexOf("Is") != -1){
+				if (Utils.IsIndexValid(index - 1, Tokens) && Utils.IsIndexValid(index + 1, Tokens) && token.type.ToString().IndexOf("Is") != -1)
+				{
 					Token _operator = token;
 
 					Any _left = new Line(new List< Token >{ Tokens[index - 1] }).Exec();
@@ -141,7 +155,8 @@ namespace CowSpeak{
 						answer.identifier = (_left.Get().ToString() == _right.Get().ToString()).ToString();
 					else if (_operator.type == TokenType.IsNotEqualOperator)
 						answer.identifier = (_left.Get().ToString() != _right.Get().ToString()).ToString();
-					else if (_operator.type == TokenType.IsGreaterThanOperator || _operator.type == TokenType.IsLessThanOperator || _operator.type == TokenType.IsGreaterThanOrEqualOperator || _operator.type == TokenType.IsLessThanOrEqualOperator){
+					else if (_operator.type == TokenType.IsGreaterThanOperator || _operator.type == TokenType.IsLessThanOperator || _operator.type == TokenType.IsGreaterThanOrEqualOperator || _operator.type == TokenType.IsLessThanOrEqualOperator)
+					{
 						if (!Utils.IsDigitsOnly(_left.Get().ToString()) || !Utils.IsDigitsOnly(_right.Get().ToString()))
 							throw new Exception("Cannot perform '" + _operator.type.ToString() + "' with non-number operands");
 
@@ -173,7 +188,8 @@ namespace CowSpeak{
 					break;
 			}
 
-			if (Tokens.Count > 1){
+			if (Tokens.Count > 1)
+			{
 				string errMsg = "Could not evaluate expression: '";
 				foreach (Token token in Tokens)
 					errMsg += token.identifier + " ";

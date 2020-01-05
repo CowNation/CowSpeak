@@ -3,9 +3,14 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.InteropServices;
 
-namespace CowSpeak{
-	public class ByteArray{
-		public ByteArray(){}
+namespace CowSpeak
+{
+	public class ByteArray
+	{
+		public ByteArray()
+		{
+
+		}
 		public byte[] bytes;
 
 		public static object ByteArrayToObject(byte[] arrBytes)
@@ -30,11 +35,13 @@ namespace CowSpeak{
 			}
 		}
 
-		public object Get(){
+		public object Get()
+		{
 			return ByteArrayToObject(bytes);
 		}
 
-		public void Set(object to){
+		public void Set(object to)
+		{
 			bytes = ObjectToByteArray(to);
 		}
 	}
