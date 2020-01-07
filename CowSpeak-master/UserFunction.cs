@@ -110,7 +110,6 @@ namespace CowSpeak
 			{
 				Parameter parameter = Parameters[i];
 				CowSpeak.Vars.Insert(0, new Variable(parameter.Type, parameter.Name, parameters[i].Get()));
-				//CowSpeak.CreateVariable(new Variable(parameter.Type, parameter.Name, parameters[i].Get()));
 			}
 
 			Any returnedValue = ExecuteLines(Definition);

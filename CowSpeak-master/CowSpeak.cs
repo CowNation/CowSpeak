@@ -20,20 +20,17 @@ namespace CowSpeak
 					functionName = obj.vType.Name + functionName.Substring(functionName.IndexOf("."));
 			} // if it has a period, it's probably a method
 
-			for (int i = 0; i < Functions.Count; i++)
-			{
-				if (functionName.IndexOf(Functions[i].Name) == 0)
-					return Functions[i];
-			}
+			foreach (FunctionBase Function in Functions)
+				if (functionName.IndexOf(Function.Name) == 0)
+					return Function;
 
 			if (functionName.IndexOf(".") != -1)
 			{
 				string anyMethod = "Any" + functionName.Substring(functionName.IndexOf("."));
-				for (int i = 0; i < Functions.Count; i++)
-				{
-					if (anyMethod.IndexOf(Functions[i].Name) == 0)
-						return Functions[i];
-				}
+
+				foreach (FunctionBase Function in Functions)
+					if (anyMethod.IndexOf(Function.Name) == 0)
+						return Function;
 			} // try to see if it's an 'Any' method
 
 			if (_throw)
@@ -74,9 +71,9 @@ namespace CowSpeak
 
 		public static Variable GetVariable(string varName, bool _throw = true)
 		{
-			for (int i = 0; i < Vars.Count; i++)
-				if (Vars[i].Name == varName)
-					return Vars[i];
+			foreach (Variable Var in Vars)
+				if (Var.Name == varName)
+					return Var;
 
 			if (_throw)
 				throw new Exception("Could not find variable: " + varName);
