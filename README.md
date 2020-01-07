@@ -3,7 +3,7 @@
 # CowSpeak
 A pointless programming language made in C#
 ## Info
-This program uses csharp-CowConfig. To see CowConfig go to https://github.com/CowNation/CowConfig
+This language uses CowConfig. To see CowConfig go to https://github.com/CowNation/CowConfig
 ## Features
 * Data types: boolean, integer, string, and decimal
 * Most standard operators you would expect (+, -, *, /, =, ^, %)
