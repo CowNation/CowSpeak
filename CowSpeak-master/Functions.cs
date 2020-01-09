@@ -229,7 +229,7 @@ namespace CowSpeak
 			int maximum = (int)parameters[1].Get() + 1;
 
 			if (minimum > maximum)
-				throw new Exception("Minimum may not be greater than the maximum");
+				throw new Exception("Minimum must be less than the maximum");
 
 			return new Any(Type.Integer, Utils.rand.Next(minimum, maximum));
 		}

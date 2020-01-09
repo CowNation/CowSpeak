@@ -67,7 +67,7 @@ namespace CowSpeak
 						{
 							Scope scope = new Scope();
 
-							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1, isNestedInFunction, true);
+							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1 + CurrentLineOffset, isNestedInFunction, true);
 
 							scope.End();
 						}
@@ -100,7 +100,7 @@ namespace CowSpeak
 						if (!new Conditional(Lines[parentIf][0].identifier).EvaluateBoolean()){
 							Scope scope = new Scope();
 
-							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1, isNestedInFunction, true);
+							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1 + CurrentLineOffset, isNestedInFunction, true);
 
 							scope.End();
 						}
@@ -117,7 +117,7 @@ namespace CowSpeak
 						{
 							Scope scope = new Scope();
 
-							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1, isNestedInFunction, true);
+							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1 + CurrentLineOffset, isNestedInFunction, true);
 
 							scope.End();
 						}
@@ -146,7 +146,7 @@ namespace CowSpeak
 
 							CowSpeak.GetVariable(varName).Set(p);
 
-							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1, isNestedInFunction, true);
+							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1 + CurrentLineOffset, isNestedInFunction, true);
 
 							scope.End();
 						}

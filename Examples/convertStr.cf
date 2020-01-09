@@ -24,15 +24,27 @@ string ToLower(string str){
 	return result
 }
 
+string RandomCaps(string str){
+	string result = ""
+
+	loop("index", 0, str.Length()){
+		character char = str.CharacterAt(index)
+
+		if(RandomInteger(0, 1) == 1){
+			char = char.ToUpper()
+		}
+		else{
+			char = char.ToLower()
+		}
+		result = result + char
+	}
+
+	return result
+}
+
 print("Enter the target string: ")
 string target = InputString()
 
-print("Convert ToUpper(1) or ToLower(0): ")
-integer ToUpper = InputInteger()
-
-if(ToUpper == 1){
-	print(ToUpper(target) + "\n")
-}
-else{
-	print(ToLower(target) + "\n")
-}
+print("ToUpper: " + ToUpper(target) + "\n")
+print("ToLower: " + ToLower(target) + "\n")
+print("RandomCaps: " + RandomCaps(target) + "\n")
