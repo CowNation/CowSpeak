@@ -99,30 +99,47 @@ namespace CowSpeak
 				return starts % 2 != 0;
 		}
 
+		public static int OrdinalIndexOf(string str, string substr, int n)
+		{
+			int pos = -1;
+			do
+			{
+				pos = str.IndexOf(substr, pos + 1);
+			} while (n-- > 0 && pos != -1);
+			return pos;
+		}
+
 		public static string FixBoolean(string str)
 		{
 			if (str.IndexOf("True") == -1 && str.IndexOf("False") == -1)
 				return str; 
 
-			for (int i = 0; i < str.Length; i++)
+			for (int i = 0; i < OccurrencesOf(str, "True"); i++)
 			{
-				string trueSub = i + 4 <= str.Length ? str.Substring(i, 4) : "";
-				string falseSub = i + 5 <= str.Length ? str.Substring(i, 5) : "";
+				int at = OrdinalIndexOf(str, "True", i);
+				string sub = str.Substring(at, 4);
+				if (sub == "True" && !IsBetween(str, at, '\"', '\"'))
+					str = str.Remove(at, 4).Insert(at, "1");
+			}
 
-				if (trueSub == "True" && !IsBetween(str, i, '\"', '\"'))
-					str = str.Remove(i, 4).Insert(i, "1");
-				else if (falseSub == "False" && !IsBetween(str, i, '\"', '\"'))
-					str = str.Remove(i, 5).Insert(i, "0");
+			for (int i = 0; i < OccurrencesOf(str, "False"); i++)
+			{
+				int at = OrdinalIndexOf(str, "False", i);
+				string sub = str.Substring(at, 5);
+				if (sub == "False" && !IsBetween(str, at, '\"', '\"'))
+					str = str.Remove(at, 5).Insert(at, "0");
 			}
 
 			return str;
 		}
 
 		public static string SubstituteBetween(string str, char toSub, char start, char end, char substitution = (char)0x1a){
-			int i = 0;
 			string _str = str;
-			foreach (char letter in str)
+			for (int Occurrence = 0; Occurrence < OccurrencesOf(str, toSub.ToString()); Occurrence++)
 			{
+				int i = OrdinalIndexOf(str, toSub.ToString(), Occurrence);
+				char letter = str[i];
+
 				if (letter == toSub && IsBetween(str, i, start, end))
 				{
 					if (substitution == (char)0x0)
@@ -134,9 +151,8 @@ namespace CowSpeak
 						_str = fileLine.ToString(); 
 					}
 				}
-
-				i++;
 			}
+
 			return _str;
 		} // so you don't have to do it very inefficently with IsBetween on each char
 
