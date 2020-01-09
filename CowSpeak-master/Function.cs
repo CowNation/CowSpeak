@@ -57,7 +57,7 @@ namespace CowSpeak
 			
 			s_parameters = Utils.SubstituteBetween(Utils.SubstituteBetween(s_parameters, ',', '\"', '\"', (char)0x1a), ',', '(', ')', (char)0x1a).Replace(((char)0x1D).ToString(), " "); // prevent splitting of commas in nested functions & strings
 
-			string[] splitParams = s_parameters.Split(","); // split by each comma (each item is a parameter)
+			string[] splitParams = s_parameters.Split(','); // split by each comma (each item is a parameter)
 
 			for (int i = 0; i < splitParams.Length; i++)
 			{

@@ -67,7 +67,7 @@ namespace CowSpeak
 			List< Parameter > parameters = new List< Parameter >();
 			s_params = s_params.Substring(1, s_params.Length - 1); // remove parentheses
 
-			string[] splitParams = s_params.Split(","); // split by each comma (each item is a parameter)
+			string[] splitParams = s_params.Split(','); // split by each comma (each item is a parameter)
 
 			foreach (string parameter in splitParams)
 			{

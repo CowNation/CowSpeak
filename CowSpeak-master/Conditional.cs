@@ -14,7 +14,7 @@ namespace CowSpeak
 
 		public bool EvaluateBoolean()
 		{
-			List< string > Expressions = text.Split(Syntax.Operators.And).ToList();
+			List< string > Expressions = Utils.Split(text, Syntax.Operators.And).ToList();
 			bool Evaluated = true;
 
 			foreach (string Expression in Expressions)

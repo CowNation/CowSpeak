@@ -18,7 +18,19 @@ namespace CowSpeak
 
 		public static int OccurrencesOf(string str, string splitter)
 		{
-			return str.Split(splitter).Length - 1;
+			return Split(str, splitter).Length - 1;
+		}
+
+		public static string[] Split(string str, string splitter)
+		{
+			List<string> ret = new List<string>();
+			while (str.IndexOf(splitter) != -1)
+			{
+				ret.Add(str.Substring(0, str.IndexOf(splitter)));
+				str = str.Remove(0, str.IndexOf(splitter) + splitter.Length);
+			}
+			ret.Add(str);
+			return ret.ToArray();
 		}
 
 		public static bool IsOperator(TokenType type)

@@ -82,7 +82,7 @@ namespace CowSpeak
 
 			if (_Parameters != "")
 			{
-				string[] SplitParameters = _Parameters.Split(",");
+				string[] SplitParameters = _Parameters.Split(',');
 				foreach (string Parameter in SplitParameters)
 				{
 					List< Token > Tokens = Lexer.ParseLine(Parameter);
