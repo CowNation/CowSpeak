@@ -123,8 +123,8 @@ namespace CowSpeak
 			if (string.IsNullOrWhiteSpace(line))
 				return new List< Token >(); // don't parse empty line
 
-			line = Utils.SubstituteBetween(line, ' ', '\"', '\"', (char)0x1f);
-			line = Utils.SubstituteBetween(line, ' ', '(', ')', (char)0x1D);
+			line = Utils.ReplaceBetween(line, ' ', '\"', '\"', (char)0x1f);
+			line = Utils.ReplaceBetween(line, ' ', '(', ')', (char)0x1D);
 
 			List< string > splitLine = line.Split(' ').ToList();
 			List< Token > ret = new List< Token >();

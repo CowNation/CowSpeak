@@ -133,14 +133,14 @@ namespace CowSpeak
 			return str;
 		}
 
-		public static string SubstituteBetween(string str, char toSub, char start, char end, char substitution = (char)0x1a){
+		public static string ReplaceBetween(string str, char toReplace, char start, char end, char substitution = (char)0x1a){
 			string _str = str;
-			for (int Occurrence = 0; Occurrence < OccurrencesOf(str, toSub.ToString()); Occurrence++)
+			for (int Occurrence = 0; Occurrence < OccurrencesOf(str, toReplace.ToString()); Occurrence++)
 			{
-				int i = OrdinalIndexOf(str, toSub.ToString(), Occurrence);
+				int i = OrdinalIndexOf(str, toReplace.ToString(), Occurrence);
 				char letter = str[i];
 
-				if (letter == toSub && IsBetween(str, i, start, end))
+				if (letter == toReplace && IsBetween(str, i, start, end))
 				{
 					if (substitution == (char)0x0)
 						_str = _str.Remove(i, 1);
