@@ -90,7 +90,7 @@ namespace CowSpeak
 
 			string dName = usage.Substring(0, usage.IndexOf("(")); // text before first '('
 
-			return new UserFunction(dName, Utils.GetContainedLines(owner.Lines, owner.GetClosingBracket(definitionLine), definitionLine), ParseDefinitionParams(usage.Substring(usage.IndexOf("("))), Utils.GetType(returnType.identifier), returnType.identifier + " " + usage, definitionLine);
+			return new UserFunction(dName, Utils.GetContainedLines(owner.Lines, Executor.GetClosingBracket(owner.Lines, definitionLine), definitionLine), ParseDefinitionParams(usage.Substring(usage.IndexOf("("))), Utils.GetType(returnType.identifier), returnType.identifier + " " + usage, definitionLine);
 		}
 
 		public override Any Execute(string usage)
