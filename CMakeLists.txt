@@ -4,7 +4,7 @@ PROJECT(CowSpeak LANGUAGES CSharp)
 
 SET(CMAKE_CSharp_FLAGS "/langversion:6")
 
-set(CMAKE_SUPPRESS_REGENERATION true)
+SET(CMAKE_SUPPRESS_REGENERATION true)
 
 ADD_EXECUTABLE(CowSpeak
 	CowSpeak-master/Any.cs
@@ -31,7 +31,7 @@ ADD_EXECUTABLE(CowSpeak
 	CowSpeak-master/Variable.cs
 	main.cs)
 
-set_property(TARGET CowSpeak PROPERTY VS_DOTNET_REFERENCES
+SET_PROPERTY(TARGET CowSpeak PROPERTY VS_DOTNET_REFERENCES
     "Microsoft.CSharp"
     "System"
     "System.Core"
