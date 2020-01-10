@@ -8,11 +8,11 @@ namespace CowSpeak
 {
 	public class UserFunction : FunctionBase
 	{
-		List< string > Definition; // lines contained inside of the function
+		List< Line > Definition; // lines contained inside of the function
 		int DefinitionOffset; // offset of where the definition is so CowSpeak.CurrentLine is correct
 		string DefinedIn; // file function was defined in, may be empty
 
-		public UserFunction(string Name, List< string > Definition, Parameter[] Parameters, Type type, string ProperUsage, int DefinitionOffset)
+		public UserFunction(string Name, List< Line > Definition, Parameter[] Parameters, Type type, string ProperUsage, int DefinitionOffset)
 		{
 			this.DefinitionType = DefinitionType.User;
 			this.type = type;
@@ -24,32 +24,33 @@ namespace CowSpeak
 			this.DefinedIn = CowSpeak.CurrentFile;
 		}
 
-		private Any ExecuteLines(List< string > lines)
+		private Any ExecuteLines()
 		{
 			string CurrentFile = CowSpeak.CurrentFile;
 			CowSpeak.CurrentFile = DefinedIn;
 
-			new Lexer(lines, DefinitionOffset + 1, true);
+			Executor.Execute(Definition, DefinitionOffset + 1, true);
 
-			string ReturnedLine = Definition[CowSpeak.CurrentLine - DefinitionOffset - 2]; // relative line where Lexer returned
+			Line ReturnedLine = Definition[CowSpeak.CurrentLine - DefinitionOffset - 2]; // relative line where Lexer returned
+
+			bool HasReturnStatement = ReturnedLine.Count > 0 && ReturnedLine[0].type == TokenType.ReturnStatement; // starts with a ReturnStatement
+			bool IsReturnStatement = ReturnedLine.Count == 1 && HasReturnStatement; // is only one token, a ReturnStatement
 
 			if (type == Type.Void)
 			{
-				if (ReturnedLine.IndexOf(Syntax.Statements.Return) == 0 && ReturnedLine != Syntax.Statements.Return)
+				if (HasReturnStatement && !IsReturnStatement)
 					throw new Exception("Cannot return a value from a void function");
 
 				return new Any(Type.Integer, 0);
 			}
 
-			if (ReturnedLine.IndexOf(Syntax.Statements.Return + " ") != 0)
-				throw new Exception("Function is missing a ReturnStatement");
+			if (!HasReturnStatement)
+				throw new Exception(Name + " - Function is missing a ReturnStatement");
 
-			ReturnedLine = ReturnedLine.Remove(0, Syntax.Statements.Return.Length + 1);
-
-			if (ReturnedLine.Length == 0)
+			if (ReturnedLine.Count == 0)
 				throw new Exception("ReturnStatement requires a value when the function type is not void");
 
-			Any returnedValue = new Line(Lexer.ParseLine(ReturnedLine)).Exec();
+			Any returnedValue = new Line(ReturnedLine.GetRange(1, ReturnedLine.Count - 1)).Exec();
 
 			if (!Conversion.IsCompatible(returnedValue.vType, type))
 				throw new Exception("Incompatible return type ('" + returnedValue.vType.Name + "' is incompatible with '" + type.Name + "')");
@@ -90,7 +91,7 @@ namespace CowSpeak
 
 			string dName = usage.Substring(0, usage.IndexOf("(")); // text before first '('
 
-			return new UserFunction(dName, Utils.GetContainedLines(owner.Lines, Executor.GetClosingBracket(owner.Lines, definitionLine), definitionLine), ParseDefinitionParams(usage.Substring(usage.IndexOf("("))), Utils.GetType(returnType.identifier), returnType.identifier + " " + usage, definitionLine);
+			return new UserFunction(dName, Utils.pGetContainedLines(owner.Lines, Executor.GetClosingBracket(owner.Lines, definitionLine), definitionLine), ParseDefinitionParams(usage.Substring(usage.IndexOf("("))), Utils.GetType(returnType.identifier), returnType.identifier + " " + usage, definitionLine);
 		}
 
 		public override Any Execute(string usage)
@@ -112,7 +113,7 @@ namespace CowSpeak
 				CowSpeak.Vars.Insert(0, new Variable(parameter.Type, parameter.Name, parameters[i].Get()));
 			}
 
-			Any returnedValue = ExecuteLines(Definition);
+			Any returnedValue = ExecuteLines();
 
 			scope.End();
 

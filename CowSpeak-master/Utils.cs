@@ -60,6 +60,10 @@ namespace CowSpeak
 			return Lines.GetRange(i + 1, endingBracket - (i + 1));
 		}
 
+		public static List< Line > pGetContainedLines(List< Line > Lines, int endingBracket, int i){
+			return Lines.GetRange(i + 1, endingBracket - (i + 1));
+		}
+
 		public static List< string > GetContainedLines(List< Line > Lines, int endingBracket, int i){
 			List< Line > _containedLines = new List< Line >();
 			_containedLines = Lines.GetRange(i + 1, endingBracket - (i + 1));

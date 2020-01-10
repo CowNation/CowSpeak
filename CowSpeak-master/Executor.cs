@@ -28,9 +28,9 @@ namespace CowSpeak
 			throw new Exception("Conditional or function is missing an ending curly bracket");
 		}
 
-		public static void Execute(List< Line > Lines, List< string > fileLines, int CurrentLineOffset = 0, bool isNestedInFunction = false, bool isNestedInConditional = false)
+		public static void Execute(List< Line > Lines, int CurrentLineOffset = 0, bool isNestedInFunction = false, bool isNestedInConditional = false)
 		{
-			for (int i = 0; i < fileLines.Count; i++)
+			for (int i = 0; i < Lines.Count; i++)
 			{
 				CowSpeak.CurrentLine = i + 1 + CurrentLineOffset;
 
@@ -53,7 +53,7 @@ namespace CowSpeak
 					usage = usage.Substring(0, usage.Length - 2); // remove StartBracket
 					string dName = usage.Substring(0, usage.IndexOf("(")); // text before first '('
 
-					CowSpeak.CreateFunction(new UserFunction(dName, Utils.GetContainedLines(fileLines, GetClosingBracket(Lines, i), i), UserFunction.ParseDefinitionParams(usage.Substring(usage.IndexOf("("))), Utils.GetType(Lines[i][0].identifier), Lines[i][0].identifier + " " + usage + ")", i));
+					CowSpeak.CreateFunction(new UserFunction(dName, Utils.pGetContainedLines(Lines, GetClosingBracket(Lines, i), i), UserFunction.ParseDefinitionParams(usage.Substring(usage.IndexOf("("))), Utils.GetType(Lines[i][0].identifier), Lines[i][0].identifier + " " + usage + ")", i));
 
 					i = GetClosingBracket(Lines, i); // skip to end of definition
 				}
@@ -164,7 +164,7 @@ namespace CowSpeak
 					}
 				}
 
-				if (i >= fileLines.Count)
+				if (i >= Lines.Count)
 					break;
 
 				if (Lines[i].Count == 2 && Lines[i][0].type == TokenType.DeleteIdentifier && Lines[i][1].type == TokenType.VariableIdentifier)

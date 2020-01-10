@@ -156,25 +156,28 @@ namespace CowSpeak
 				} // no need to parse or evaluate empty line
 
 				Lines.Add(new Line(ParseLine(fileLines[i])));
-				Line recentLine = Lines[Lines.Count - 1];
+				Line RecentLine = Lines[Lines.Count - 1];
 
-				if (!isNestedInFunction && CowSpeak.Debug && recentLine.Count > 0)
+				if (RecentLine.Count >= 2 && RecentLine[0].type == TokenType.VariableIdentifier && RecentLine[1].type == TokenType.VariableIdentifier)
+					throw new Exception("Unknown token: " + RecentLine[0].identifier.Replace(((char)0x1f).ToString(), " "));
+
+				if (!isNestedInFunction && CowSpeak.Debug && RecentLine.Count > 0)
 				{
 					System.Console.WriteLine("\n(" + CowSpeak.CurrentFile + ") Line " + (i + 1) + ": ");
-					foreach (var token in recentLine)
+					foreach (var token in RecentLine)
 						System.Console.WriteLine(token.type.ToString() + " - " + token.identifier.Replace(System.Environment.NewLine, @"\n").Replace(((char)0x1f).ToString(), " ").Replace(((char)0x1D).ToString(), " "));
 				}
 
-				if (recentLine.Count > 0 && recentLine[0].type == TokenType.FunctionCall && recentLine[0].identifier.IndexOf("Define(") == 0)
+				if (RecentLine.Count > 0 && RecentLine[0].type == TokenType.FunctionCall && RecentLine[0].identifier.IndexOf("Define(") == 0)
 				{
-					CowSpeak.GetFunction("Define(").Execute(recentLine[0].identifier);
+					CowSpeak.GetFunction("Define(").Execute(RecentLine[0].identifier);
 					Lines[Lines.Count - 1] = new Line(new List<Token>()); // line was already handled, clear line
 				} // must handle this function before the other lines are compiled to avoid errors
 			}
 
 			CowSpeak.Debug = false; // only debug tokens on compilation, needed because many things recurse back to Lexer
 
-			Executor.Execute(Lines, fileLines, CurrentLineOffset, isNestedInFunction, isNestedInConditional);
+			Executor.Execute(Lines, CurrentLineOffset, isNestedInFunction, isNestedInConditional);
 		}
 	}
 }
