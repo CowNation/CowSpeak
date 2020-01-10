@@ -151,14 +151,7 @@ namespace CowSpeak
 							scope.End();
 						}
 
-						foreach (Variable Var in CowSpeak.Vars)
-						{
-							if (Var.Name == varName)
-							{
-								CowSpeak.Vars.Remove(Var);
-								break;
-							}
-						} // delete the variable after loop is done
+						CowSpeak.Vars.Remove(CowSpeak.GetVariable(varName)); // delete the variable after loop is done
 
 						i = endingBracket; // loop is over, skip to end of brackets to prevent continedLines getting executed again
 					}
@@ -170,14 +163,7 @@ namespace CowSpeak
 				if (Lines[i].Count == 2 && Lines[i][0].type == TokenType.DeleteIdentifier && Lines[i][1].type == TokenType.VariableIdentifier)
 				{
 					Variable target = CowSpeak.GetVariable(Lines[i][1].identifier);
-					foreach (Variable Var in CowSpeak.Vars)
-					{
-						if (Var.Name == target.Name)
-						{
-							CowSpeak.Vars.Remove(Var);
-							break;
-						}
-					}
+					CowSpeak.Vars.Remove(CowSpeak.GetVariable(target.Name));
 
 					continue; // prevent execution
 				} // must handle this before the other lines are evaluated to avoid wrong exceptions
