@@ -137,11 +137,10 @@ namespace CowSpeak
 				}
 			} // remove the equal sign and everything to the left
 
-			List< Token > Evaluated = new List< Token >();
+			string Expression = "";
 			for (int i = 0; i < toEval.Count; i++)
 			{
 				string identifier = toEval[i].identifier;
-				TokenType type = toEval[i].type;
 
 				Any fixCharChain = FixCharChain(toEval, i, identifier);
 				if (fixCharChain != null)
@@ -152,30 +151,26 @@ namespace CowSpeak
 					return strChain;
 
 				if (toEval[i].type == TokenType.VariableIdentifier)
-				{
-					type = TokenType.Number;
 					identifier = CowSpeak.GetVariable(identifier).Get().ToString(); // replace variable name with it's value
-				} // TOFIX
 				if (toEval[i].type == TokenType.WhileConditional || toEval[i].type == TokenType.IfConditional || toEval[i].type == TokenType.EndBracket)
 					continue;
 				else if (toEval[i].type == TokenType.FunctionCall)
 				{
-					type = TokenType.Number;
 					FunctionBase func = CowSpeak.GetFunction(identifier);
 					if (toEval.Count == 1)
 						return new Any(func.type, func.Execute(identifier).Get());
 					identifier = func.Execute(identifier).Get().ToString(); // replace function call with it's return value
 				}
 				
-				Evaluated.Add(new Token(type, Utils.FixBoolean(identifier)));
+				Expression += identifier;
 			}
 
-			if (Evaluated.Count == 0)
+			if (Expression.Length == 0)
 				return new Any(Type.Integer, 0);
 
 			Any evaluatedValue = new Any();
 			evaluatedValue.vType = Type.Decimal;
-			evaluatedValue.Set(Evaluate.EvaluateTokens(Evaluated));
+			evaluatedValue.Set(Evaluate.EvaluateExpression(Expression));
 			if (((double)evaluatedValue.Get()).ToString().IndexOf(".") == -1)
 				evaluatedValue.vType = Type.Integer; // decimal not found, we can convert to int
 

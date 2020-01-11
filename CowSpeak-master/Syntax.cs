@@ -54,7 +54,6 @@ namespace CowSpeak
 			public const string Subtract = "-";
 			public const string Multiply = "*";
 			public const string Divide = "/";
-			public const string Power = "^";
 			public const string Modulo = "%";
 			public const string Equal = "=";
 			public const string And = "&&";

@@ -1,4 +1,5 @@
 using System;
+using System.Data;
 
 class MainClass
 {
@@ -6,7 +7,7 @@ class MainClass
 	{
 		try
 		{
-			CowSpeak.CowSpeak.Run("Examples/fizzBuzz.cf");
+			CowSpeak.CowSpeak.Run("Examples/fizzBuzz.cf", true);
 			CowSpeak.CowSpeak.Run("Examples/convertStr.cf");
 			CowSpeak.CowSpeak.Run("Examples/stringThings.cf");
 			CowSpeak.CowSpeak.Run("Examples/calculator.cf");

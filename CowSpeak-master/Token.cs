@@ -6,7 +6,6 @@ namespace CowSpeak
 		SubtractOperator,
 		MultiplyOperator,
 		DivideOperator,
-		PowerOperator,
 		ModuloOperator,
 		EqualOperator,
 		IsEqualOperator,
@@ -27,6 +26,7 @@ namespace CowSpeak
 		Number,
 		String,
 		Character,
+		Parenthesis,
 
 		IfConditional,
 		ElseConditional,

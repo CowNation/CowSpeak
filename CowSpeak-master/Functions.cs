@@ -179,6 +179,12 @@ namespace CowSpeak
 			return new Any(Type.Integer, System.Math.Sqrt((double)parameters[0].Get()));
 		}
 
+		[FunctionAttr("Pow", Syntax.Types.Decimal, Syntax.Types.Decimal + " x, " + Syntax.Types.Decimal + " y")]
+		public static Any Pow(Any[] parameters)
+		{
+			return new Any(Type.Integer, System.Math.Pow((double)parameters[0].Get(), (double)parameters[1].Get()));
+		}
+
 		[FunctionAttr("Sleep", Syntax.Types.Void, Syntax.Types.Integer + " ms")]
 		public static Any Sleep(Any[] parameters)
 		{
@@ -210,7 +216,7 @@ namespace CowSpeak
 		{
 			Any evaluatedValue = new Any();
 			evaluatedValue.vType = Type.Decimal;
-			evaluatedValue.Set(Evaluate.EvaluateTokens(Lexer.ParseLine(parameters[0].Get().ToString())));
+			evaluatedValue.Set(Evaluate.EvaluateExpression(parameters[0].Get().ToString()));
 			if (((double)evaluatedValue.Get()).ToString().IndexOf(".") == -1)
 				evaluatedValue.vType = Type.Integer; // decimal not found, we can convert to int
 

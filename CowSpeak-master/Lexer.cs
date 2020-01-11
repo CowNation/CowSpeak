@@ -50,6 +50,8 @@ namespace CowSpeak
 				return new Token(TokenType.LoopConditional, token);
 			else if (token == Syntax.Statements.Delete)
 				return new Token(TokenType.DeleteIdentifier, token);
+			else if (token == "(" || token == ")")
+				return new Token(TokenType.Parenthesis, token);
 			else if (Utils.IsDigitsOnly(token))
 				return new Token(TokenType.Number, token);
 			else if (token == Syntax.Statements.Return)
@@ -76,8 +78,6 @@ namespace CowSpeak
 				return new Token(TokenType.MultiplyOperator, token);
 			else if (token == Syntax.Operators.Divide)
 				return new Token(TokenType.DivideOperator, token);
-			else if (token == Syntax.Operators.Power)
-				return new Token(TokenType.PowerOperator, token);
 			else if (token == Syntax.Operators.Modulo)
 				return new Token(TokenType.ModuloOperator, token);
 			else if (token == Syntax.Operators.Equal)
@@ -101,7 +101,25 @@ namespace CowSpeak
 				return new List< Token >(); // don't parse empty line
 
 			line = Utils.ReplaceBetween(line, ' ', '\"', '\"', (char)0x1f);
-			line = Utils.ReplaceBetween(line, ' ', '(', ')', (char)0x1D);
+			//line = Utils.ReplaceBetween(line, ' ', '(', ')', (char)0x1D);
+			string _line = line;
+			for (int Occurrence = 0; Occurrence < Utils.OccurrencesOf(line, " "); Occurrence++)
+			{
+				int i = Utils.OrdinalIndexOf(line, " ", Occurrence);
+				char letter = line[i];
+
+				if (letter == ' ' && Utils.IsBetween(line, i, '(', ')'))
+				{
+					char before = line[line.Substring(0, i).LastIndexOf("(") - 1]; // char before the (
+					if ((before >= 'A' && before <= 'Z') || (before >= 'a' && before <= 'z'))
+					{
+						StringBuilder fileLine = new StringBuilder(_line);
+						fileLine[i] = (char)0x1D;
+						_line = fileLine.ToString(); 
+					}
+				}
+			}
+			line = _line;
 
 			List< string > splitLine = line.Split(' ').ToList();
 			List< Token > ret = new List< Token >();
