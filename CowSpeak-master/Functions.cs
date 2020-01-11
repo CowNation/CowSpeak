@@ -182,7 +182,7 @@ namespace CowSpeak
 		[FunctionAttr("Pow", Syntax.Types.Decimal, Syntax.Types.Decimal + " x, " + Syntax.Types.Decimal + " y")]
 		public static Any Pow(Any[] parameters)
 		{
-			return new Any(Type.Integer, System.Math.Pow((double)parameters[0].Get(), (double)parameters[1].Get()));
+			return new Any(Type.Decimal, System.Math.Pow((double)parameters[0].Get(), (double)parameters[1].Get()));
 		}
 
 		[FunctionAttr("Sleep", Syntax.Types.Void, Syntax.Types.Integer + " ms")]
