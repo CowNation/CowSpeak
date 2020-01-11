@@ -1,6 +1,3 @@
-integer gg = ( 5 + 2 ) * 2
-print(gg.ToString() + "\n")
-
 # Shout out to Pinecone by William W Wold
 void fizzBuzz(integer start, integer end){
 	loop("index", start, end + 1){
