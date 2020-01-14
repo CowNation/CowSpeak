@@ -32,14 +32,51 @@ namespace CowSpeak
 			if (type != null)
 				return new Token(TokenType.TypeIdentifier, token);
 
+			switch (token)
+			{
+				case Syntax.Statements.Delete:
+					return new Token(TokenType.DeleteIdentifier, token);
+				case Syntax.Statements.Return:
+					return new Token(TokenType.ReturnStatement, token);
+				case Syntax.Comparators.IsEqual:
+					return new Token(TokenType.IsEqualOperator, token);
+				case Syntax.Comparators.IsNotEqual:
+					return new Token(TokenType.IsNotEqualOperator, token);
+				case Syntax.Comparators.IsGreaterThan:
+					return new Token(TokenType.IsGreaterThanOperator, token);
+				case Syntax.Comparators.IsLessThan:
+					return new Token(TokenType.IsLessThanOperator, token);
+				case Syntax.Comparators.IsGreaterThanOrEqual:
+					return new Token(TokenType.IsGreaterThanOrEqualOperator, token);
+				case Syntax.Comparators.IsLessThanOrEqual:
+					return new Token(TokenType.IsLessThanOrEqualOperator, token);
+				case Syntax.Operators.Add:
+					return new Token(TokenType.AddOperator, token);
+				case Syntax.Operators.And:
+					return new Token(TokenType.AndOperator, token);
+				case Syntax.Operators.Subtract:
+					return new Token(TokenType.SubtractOperator, token);
+				case Syntax.Operators.Multiply:
+					return new Token(TokenType.MultiplyOperator, token);
+				case Syntax.Operators.Divide:
+					return new Token(TokenType.DivideOperator, token);
+				case Syntax.Operators.Modulo:
+					return new Token(TokenType.ModuloOperator, token);
+				case Syntax.Operators.Equal:
+					return new Token(TokenType.EqualOperator, token);
+				case "''":
+					return new Token(TokenType.Character, ""); // support empty Characters ('')
+				case "}":
+					return new Token(TokenType.EndBracket, token);
+				case "(":
+				case ")":
+					return new Token(TokenType.Parenthesis, token);
+			}
+
 			if (token[0] == '\"' && token[token.Length - 1] == '\"')
-				return new Token(TokenType.String, token.Replace(((char)0x1f).ToString(), " ").Substring(1, token.Replace(((char)0x1f).ToString(), " ").Length - 2));
-			else if (token == "''")
-				return new Token(TokenType.Character, ""); // support empty Characters ('')
+				return new Token(TokenType.String, token.Replace(((char)0x1f).ToString(), " ").Substring(1, token.Replace(((char)0x1f).ToString(), " ").Length - 2));				
 			else if (token[0] == '\'' && token[token.Length - 1] == '\'' && token.Length == 3)
 				return new Token(TokenType.Character, token[token.Length - 2].ToString());
-			else if (token == "}")
-				return new Token(TokenType.EndBracket, token);
 			else if (token.IndexOf(Syntax.Conditionals.If + "(") == 0 && token[token.Length - 1] == '{' && token[token.Length - 2] == ')')
 				return new Token(TokenType.IfConditional, token);
 			else if (token.IndexOf(Syntax.Conditionals.Else) == 0 && token[token.Length - 1] == '{')
@@ -48,40 +85,8 @@ namespace CowSpeak
 				return new Token(TokenType.WhileConditional, token);
 			else if (token.IndexOf(Syntax.Conditionals.Loop + "(") == 0 && token[token.Length - 1] == '{' && token[token.Length - 2] == ')')
 				return new Token(TokenType.LoopConditional, token);
-			else if (token == Syntax.Statements.Delete)
-				return new Token(TokenType.DeleteIdentifier, token);
-			else if (token == "(" || token == ")")
-				return new Token(TokenType.Parenthesis, token);
 			else if (Utils.IsDigitsOnly(token))
 				return new Token(TokenType.Number, token);
-			else if (token == Syntax.Statements.Return)
-				return new Token(TokenType.ReturnStatement, token);
-			else if (token == Syntax.Comparators.IsEqual)
-				return new Token(TokenType.IsEqualOperator, token);
-			else if (token == Syntax.Comparators.IsNotEqual)
-				return new Token(TokenType.IsNotEqualOperator, token);
-			else if (token == Syntax.Comparators.IsGreaterThan)
-				return new Token(TokenType.IsGreaterThanOperator, token);
-			else if (token == Syntax.Comparators.IsLessThan)
-				return new Token(TokenType.IsLessThanOperator, token);
-			else if (token == Syntax.Comparators.IsGreaterThanOrEqual)
-				return new Token(TokenType.IsGreaterThanOrEqualOperator, token);
-			else if (token == Syntax.Comparators.IsLessThanOrEqual)
-				return new Token(TokenType.IsLessThanOrEqualOperator, token);
-			else if (token == Syntax.Operators.Add)
-				return new Token(TokenType.AddOperator, token);
-			else if (token == Syntax.Operators.And)
-				return new Token(TokenType.AndOperator, token);
-			else if (token == Syntax.Operators.Subtract)
-				return new Token(TokenType.SubtractOperator, token);
-			else if (token == Syntax.Operators.Multiply)
-				return new Token(TokenType.MultiplyOperator, token);
-			else if (token == Syntax.Operators.Divide)
-				return new Token(TokenType.DivideOperator, token);
-			else if (token == Syntax.Operators.Modulo)
-				return new Token(TokenType.ModuloOperator, token);
-			else if (token == Syntax.Operators.Equal)
-				return new Token(TokenType.EqualOperator, token);
 			else if (token.IndexOf("(") != -1 && token[token.Length - 1] == ')')
 				return new Token(TokenType.FunctionCall, token);
 			else if (token.IndexOf("(") != -1 && token[token.Length - 2] == ')' && token[token.Length - 1] == '{')
