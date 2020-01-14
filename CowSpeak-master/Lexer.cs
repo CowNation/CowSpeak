@@ -74,7 +74,7 @@ namespace CowSpeak
 			}
 
 			if (token[0] == '\"' && token[token.Length - 1] == '\"')
-				return new Token(TokenType.String, token.Replace(((char)0x1f).ToString(), " ").Substring(1, token.Replace(((char)0x1f).ToString(), " ").Length - 2));				
+				return new Token(TokenType.String, token.Replace(((char)0x1f).ToString(), " ").Substring(1, token.Replace(((char)0x1f).ToString(), " ").Length - 2));	
 			else if (token[0] == '\'' && token[token.Length - 1] == '\'' && token.Length == 3)
 				return new Token(TokenType.Character, token[token.Length - 2].ToString());
 			else if (token.IndexOf(Syntax.Conditionals.If + "(") == 0 && token[token.Length - 1] == '{' && token[token.Length - 2] == ')')
