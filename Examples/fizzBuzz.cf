@@ -1,5 +1,5 @@
 # Shout out to Pinecone by William W Wold
-void fizzBuzz(integer start, integer end){
+void fizzBuzz(integer start, integer end) {
 	loop("index", start, end + 1){
 		integer threeDivisible = index % 3
 		integer fiveDivisible = index % 5

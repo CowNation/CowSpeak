@@ -66,6 +66,8 @@ namespace CowSpeak
 					return new Token(TokenType.EqualOperator, token);
 				case "''":
 					return new Token(TokenType.Character, ""); // support empty Characters ('')
+				case "{":
+					return new Token(TokenType.StartBracket, token);
 				case "}":
 					return new Token(TokenType.EndBracket, token);
 				case "(":
@@ -89,8 +91,6 @@ namespace CowSpeak
 				return new Token(TokenType.Number, token);
 			else if (token.IndexOf("(") != -1 && token[token.Length - 1] == ')')
 				return new Token(TokenType.FunctionCall, token);
-			else if (token.IndexOf("(") != -1 && token[token.Length - 2] == ')' && token[token.Length - 1] == '{')
-				return new Token(TokenType.FunctionDefinition, token);
 			else if (Utils.IsLettersOnly(token))
 				return new Token(TokenType.VariableIdentifier, token);
 

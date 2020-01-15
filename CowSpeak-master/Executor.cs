@@ -43,14 +43,17 @@ namespace CowSpeak
 				}
 
 
-				if (Lines[i].Count > 1 && Lines[i][0].type == TokenType.TypeIdentifier && Lines[i][1].type == TokenType.FunctionDefinition)
+				if (Lines[i].Count > 1 && Lines[i][0].type == TokenType.TypeIdentifier && Lines[i][1].type == TokenType.FunctionCall)
 				{
+					if (Lines[i].Count < 3 || Lines[i][2].type != TokenType.StartBracket)
+						throw new Exception("StartBracket must immediately precede a function definition");
+
 					if (isNestedInFunction || isNestedInConditional)
 						throw new Exception("Function cannot be defined inside of a function or conditional");
 
 					string usage = Lines[i][1].identifier.Replace(((char)0x1D).ToString(), " ");
 
-					usage = usage.Substring(0, usage.Length - 2); // remove StartBracket
+					usage = usage.Substring(0, usage.Length - 1); // remove )
 					string dName = usage.Substring(0, usage.IndexOf("(")); // text before first '('
 
 					CowSpeak.CreateFunction(new UserFunction(dName, Utils.pGetContainedLines(Lines, GetClosingBracket(Lines, i), i), UserFunction.ParseDefinitionParams(usage.Substring(usage.IndexOf("("))), Utils.GetType(Lines[i][0].identifier), Lines[i][0].identifier + " " + usage + ")", i));

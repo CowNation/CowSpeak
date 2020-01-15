@@ -17,7 +17,6 @@ namespace CowSpeak
 		AndOperator,
 
 		FunctionCall,
-		FunctionDefinition,
 
 		VariableIdentifier,
 		TypeIdentifier,
@@ -33,6 +32,7 @@ namespace CowSpeak
 		WhileConditional,
 		LoopConditional,
 
+		StartBracket,
 		EndBracket,
 
 		ReturnStatement

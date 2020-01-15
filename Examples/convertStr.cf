@@ -1,6 +1,6 @@
 Print("Convert String:\n")
 
-string ToUpper(string str){
+string ToUpper(string str) {
 	string result = ""
 
 	loop("index", 0, str.Length()){
@@ -12,7 +12,7 @@ string ToUpper(string str){
 	return result
 }
 
-string ToLower(string str){
+string ToLower(string str) {
 	string result = ""
 
 	loop("index", 0, str.Length()){
@@ -24,7 +24,7 @@ string ToLower(string str){
 	return result
 }
 
-string RandomCaps(string str){
+string RandomCaps(string str) {
 	string result = ""
 
 	loop("index", 0, str.Length()){
