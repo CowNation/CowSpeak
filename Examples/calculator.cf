@@ -1,13 +1,13 @@
-print("Calculator:\n")
+Print("Calculator:\n")
 
-print("Enter number left of symbol: ")
+Print("Enter number left of symbol: ")
 decimal left = InputDecimal()
 
-print("Enter symbol: ")
+Print("Enter symbol: ")
 character symbol = InputCharacter()
 
-print("\nEnter number right of symbol: ")
+Print("\nEnter number right of symbol: ")
 decimal right = InputDecimal()
 
 string expression = "" + left + " " + symbol + " " + right
-print("" + expression + " = " + Evaluate(expression) + "\n")
+Print("" + expression + " = " + Evaluate(expression) + "\n")

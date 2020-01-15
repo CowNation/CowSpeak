@@ -1,53 +1,35 @@
-print("String Things:\n")
+Import("stringUtils.cf")
 
-string GetTextBetween(string str, string leftOf, string rightOf){
-	integer leftOccurence = str.IndexOf(leftOf)
-	integer rightOccurence = str.IndexOf(rightOf)
-	return str.SubString(leftOccurence + leftOf.Length(), rightOccurence)
-}
-
-string ReplaceFirstOf(string str, string lookFor, string replaceWith){
-	integer index = str.IndexOf(lookFor)
-	str = str.Remove(index, index + lookFor.Length())
-	str = str.Insert(index, replaceWith)
-	return str
-}
-
-string ReplaceAllOf(string str, string lookFor, string replaceWith){
-	loop("", 0, str.OccurrencesOf(lookFor)){
-		str = ReplaceFirstOf(str, lookFor, replaceWith)
-	}
-	return str
-} # replace all OccurrencesOf
+Print("String Things:\n")
 
 string html = GetHtmlFromUrl("http://example.org/")
-print(GetTextBetween(html, "<h1>", "</h1>") + "\n")
-print(ReplaceAllOf(ReplaceAllOf(GetTextBetween(html, "<p>", "</p>"), "\n", ""), "   ", "") + "\n") # get text between paragraph, remove newline & extra spaces in text
+Print(GetTextBetween(html, "<h1>", "</h1>") + "\n")
+Print(ReplaceAllOf(ReplaceAllOf(GetTextBetween(html, "<p>", "</p>"), "\n", ""), "   ", "") + "\n") # get text between paragraph, remove newline & extra spaces in text
 
 string hello = "hey ho hi he he ho hi heah ho ho ho\n"
-print(ReplaceAllOf(hello, "ho", "ha"))
+Print(ReplaceAllOf(hello, "ho", "ha"))
 
 string myn = "67.56"
-print("" + myn.ToDecimal() + "\n")
+Print("" + myn.ToDecimal() + "\n")
 delete myn # we don't need this var anymore
 
 string cs = "CowSpeak is literally the best language in the world!" # just kidding
-print(string.SubString(cs, 0, 8) + "\n")
-print(cs.SubString(0, 8) + "\n")
+Print(string.SubString(cs, 0, 8) + "\n")
+Print(cs.SubString(0, 8) + "\n")
 
 # make a word out of a string
 character w = cs.CharacterAt(2)
-print(w.ToUpper() + cs.CharacterAt(1) + w + "ie\n")
+Print(w.ToUpper() + cs.CharacterAt(1) + w + "ie\n")
 delete w
 
 # split string in two
 integer halfLen = cs.Length() / 2 # decimal to integer for use with some string methods
-print("First Half: " + cs.SubString(0, halfLen) + "\n")
-print("Second Half: " + cs.SubString(halfLen, cs.Length()) + "\n")
+Print("First Half: " + cs.SubString(0, halfLen) + "\n")
+Print("Second Half: " + cs.SubString(halfLen, cs.Length()) + "\n")
 delete halfLen
 
 # replace "world" with "universe"
 cs = ReplaceFirstOf(cs, "world", "universe")
-print(cs + "\n")
+Print(cs + "\n")
 
 # the rest of vars are deleted on completion of execution of a file

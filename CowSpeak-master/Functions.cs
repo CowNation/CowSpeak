@@ -133,6 +133,24 @@ namespace CowSpeak
 		}
 		#endregion
 
+		[FunctionAttr("Import", Syntax.Types.Void, Syntax.Types.String + " modulePath")]
+		public static Any Import(Any[] parameters)
+		{
+			string modulePath = parameters[0].Get().ToString();
+
+			// make modulePath relative to CurrentFile as long as modulePath is relative
+			if (!Path.IsPathRooted(modulePath))
+			{
+				if (CowSpeak.CurrentFile.IndexOf("/") != -1)
+					modulePath = CowSpeak.CurrentFile.Substring(0, CowSpeak.CurrentFile.IndexOf("/") + 1) + modulePath;
+				if (CowSpeak.CurrentFile.IndexOf("\\") != -1)
+					modulePath = CowSpeak.CurrentFile.Substring(0, CowSpeak.CurrentFile.IndexOf("\\") + 1) + modulePath;
+			}
+
+			CowSpeak.Exec(modulePath);
+			return new Any(Type.Integer, 0);
+		}
+
 		[FunctionAttr("GetHtmlFromUrl", Syntax.Types.String, Syntax.Types.String + " url")]
 		public static Any GetHtmlFromUrl(Any[] parameters)
 		{
@@ -212,7 +230,7 @@ namespace CowSpeak
 		}
 
 		[FunctionAttr("Evaluate", Syntax.Types.Decimal, Syntax.Types.String + " toExec")]
-		public static Any _Evaluate(Any[] parameters)
+		public static Any _Evaluate(Any[] parameters) // evaluates an expression
 		{
 			Any evaluatedValue = new Any();
 			evaluatedValue.vType = Type.Decimal;
@@ -240,8 +258,8 @@ namespace CowSpeak
 			return new Any(Type.Integer, Utils.rand.Next(minimum, maximum));
 		}
 
-		[FunctionAttr("print", Syntax.Types.Void, Syntax.Types.Any + " text")]
-		public static Any print(Any[] parameters)
+		[FunctionAttr("Print", Syntax.Types.Void, Syntax.Types.Any + " text")]
+		public static Any Print(Any[] parameters)
 		{
 			System.Console.Write(parameters[0].Get().ToString());
 			return new Any(Type.Integer, 0);

@@ -1,4 +1,4 @@
-print("Convert String:\n")
+Print("Convert String:\n")
 
 string ToUpper(string str){
 	string result = ""
@@ -42,9 +42,9 @@ string RandomCaps(string str){
 	return result
 }
 
-print("Enter the target string: ")
+Print("Enter the target string: ")
 string target = InputString()
 
-print("ToUpper: " + ToUpper(target) + "\n")
-print("ToLower: " + ToLower(target) + "\n")
-print("RandomCaps: " + RandomCaps(target) + "\n")
+Print("ToUpper: " + ToUpper(target) + "\n")
+Print("ToLower: " + ToLower(target) + "\n")
+Print("RandomCaps: " + RandomCaps(target) + "\n")

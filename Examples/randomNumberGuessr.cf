@@ -1,4 +1,4 @@
-print("Random Number Guesser:\n")
+Print("Random Number Guesser:\n")
 
 integer correctGuess = RandomInteger(1, 100)
 integer guess = -1
@@ -9,22 +9,22 @@ while(correctGuess != guess){
 	tries = tries + 1
 
 	if(firstTime == False){
-		print("Wrong Answer - ")
+		Print("Wrong Answer - ")
 
 		if(guess < correctGuess){
-			print("Too Low!!")
+			Print("Too Low!!")
 		}
 
 		if(guess > correctGuess){
-			print("Too High!!")
+			Print("Too High!!")
 		}
 
-		print("\n")
+		Print("\n")
 	}
 	
-	print("Input Your Guess: ")
+	Print("Input Your Guess: ")
 	guess = InputInteger()
 	firstTime = False # it's not the first time through the loop
 }
 
-print("Correct Answer!!\nYour Tries: " + tries)
+Print("Correct Answer!!\nYour Tries: " + tries)

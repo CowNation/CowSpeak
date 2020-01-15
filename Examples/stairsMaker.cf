@@ -1,16 +1,16 @@
-print("Stairs Maker:\n")
+Print("Stairs Maker:\n")
 
-print("Enter the number of stairs: ")
+Print("Enter the number of stairs: ")
 integer steps = InputInteger()
 
-print("Enter the symbol: ")
+Print("Enter the symbol: ")
 character symbol = InputCharacter()
 
-print("\n")
+Print("\n")
 
 loop("step", 0, steps){
 	loop("symbolNum", 0, step + 1){
-		print(symbol + " ")
+		Print(symbol + " ")
 	}
-	print("\n")
+	Print("\n")
 }

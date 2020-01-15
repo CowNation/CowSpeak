@@ -46,6 +46,13 @@ namespace CowSpeak
 					Functions.RemoveAt(i);
 		}
 
+		public static void ClearUserDefinitions()
+		{
+			for (int i = 0; i < Definitions.Count; i++)
+				if (Definitions[i].DefinitionType == DefinitionType.User)
+					Definitions.RemoveAt(i);
+		}
+
 		public static bool Debug = false;
 
 		public static int CurrentLine = -1;
@@ -81,6 +88,11 @@ namespace CowSpeak
 			return null;
 		}
 
+		public static void ImportModule() // The file is ran normally except all definitions and functions
+		{
+
+		}
+
 		public static void Exec(string fileName, bool _Debug = false)
 		{
 			CurrentFile = fileName;
@@ -106,7 +118,7 @@ namespace CowSpeak
 		{
 			Exec(fileName, _Debug);
 			Vars.Clear();
-			Definitions.Clear();
+			ClearUserDefinitions();
 			ClearUserFunctions();
 		}
 
@@ -114,7 +126,7 @@ namespace CowSpeak
 		{
 			Exec(lines, _Debug);
 			Vars.Clear();
-			Definitions.Clear();
+			ClearUserDefinitions();
 			ClearUserFunctions();
 		}
 	}

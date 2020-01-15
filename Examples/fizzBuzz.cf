@@ -4,15 +4,15 @@ void fizzBuzz(integer start, integer end){
 		integer threeDivisible = index % 3
 		integer fiveDivisible = index % 5
 		if(threeDivisible == 0){
-			print("Fizz")
+			Print("Fizz")
 		}
 		if(fiveDivisible == 0){
-			print("Buzz")
+			Print("Buzz")
 		}
 		if(threeDivisible != 0 && fiveDivisible != 0){
-			print(index)
+			Print(index)
 		}
-		print("\n")
+		Print("\n")
 	}
 }
 
