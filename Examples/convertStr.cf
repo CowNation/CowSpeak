@@ -1,9 +1,9 @@
 Print("Convert String:\n")
 
-string ToUpper(string str){
+string ToUpper(string str) {
 	string result = ""
 
-	loop("index", 0, str.Length()){
+	loop("index", 0, str.Length()) {
 		character char = str.CharacterAt(index)
 
 		result = result + char.ToUpper()
@@ -12,10 +12,10 @@ string ToUpper(string str){
 	return result
 }
 
-string ToLower(string str){
+string ToLower(string str) {
 	string result = ""
 
-	loop("index", 0, str.Length()){
+	loop("index", 0, str.Length()) {
 		character char = str.CharacterAt(index)
 
 		result = result + char.ToLower()
@@ -24,16 +24,16 @@ string ToLower(string str){
 	return result
 }
 
-string RandomCaps(string str){
+string RandomCaps(string str) {
 	string result = ""
 
-	loop("index", 0, str.Length()){
+	loop("index", 0, str.Length()) {
 		character char = str.CharacterAt(index)
 
-		if(RandomInteger(0, 1) == 1){
+		if(RandomInteger(0, 1) == 1) {
 			char = char.ToUpper()
 		}
-		else{
+		else {
 			char = char.ToLower()
 		}
 		result = result + char

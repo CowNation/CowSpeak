@@ -13,7 +13,7 @@ namespace CowSpeak
 				if (Lines[j].Count < 1)
 					continue;
 
-				if (Lines[j][0].type.ToString().IndexOf("Conditional") != -1 || (Lines[j].Count > 1 && Lines[j][1].type.ToString() == "FunctionDefinition"))
+				if (Lines[j][0].type.ToString().IndexOf("Conditional") != -1 || (Lines[j].Count > 2 && Lines[j][1].type == TokenType.FunctionCall && Lines[j][0].type == TokenType.TypeIdentifier && Lines[j][2].type == TokenType.StartBracket))
 					nextSkips++; // there is a nested conditional, skip the next bracket
 
 				if (Lines[j][0].type == TokenType.EndBracket)
@@ -42,32 +42,39 @@ namespace CowSpeak
 						throw new Exception("ReturnStatement must be located inside of a FunctionDefinition");
 				}
 
-
-				if (Lines[i].Count > 1 && Lines[i][0].type == TokenType.TypeIdentifier && Lines[i][1].type == TokenType.FunctionDefinition)
+				if (Lines[i].Count > 1 && Lines[i][0].type == TokenType.TypeIdentifier && Lines[i][1].type == TokenType.FunctionCall)
 				{
+					if (Lines[i].Count < 3 || Lines[i][2].type != TokenType.StartBracket)
+						throw new Exception("StartBracket must immediately precede a function definition");
+
 					if (isNestedInFunction || isNestedInConditional)
 						throw new Exception("Function cannot be defined inside of a function or conditional");
 
 					string usage = Lines[i][1].identifier.Replace(((char)0x1D).ToString(), " ");
 
-					usage = usage.Substring(0, usage.Length - 2); // remove StartBracket
+					usage = usage.Substring(0, usage.Length - 1); // remove )
 					string dName = usage.Substring(0, usage.IndexOf("(")); // text before first '('
 
 					CowSpeak.CreateFunction(new UserFunction(dName, Utils.pGetContainedLines(Lines, GetClosingBracket(Lines, i), i), UserFunction.ParseDefinitionParams(usage.Substring(usage.IndexOf("("))), Utils.GetType(Lines[i][0].identifier), Lines[i][0].identifier + " " + usage + ")", i));
 
 					i = GetClosingBracket(Lines, i); // skip to end of definition
 				}
-				else if (Lines[i].Count > 0)
+				else if (Lines[i].Count > 0 && Lines[i][0].type.ToString().IndexOf("Conditional") != -1)
 				{
+					if (Lines[i].Count < 2 || Lines[i][1].type != TokenType.StartBracket)
+						throw new Exception("StartBracket must immediately precede a conditional");
+
+					int endingBracket = GetClosingBracket(Lines, i);
+					List< string > ContainedLines = Utils.GetContainedLines(Lines, endingBracket, i);
+
 					if (Lines[i][0].type == TokenType.IfConditional)
 					{
-						int endingBracket = GetClosingBracket(Lines, i);
 
 						if (new Conditional(Lines[i][0].identifier).EvaluateBoolean())
 						{
 							Scope scope = new Scope();
 
-							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1 + CurrentLineOffset, isNestedInFunction, true);
+							new Lexer(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
 
 							scope.End();
 						}
@@ -81,7 +88,6 @@ namespace CowSpeak
 						if (i == 0 || (Lines[i - 1].Count > 0 && Lines[i - 1][0].type != TokenType.EndBracket))
 							throw new Exception("ElseConditional isn't immediately preceding an EndBracket");
 
-
 						for (int j = 0; j < i; j++)
 						{
 							if (Lines[j].Count > 0 && Lines[j][0].type == TokenType.IfConditional && GetClosingBracket(Lines, j) == i - 1)
@@ -94,13 +100,10 @@ namespace CowSpeak
 						if (parentIf == -1)
 							throw new Exception("ElseConditional isn't immediately preceding an EndBracket");
 
-
-						int endingBracket = GetClosingBracket(Lines, i);
-
 						if (!new Conditional(Lines[parentIf][0].identifier).EvaluateBoolean()){
 							Scope scope = new Scope();
 
-							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1 + CurrentLineOffset, isNestedInFunction, true);
+							new Lexer(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
 
 							scope.End();
 						}
@@ -109,15 +112,13 @@ namespace CowSpeak
 					}
 					else if (Lines[i][0].type == TokenType.WhileConditional)
 					{
-						int endingBracket = GetClosingBracket(Lines, i);
-
 						Conditional whileStatement = new Conditional(Lines[i][0].identifier);
 						
 						while (whileStatement.EvaluateBoolean())
 						{
 							Scope scope = new Scope();
 
-							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1 + CurrentLineOffset, isNestedInFunction, true);
+							new Lexer(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
 
 							scope.End();
 						}
@@ -126,8 +127,6 @@ namespace CowSpeak
 					}
 					else if (Lines[i][0].type == TokenType.LoopConditional)
 					{
-						int endingBracket = GetClosingBracket(Lines, i);
-
 						string usage = Lines[i][0].identifier;
 						Any[] loopParams = StaticFunction.ParseParameters(usage.Substring(usage.IndexOf("("), usage.LastIndexOf(")") - usage.IndexOf("(") + 1));
 
@@ -146,7 +145,7 @@ namespace CowSpeak
 
 							CowSpeak.GetVariable(varName).Set(p);
 
-							new Lexer(Utils.GetContainedLines(Lines, endingBracket, i), i + 1 + CurrentLineOffset, isNestedInFunction, true);
+							new Lexer(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
 
 							scope.End();
 						}
