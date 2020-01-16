@@ -217,6 +217,13 @@ namespace CowSpeak
 			return null;
 		}
 
+		[FunctionAttr("ClearConsole", Syntax.Types.Void, "")]
+		public static Any ClearConsole(Any[] parameters)
+		{
+			System.Console.Clear();
+			return null;
+		}
+
 		[FunctionAttr("Define", Syntax.Types.Void, Syntax.Types.String + " from, " + Syntax.Types.String + " to")]
 		public static Any Define(Any[] parameters) 
 		{
