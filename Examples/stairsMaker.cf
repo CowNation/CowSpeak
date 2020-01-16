@@ -8,8 +8,8 @@ character symbol = InputCharacter()
 
 Print("\n")
 
-loop("step", 0, steps){
-	loop("symbolNum", 0, step + 1){
+loop("step", 0, steps) {
+	loop("symbolNum", 0, step + 1) {
 		Print(symbol + " ")
 	}
 	Print("\n")

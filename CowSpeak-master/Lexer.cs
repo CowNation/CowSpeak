@@ -73,19 +73,19 @@ namespace CowSpeak
 				case "(":
 				case ")":
 					return new Token(TokenType.Parenthesis, token);
+				case Syntax.Conditionals.Else:
+					return new Token(TokenType.ElseConditional, token);
 			}
 
 			if (token[0] == '\"' && token[token.Length - 1] == '\"')
 				return new Token(TokenType.String, token.Replace(((char)0x1f).ToString(), " ").Substring(1, token.Replace(((char)0x1f).ToString(), " ").Length - 2));	
 			else if (token[0] == '\'' && token[token.Length - 1] == '\'' && token.Length == 3)
 				return new Token(TokenType.Character, token[token.Length - 2].ToString());
-			else if (token.IndexOf(Syntax.Conditionals.If + "(") == 0 && token[token.Length - 1] == '{' && token[token.Length - 2] == ')')
+			else if (token.IndexOf(Syntax.Conditionals.If + "(") == 0 && token[token.Length - 1] == ')')
 				return new Token(TokenType.IfConditional, token);
-			else if (token.IndexOf(Syntax.Conditionals.Else) == 0 && token[token.Length - 1] == '{')
-				return new Token(TokenType.ElseConditional, token);
-			else if (token.IndexOf(Syntax.Conditionals.While + "(") == 0 && token[token.Length - 1] == '{' && token[token.Length - 2] == ')')
+			else if (token.IndexOf(Syntax.Conditionals.While + "(") == 0 && token[token.Length - 1] == ')')
 				return new Token(TokenType.WhileConditional, token);
-			else if (token.IndexOf(Syntax.Conditionals.Loop + "(") == 0 && token[token.Length - 1] == '{' && token[token.Length - 2] == ')')
+			else if (token.IndexOf(Syntax.Conditionals.Loop + "(") == 0 && token[token.Length - 1] == ')')
 				return new Token(TokenType.LoopConditional, token);
 			else if (Utils.IsDigitsOnly(token))
 				return new Token(TokenType.Number, token);

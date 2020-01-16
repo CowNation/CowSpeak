@@ -12,7 +12,7 @@ string ReplaceFirstOf(string str, string lookFor, string replaceWith) {
 }
 
 string ReplaceAllOf(string str, string lookFor, string replaceWith) {
-	loop("", 0, str.OccurrencesOf(lookFor)){
+	loop("", 0, str.OccurrencesOf(lookFor)) {
 		str = ReplaceFirstOf(str, lookFor, replaceWith)
 	}
 	return str
