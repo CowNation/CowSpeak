@@ -168,11 +168,12 @@ namespace CowSpeak
 				} // must handle this before the other lines are evaluated to avoid wrong exceptions
 
 				bool shouldBeSet = false; // topmost variable in list should be set after exec
-				if (Lines[i].Count >= 3 && Lines[i][0].type == TokenType.TypeIdentifier && Lines[i][1].type == TokenType.VariableIdentifier && Lines[i][2].type == TokenType.EqualOperator)
+				if (Lines[i].Count >= 2 && Lines[i][0].type == TokenType.TypeIdentifier && Lines[i][1].type == TokenType.VariableIdentifier)
 				{
 					CowSpeak.CreateVariable(new Variable(Type.GetType(Lines[i][0].identifier), Lines[i][1].identifier));
 
-					shouldBeSet = true;
+					if (Lines[i].Count >= 3 && Lines[i][2].type == TokenType.EqualOperator)
+						shouldBeSet = true;
 				} // variable must be created before exec is called so that it may be accessed
 
 				Any retVal = Lines[i].Exec(); // Execute line

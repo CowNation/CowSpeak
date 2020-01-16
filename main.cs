@@ -4,6 +4,8 @@ class MainClass
 {
 	public static void Main(string[] args)
 	{
+		Console.Clear();
+
 		try
 		{
 			CowSpeak.CowSpeak.Run("Examples/fizzBuzz.cf");

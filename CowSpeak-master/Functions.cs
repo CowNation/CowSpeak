@@ -148,7 +148,7 @@ namespace CowSpeak
 			}
 
 			CowSpeak.Exec(modulePath);
-			return new Any(Type.Integer, 0);
+			return null;
 		}
 
 		[FunctionAttr("GetHtmlFromUrl", Syntax.Types.String, Syntax.Types.String + " url")]
@@ -207,14 +207,14 @@ namespace CowSpeak
 		public static Any Sleep(Any[] parameters)
 		{
 			Thread.Sleep((int)parameters[0].Get());
-			return new Any(Type.Integer, 0);
+			return null;
 		}
 
 		[FunctionAttr("Pause", Syntax.Types.Void, "")]
 		public static Any Pause(Any[] parameters)
 		{
 			System.Console.ReadKey();
-			return new Any(Type.Integer, 0);
+			return null;
 		}
 
 		[FunctionAttr("Define", Syntax.Types.Void, Syntax.Types.String + " from, " + Syntax.Types.String + " to")]
@@ -226,7 +226,7 @@ namespace CowSpeak
 				to = parameters[1].Get().ToString(),
 				DefinitionType = DefinitionType.User
 			});
-			return new Any(Type.Integer, 0);
+			return null;
 		}
 
 		[FunctionAttr("Evaluate", Syntax.Types.Decimal, Syntax.Types.String + " toExec")]
@@ -262,27 +262,14 @@ namespace CowSpeak
 		public static Any Print(Any[] parameters)
 		{
 			System.Console.Write(parameters[0].Get().ToString());
-			return new Any(Type.Integer, 0);
+			return null;
 		}
 
-		[FunctionAttr("run", Syntax.Types.Void, Syntax.Types.String + " fileName")]
-		public static Any run(Any[] parameters)
-		{
-			string CurrentFile = CowSpeak.CurrentFile;
-			string fileName = parameters[0].Get().ToString();
-			if (File.Exists(fileName))
-				CowSpeak.Exec(fileName); // Execute file specified
-			else
-				throw new Exception(fileName + " does not exist");
-			CowSpeak.CurrentFile = CurrentFile; // curr file is not set back after exec of another file
-			return new Any(Type.Integer, 0);
-		}
-
-		[FunctionAttr("exit", Syntax.Types.Void, Syntax.Types.Integer + " exitCode")]
-		public static Any exit(Any[] parameters)
+		[FunctionAttr("Exit", Syntax.Types.Void, Syntax.Types.Integer + " exitCode")]
+		public static Any Exit(Any[] parameters)
 		{
 			System.Environment.Exit((int)parameters[0].Get());
-			return new Any(Type.Integer, 0);
+			return null;
 		}
 
 		[FunctionAttr("ThrowError", Syntax.Types.Void, Syntax.Types.String + " errorText")]

@@ -137,6 +137,9 @@ namespace CowSpeak
 				}
 			} // remove the equal sign and everything to the left
 
+			if (Count == 2 && base[0].type == TokenType.TypeIdentifier && base[1].type == TokenType.VariableIdentifier)
+				return null; // support for uninitialized vars
+
 			string Expression = "";
 			for (int i = 0; i < toEval.Count; i++)
 			{
@@ -157,9 +160,17 @@ namespace CowSpeak
 				else if (toEval[i].type == TokenType.FunctionCall)
 				{
 					FunctionBase func = CowSpeak.GetFunction(identifier);
+					Any returned = func.Execute(identifier);
 					if (toEval.Count == 1)
-						return new Any(func.type, func.Execute(identifier).Get());
-					identifier = func.Execute(identifier).Get().ToString(); // replace function call with it's return value
+					{
+						if (returned == null)
+							return null; // tocleanup
+						return new Any(func.type, returned.Get());
+					}
+					if (returned != null)
+						identifier = returned.Get().ToString(); // replace function call with it's return value
+					else
+						identifier = "";
 				}
 				
 				Expression += identifier;

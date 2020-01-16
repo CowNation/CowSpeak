@@ -37,6 +37,9 @@ namespace CowSpeak
 
 		public object Get()
 		{
+			if (bytes == null)
+				throw new Exception("Object not initialized");
+
 			return ByteArrayToObject(bytes);
 		}
 
