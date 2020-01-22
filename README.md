@@ -1,7 +1,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Run on Repl.it](https://repl.it/badge/github/CowNation/CowSpeak)](https://repl.it/github/CowNation/CowSpeak)
 # CowSpeak
-A pointless programming language made in C#
+Ever wish for an interpreted programming language with a C style syntax? Here's your answer!
+CowSpeak is an open source interpreted programming language made in C# with a C style syntax
 ## Info
 This language uses CowConfig. To see CowConfig go to https://github.com/CowNation/CowConfig
 

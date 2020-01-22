@@ -133,6 +133,24 @@ namespace CowSpeak
 		}
 		#endregion
 
+		[FunctionAttr("Sin", Syntax.Types.Decimal, Syntax.Types.Decimal + " a")]
+		public static Any Sin(Any[] parameters)
+		{
+			return new Any(Type.Decimal, System.Math.Sin((double)parameters[0].Get()));
+		}
+
+		[FunctionAttr("Cos", Syntax.Types.Decimal, Syntax.Types.Decimal + " d")]
+		public static Any Cos(Any[] parameters)
+		{
+			return new Any(Type.Decimal, System.Math.Cos((double)parameters[0].Get()));
+		}
+
+		[FunctionAttr("Tan", Syntax.Types.Decimal, Syntax.Types.Decimal + " a")]
+		public static Any Tan(Any[] parameters)
+		{
+			return new Any(Type.Decimal, System.Math.Tan((double)parameters[0].Get()));
+		}
+
 		[FunctionAttr("Import", Syntax.Types.Void, Syntax.Types.String + " modulePath")]
 		public static Any Import(Any[] parameters)
 		{
@@ -210,11 +228,10 @@ namespace CowSpeak
 			return null;
 		}
 
-		[FunctionAttr("Pause", Syntax.Types.Void, "")]
-		public static Any Pause(Any[] parameters)
+		[FunctionAttr("Read" + Syntax.Types.c_Character, Syntax.Types.Character, "")]
+		public static Any ReadCharacter(Any[] parameters)
 		{
-			System.Console.ReadKey();
-			return null;
+			return new Any(Type.Character, (char)System.Console.ReadKey().KeyChar);
 		}
 
 		[FunctionAttr("ClearConsole", Syntax.Types.Void, "")]
