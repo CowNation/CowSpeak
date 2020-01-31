@@ -4,6 +4,13 @@ using System.Linq;
 
 namespace CowSpeak
 {
+	public enum FileType
+	{
+		Normal,
+		Binary,
+		Hex
+	}
+
 	public class CowSpeak
 	{
 		public static List< FunctionBase > Functions = FunctionAttr.GetFunctions();
@@ -34,7 +41,7 @@ namespace CowSpeak
 			} // try to see if it's an 'Any' method
 
 			if (_throw)
-				throw new Exception("Function '" + functionName + "' not found");
+				throw new Exception("Function '" + functionName.Replace(System.Environment.NewLine, "\\n") + "' not found");
 
 			return null;
 		}
@@ -97,13 +104,21 @@ namespace CowSpeak
 		{
 			CurrentFile = fileName;
 			Debug = _Debug;
+			FileType Type;
 
 			if (!File.Exists(fileName))
 				throw new Exception("Cannot execute COWFILE '" + fileName + "', it doesn't exist");
-			else if (fileName.IndexOf(".cf") == -1)
-				throw new Exception("Cannot execute COWFILE '" + fileName + "', it doesn't have the .cf file extension");
 
-			new Lexer(new CowConfig.ReadConfig(fileName).GetLines());
+			if (fileName.IndexOf(".cf") != -1)
+				Type = FileType.Normal;
+			else if (fileName.IndexOf(".bcf") != -1)
+				Type = FileType.Binary;
+			else if (fileName.IndexOf(".hcf") != -1)
+				Type = FileType.Hex;
+			else
+				throw new Exception("Cannot execute COWFILE '" + fileName + "', it doesn't have the .bcf file extension");
+
+			new Lexer(new CowConfig.ReadConfig(fileName).GetLines(), 0, false, false, Type);
 		}
 
 		public static void Exec(string[] lines, bool _Debug = false)

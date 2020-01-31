@@ -8,12 +8,14 @@ class MainClass
 
 		try
 		{
+			CowSpeak.CowSpeak.Run("Examples/binaryTest.bcf");
+			CowSpeak.CowSpeak.Run("Examples/hexTest.hcf");
 			CowSpeak.CowSpeak.Run("Examples/fizzBuzz.cf");
-			CowSpeak.CowSpeak.Run("Examples/convertStr.cf");
-			CowSpeak.CowSpeak.Run("Examples/stringThings.cf");
-			CowSpeak.CowSpeak.Run("Examples/calculator.cf");
-			CowSpeak.CowSpeak.Run("Examples/stairsMaker.cf");
-			CowSpeak.CowSpeak.Run("Examples/randomNumberGuessr.cf");
+			//CowSpeak.CowSpeak.Run("Examples/convertStr.cf");
+			//CowSpeak.CowSpeak.Run("Examples/stringThings.cf");
+			//CowSpeak.CowSpeak.Run("Examples/calculator.cf");
+			//CowSpeak.CowSpeak.Run("Examples/stairsMaker.cf");
+			//CowSpeak.CowSpeak.Run("Examples/randomNumberGuessr.cf");
 		}
 		catch (CowSpeak.Exception ex)
 		{

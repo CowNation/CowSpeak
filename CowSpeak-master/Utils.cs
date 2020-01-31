@@ -11,6 +11,31 @@ namespace CowSpeak
 	{
 		public static System.Random rand = new System.Random();
 
+		public static byte[] GetBytesFromBinaryString(string binary)
+		{
+			var list = new List<byte>();
+
+			for (int i = 0; i < binary.Length; i += 8)
+			{
+				string t = binary.Substring(i, 8);
+
+				list.Add(System.Convert.ToByte(t, 2));
+			}
+
+			return list.ToArray();
+		}
+
+		public static string GetStrFromHexString(string hexString)
+		{
+			var bytes = new byte[hexString.Length / 2];
+			for (var i = 0; i < bytes.Length; i++)
+			{
+				bytes[i] = System.Convert.ToByte(hexString.Substring(i * 2, 2), 16);
+			}
+
+			return Encoding.Unicode.GetString(bytes); // returns: "Hello world" for "48656C6C6F20776F726C64"
+		}
+
 		public static bool IsHexadecimal(string str)
 		{
 			return Utils.OccurrencesOf(str, "0x") == 1 && str.IndexOf("0x") == 0;

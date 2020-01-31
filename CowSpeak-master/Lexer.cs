@@ -144,8 +144,27 @@ namespace CowSpeak
 			return ret;
 		}
 
-		public Lexer(List< string > fileLines, int CurrentLineOffset = 0, bool isNestedInFunction = false, bool isNestedInConditional = false)
+		public Lexer(List< string > fileLines, int CurrentLineOffset = 0, bool isNestedInFunction = false, bool isNestedInConditional = false, FileType Type = FileType.Normal)
 		{
+			if (Type == FileType.Binary)
+			{
+				for (int i = 0; i < fileLines.Count; i++)
+				{
+					string Built = "";
+					fileLines[i].Split(' ').ToList().ForEach(x => Built += Encoding.ASCII.GetString(Utils.GetBytesFromBinaryString(x)));
+					fileLines[i] = Built;
+				}
+			}
+			else if (Type == FileType.Hex)
+			{
+				for (int i = 0; i < fileLines.Count; i++)
+				{
+					string Built = "";
+					fileLines[i].Split(' ').ToList().ForEach(x => Built += (char)int.Parse(x, System.Globalization.NumberStyles.HexNumber));
+					fileLines[i] = Built;
+				}
+			}
+
 			for (int i = 0; i < fileLines.Count; i++)
 			{
 				CowSpeak.CurrentLine = i + 1 + CurrentLineOffset;
