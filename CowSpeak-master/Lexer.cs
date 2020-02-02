@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace CowSpeak
 {
@@ -150,8 +151,17 @@ namespace CowSpeak
 			{
 				for (int i = 0; i < fileLines.Count; i++)
 				{
+					CowSpeak.CurrentLine = i + 1 + CurrentLineOffset;
 					string Built = "";
-					fileLines[i].Split(' ').ToList().ForEach(x => Built += Encoding.ASCII.GetString(Utils.GetBytesFromBinaryString(x)));
+
+					try
+					{
+						fileLines[i].Split(' ').ToList().ForEach(x => Built += Encoding.ASCII.GetString(Utils.GetBytesFromBinaryString(x)));
+					}
+					catch
+					{
+						throw new Exception("Invalid binary token in bcf");
+					}
 					fileLines[i] = Built;
 				}
 			}
@@ -159,8 +169,18 @@ namespace CowSpeak
 			{
 				for (int i = 0; i < fileLines.Count; i++)
 				{
+					CowSpeak.CurrentLine = i + 1 + CurrentLineOffset;
 					string Built = "";
-					fileLines[i].Split(' ').ToList().ForEach(x => Built += (char)int.Parse(x, System.Globalization.NumberStyles.HexNumber));
+
+					try
+					{
+						fileLines[i].Split(' ').Where(x => x != "").ToList().ForEach(x => Built += (char)int.Parse(x, NumberStyles.HexNumber));
+					}
+					catch (System.FormatException ex)
+					{
+						throw new Exception("Invalid hexadecimal token in hcf");
+					}
+
 					fileLines[i] = Built;
 				}
 			}
