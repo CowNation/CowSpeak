@@ -7,10 +7,10 @@ class Shell
 {
 	public static void Main(string[] args)
 	{
-		System.Console.Write("Welcome to the CowSpeak(TM) shell!\nIn order to exit the shell, call Exit(0) on a single line");
+		System.Console.Write("Welcome to the CowSpeak(TM) shell!\nIn order to exit the shell, call the Exit() function");
 
 		List<string> Lines = null;
-		do
+		while (true)
 		{
 			Lines = new List<string>();
 			System.Console.Write("\n<< ");
@@ -38,6 +38,6 @@ class Shell
 			{
 				System.Console.WriteLine("(" + (ex.ErrorFile != "" ? ex.ErrorFile + ", " : "") + ex.ErrorLine + ") " + ex.Message);
 			}
-		} while (Lines[0] != "Exit(0)");
+		}
 	}
 }
