@@ -1,6 +1,6 @@
 namespace CowSpeak
 {
-	class Exception : System.Exception
+	public class Exception : System.Exception
 	{
 		public int ErrorLine;
 		public string ErrorFile;

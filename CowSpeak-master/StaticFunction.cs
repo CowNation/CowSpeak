@@ -60,7 +60,7 @@ namespace CowSpeak
 		}
 	}
 
-	public class FunctionAttr : System.Attribute
+	class FunctionAttr : System.Attribute
 	{
 		public string Name;
 		public Type vType = null;

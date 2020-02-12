@@ -1,25 +1,43 @@
-using System;
+using System.Reflection;
+using System.IO;
+using System.Collections.Generic;
+using CowSpeak;
 
-class MainClass
+class Shell
 {
 	public static void Main(string[] args)
 	{
-		Console.Clear();
+		System.Console.Write("Welcome to the CowSpeak(TM) shell!\nIn order to exit the shell, call Exit() on a single line");
 
-		try
+		List<string> Lines = null;
+		do
 		{
-			CowSpeak.CowSpeak.Run("Examples/binaryTest.bcf");
-			CowSpeak.CowSpeak.Run("Examples/hexTest.hcf");
-			CowSpeak.CowSpeak.Run("Examples/fizzBuzz.cf");
-			//CowSpeak.CowSpeak.Run("Examples/convertStr.cf");
-			//CowSpeak.CowSpeak.Run("Examples/stringThings.cf");
-			//CowSpeak.CowSpeak.Run("Examples/calculator.cf");
-			//CowSpeak.CowSpeak.Run("Examples/stairsMaker.cf");
-			//CowSpeak.CowSpeak.Run("Examples/randomNumberGuessr.cf");
-		}
-		catch (CowSpeak.Exception ex)
-		{
-			Console.WriteLine("(" + ex.ErrorFile + ", " + ex.ErrorLine + ") " + ex.Message);
-		}
+			Lines = new List<string>();
+			System.Console.Write("\n<< ");
+			int StartBrackets;
+			int EndBrackets;
+			do
+			{
+				StartBrackets = 0;
+				EndBrackets = 0;
+
+				Lines.Add(System.Console.ReadLine());
+
+				foreach (string Line in Lines)
+				{
+					StartBrackets += Line.OccurrencesOf("{");
+					EndBrackets += Line.OccurrencesOf("}");
+				}
+			} while (StartBrackets != EndBrackets);
+
+			try
+			{
+				CowSpeak.CowSpeak.Exec(Lines.ToArray());
+			}
+			catch (CowSpeak.Exception ex)
+			{
+				System.Console.WriteLine("(" + (ex.ErrorFile != "" ? ex.ErrorFile + ", " : "") + ex.ErrorLine + ") " + ex.Message);
+			}
+		} while (Lines[0] != "Exit()");
 	}
 }

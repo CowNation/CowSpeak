@@ -41,7 +41,7 @@ namespace CowSpeak
 			return Utils.OccurrencesOf(str, "0x") == 1 && str.IndexOf("0x") == 0;
 		}
 
-		public static int OccurrencesOf(string str, string splitter)
+		public static int OccurrencesOf(this string str, string splitter)
 		{
 			return Split(str, splitter).Length - 1;
 		}
