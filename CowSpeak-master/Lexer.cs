@@ -176,7 +176,7 @@ namespace CowSpeak
 					{
 						fileLines[i].Split(' ').Where(x => x != "").ToList().ForEach(x => Built += (char)int.Parse(x, NumberStyles.HexNumber));
 					}
-					catch (System.FormatException ex)
+					catch (System.FormatException)
 					{
 						throw new Exception("Invalid hexadecimal token in hcf");
 					}
