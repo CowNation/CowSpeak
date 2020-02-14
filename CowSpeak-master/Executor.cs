@@ -137,7 +137,8 @@ namespace CowSpeak
 						int start = (int)loopParams[1].Get();
 						int end = (int)loopParams[2].Get();
 
-						CowSpeak.Vars.Add(new Variable(Type.Integer, varName));
+
+						CowSpeak.CreateVariable(new Variable(Type.Integer, varName));
 
 						for (int p = start; p < end; p++)
 						{

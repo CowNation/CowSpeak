@@ -7,13 +7,15 @@ class Shell
 {
 	public static void Main(string[] args)
 	{
-		System.Console.Write("Welcome to the CowSpeak(TM) shell!\nIn order to exit the shell, call the Exit() function");
+		System.Console.WriteLine("Welcome to the CowSpeak(TM) shell!\nIn order to exit the shell, call the Exit() function");
 
 		List<string> Lines = null;
 		while (true)
 		{
 			Lines = new List<string>();
-			System.Console.Write("\n<< ");
+			
+			bool first = true;
+
 			int StartBrackets;
 			int EndBrackets;
 			do
@@ -21,6 +23,7 @@ class Shell
 				StartBrackets = 0;
 				EndBrackets = 0;
 
+				System.Console.Write((first ? "\n" : "") + "<< ");
 				Lines.Add(System.Console.ReadLine());
 
 				foreach (string Line in Lines)
@@ -28,6 +31,7 @@ class Shell
 					StartBrackets += Line.OccurrencesOf("{");
 					EndBrackets += Line.OccurrencesOf("}");
 				}
+				first = false;
 			} while (StartBrackets != EndBrackets);
 
 			try
