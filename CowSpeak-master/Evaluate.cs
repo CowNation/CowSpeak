@@ -25,7 +25,7 @@ namespace CowSpeak
 			{
 				Token token = Tokens[index];
 
-				if (Utils.IsIndexValid(index - 1, Tokens) && Utils.IsIndexValid(index + 1, Tokens) && token.type.ToString().IndexOf("Is") != -1)
+				if (Tokens.IsIndexValid(index - 1) && Tokens.IsIndexValid(index + 1) && token.type.ToString().IndexOf("Is") != -1)
 				{
 					Token _operator = token;
 
@@ -66,7 +66,7 @@ namespace CowSpeak
 					index = 0;
 				}
 
-				if (Utils.IsIndexValid(index + 1, Tokens))
+				if (Tokens.IsIndexValid(index + 1))
 					index++;
 				else
 					break;

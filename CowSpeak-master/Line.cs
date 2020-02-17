@@ -86,7 +86,7 @@ namespace CowSpeak
 					if (index != i + 1)
 						index++;
 					
-					if (!Utils.IsIndexValid(index + 1, toEval) || !Utils.IsIndexValid(index, toEval) || toEval[index].type != TokenType.AddOperator)
+					if (!toEval.IsIndexValid(index + 1) || !toEval.IsIndexValid(index) || toEval[index].type != TokenType.AddOperator)
 						break;
 					
 					if (toEval[index + 1].type == TokenType.VariableIdentifier)
@@ -119,9 +119,9 @@ namespace CowSpeak
 				if (base[i].type == TokenType.FunctionCall)
 				{
 					if (CowSpeak.GetFunction(base[i].identifier).isVoid()){
-						if (Utils.IsIndexValid(i - 1, GetRange(0, Count)) && Utils.IsOperator(base[i-1].type))
+						if (GetRange(0, Count).IsIndexValid(i - 1) && Utils.IsOperator(base[i-1].type))
 							throw new Exception("Cannot perform operation: '" + base[i-1].identifier + "' on void function");
-						if (Utils.IsIndexValid(i + 1, GetRange(0, Count)) && Utils.IsOperator(base[i+1].type))
+						if (GetRange(0, Count).IsIndexValid(i + 1) && Utils.IsOperator(base[i+1].type))
 							throw new Exception("Cannot perform operation: '" + base[i+1].identifier + "' on void function");
 					}
 				

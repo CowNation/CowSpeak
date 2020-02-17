@@ -11,6 +11,7 @@ namespace CowSpeak
 		{
 
 		}
+
 		public byte[] bytes;
 
 		public static object ByteArrayToObject(byte[] arrBytes)
@@ -43,9 +44,6 @@ namespace CowSpeak
 			return ByteArrayToObject(bytes);
 		}
 
-		public void Set(object to)
-		{
-			bytes = ObjectToByteArray(to);
-		}
+		public void Set(object to) => bytes = ObjectToByteArray(to);
 	}
 }

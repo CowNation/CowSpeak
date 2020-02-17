@@ -26,9 +26,9 @@ namespace CowSpeak
 			{
 				return System.Convert.ChangeType(byteArr.Get(), vType.rep);
 			}
-			catch (System.OverflowException ex)
+			catch (System.OverflowException)
 			{
-				throw new Exception("Value was either too large or too small for an " + vType.Name);
+				throw new Exception("Value was either too large or too small for an " + vType.Name); // ex might be thrown for some other reason, but im too drunk to look into it rn
 			}
 		}
 	}

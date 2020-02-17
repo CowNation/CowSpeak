@@ -43,10 +43,10 @@ namespace CowSpeak
 
 		public static int OccurrencesOf(this string str, string splitter)
 		{
-			return Split(str, splitter).Length - 1;
+			return str.Split(splitter).Length - 1;
 		}
 
-		public static string[] Split(string str, string splitter)
+		public static string[] Split(this string str, string splitter)
 		{
 			List<string> ret = new List<string>();
 			while (str.IndexOf(splitter) != -1)
@@ -81,15 +81,18 @@ namespace CowSpeak
 			return null;
 		}
 
-		public static List< string > GetContainedLines(List< string > Lines, int endingBracket, int i){
+		public static List< string > GetContainedLines(List< string > Lines, int endingBracket, int i)
+		{
 			return Lines.GetRange(i + 1, endingBracket - (i + 1));
 		}
 
-		public static List< Line > pGetContainedLines(List< Line > Lines, int endingBracket, int i){
+		public static List< Line > pGetContainedLines(List< Line > Lines, int endingBracket, int i)
+		{
 			return Lines.GetRange(i + 1, endingBracket - (i + 1));
 		}
 
-		public static List< string > GetContainedLines(List< Line > Lines, int endingBracket, int i){
+		public static List< string > GetContainedLines(List< Line > Lines, int endingBracket, int i)
+		{
 			List< Line > _containedLines = new List< Line >();
 			_containedLines = Lines.GetRange(i + 1, endingBracket - (i + 1));
 			List< string > containedLines = new List< string >();
@@ -113,7 +116,7 @@ namespace CowSpeak
 			return containedLines;
 		}
 
-		public static bool IsBetween(string str, int index, char start, char end){
+		public static bool IsIndexBetween(this string str, int index, char start, char end){
 			string leftOf = str.Substring(0, index);
 			int starts = leftOf.Split(start).Length - 1;
 
@@ -128,7 +131,7 @@ namespace CowSpeak
 				return starts % 2 != 0;
 		}
 
-		public static int OrdinalIndexOf(string str, string substr, int n)
+		public static int OrdinalIndexOf(this string str, string substr, int n)
 		{
 			int pos = -1;
 			do
@@ -147,7 +150,7 @@ namespace CowSpeak
 			{
 				int at = OrdinalIndexOf(str, "True", i);
 				string sub = str.Substring(at, 4);
-				if (sub == "True" && !IsBetween(str, at, '\"', '\"'))
+				if (sub == "True" && !str.IsIndexBetween(at, '\"', '\"'))
 					str = str.Remove(at, 4).Insert(at, "1");
 			}
 
@@ -155,7 +158,7 @@ namespace CowSpeak
 			{
 				int at = OrdinalIndexOf(str, "False", i);
 				string sub = str.Substring(at, 5);
-				if (sub == "False" && !IsBetween(str, at, '\"', '\"'))
+				if (sub == "False" && !str.IsIndexBetween(at, '\"', '\"'))
 					str = str.Remove(at, 5).Insert(at, "0");
 			}
 
@@ -169,7 +172,7 @@ namespace CowSpeak
 				int i = OrdinalIndexOf(str, toReplace.ToString(), Occurrence);
 				char letter = str[i];
 
-				if (letter == toReplace && IsBetween(str, i, start, end))
+				if (letter == toReplace && str.IsIndexBetween(i, start, end))
 				{
 					if (substitution == (char)0x0)
 						_str = _str.Remove(i, 1);
@@ -183,7 +186,7 @@ namespace CowSpeak
 			}
 
 			return _str;
-		} // so you don't have to do it very inefficently with IsBetween on each char
+		} // so you don't have to do it very inefficently with IsIndexBetween on each char
 
 		public static string AddStrings(List< string > toAdd)
 		{
@@ -193,7 +196,8 @@ namespace CowSpeak
 			return result;
 		}
 
-		public static bool IsIndexValid<T>(int index, List< T > container){
+		public static bool IsIndexValid<T>(this ICollection< T > container, int index)
+		{
 			return index >= 0 && index < container.Count && container.Count > 0;
 		}
 

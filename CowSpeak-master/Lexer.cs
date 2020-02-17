@@ -114,7 +114,7 @@ namespace CowSpeak
 				int i = Utils.OrdinalIndexOf(line, " ", Occurrence);
 				char letter = line[i];
 
-				if (letter == ' ' && Utils.IsBetween(line, i, '(', ')'))
+				if (letter == ' ' && line.IsIndexBetween(i, '(', ')'))
 				{
 					char before = line[line.Substring(0, i).LastIndexOf("(") - 1]; // char before the (
 					if ((before >= 'A' && before <= 'Z') || (before >= 'a' && before <= 'z'))
@@ -197,7 +197,7 @@ namespace CowSpeak
 				while (fileLines[i].IndexOf(Syntax.Identifiers.Comment) != -1)
 				{
 					int pos = fileLines[i].IndexOf(Syntax.Identifiers.Comment);
-					if (Utils.IsBetween(fileLines[i], pos, '"', '"') || Utils.IsBetween(fileLines[i], pos, '\'', '\''))
+					if (fileLines[i].IsIndexBetween(pos, '"', '"') || fileLines[i].IsIndexBetween(pos, '\'', '\''))
 					{
 						StringBuilder fileLine = new StringBuilder(fileLines[i]);
 						fileLine[pos] = (char)0x1f;
