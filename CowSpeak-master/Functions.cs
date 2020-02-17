@@ -124,13 +124,20 @@ namespace CowSpeak
 		[FunctionAttr(Syntax.Types.Integer + ".ToHexadecimal", Syntax.Types.String, "", true)]
 		public static Any ToHexadecimal(Any[] parameters)
 		{
-			return new Any(Type.String, "0x" + System.Convert.ToString((int)parameters[0].Get(), 16));
+			return new Any(Type.String, ((int)parameters[0].Get()).ToString("X"));
 		}
 		[FunctionAttr(Syntax.Types.Integer + ".ToCharacter", Syntax.Types.Character, "", true)]
 		public static Any ToCharacter(Any[] parameters)
 		{
 			return new Any(Type.Character, (char)(int)parameters[0].Get());
 		}
+		#endregion
+
+		#region INTEGER64_METHODS
+		[FunctionAttr(Syntax.Types.Integer64 + ".ToHexadecimal", Syntax.Types.String, "", true)]
+		public static Any ToHexadecimal64(Any[] parameters) => new Any(Type.String, ((long)parameters[0].Get()).ToString("X"));
+		[FunctionAttr(Syntax.Types.Integer64 + ".ToCharacter", Syntax.Types.Character, "", true)]
+		public static Any ToCharacter64(Any[] parameters) => new Any(Type.Character, (char)(long)parameters[0].Get());
 		#endregion
 
 		[FunctionAttr("Sin", Syntax.Types.Decimal, Syntax.Types.Decimal + " a")]

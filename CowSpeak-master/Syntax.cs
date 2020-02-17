@@ -10,6 +10,8 @@ namespace CowSpeak
 			public const string c_Decimal = "Decimal";
 			public const string Integer = "integer";
 			public const string c_Integer = "Integer";
+			public const string Integer64 = "integer64";
+			public const string c_Integer64 = "Integer64";
 			public const string String = "string";
 			public const string c_String = "String";
 			public const string Boolean = "boolean";

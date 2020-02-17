@@ -179,12 +179,29 @@ namespace CowSpeak
 			if (Expression.Length == 0)
 				return new Any(Type.Integer, 0);
 
+			if (Expression.OccurrencesOf(" ") == 0 && Utils.IsDigitsOnly(Expression))
+			{
+				Any val = new Any();
+				if (Expression.IndexOf(".") != -1)
+				{
+					val.vType = Type.Decimal;
+					val.Set(double.Parse(Expression));
+				}
+				else
+				{
+					val.vType = Type.Integer64;
+					val.Set(long.Parse(Expression));
+				}
+				
+				return val;
+			}
+
 			Any evaluatedValue = new Any();
 			evaluatedValue.vType = Type.Decimal;
 			evaluatedValue.Set(Evaluate.EvaluateExpression(Expression));
-			if (((double)evaluatedValue.Get()).ToString().IndexOf(".") == -1)
-				evaluatedValue.vType = Type.Integer; // decimal not found, we can convert to int
-
+			if (evaluatedValue.Get().ToString().IndexOf(".") == -1 || evaluatedValue.Get().ToString().IndexOf("E") != -1)
+				evaluatedValue.vType = Type.Integer64; // decimal not found, we can convert to int
+			System.Console.WriteLine(evaluatedValue.Get());
 			return evaluatedValue;
 		}
 	}
