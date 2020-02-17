@@ -20,6 +20,16 @@ namespace CowSpeak
 
 		public void Set(object to) => byteArr.Set(to);
 
-		public object Get() => System.Convert.ChangeType(byteArr.Get(), vType.rep);
+		public object Get()
+		{
+			try
+			{
+				return System.Convert.ChangeType(byteArr.Get(), vType.rep);
+			}
+			catch (System.OverflowException ex)
+			{
+				throw new Exception("Value was either too large or too small for an " + vType.Name);
+			}
+		}
 	}
 }

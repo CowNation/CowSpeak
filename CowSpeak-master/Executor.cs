@@ -185,7 +185,10 @@ namespace CowSpeak
 					throw new Exception("Cannot set '" + Lines[i][0].identifier + "', type '" + CowSpeak.GetVariable(Lines[i][0].identifier).vType.Name + "' is incompatible with '" + retVal.vType.Name + "'"); // check if types are compatible
 
 				if (shouldBeSet)
+				{
 					CowSpeak.Vars[CowSpeak.Vars.Count - 1].byteArr = retVal.byteArr;
+					CowSpeak.Vars[CowSpeak.Vars.Count - 1].Get(); // Do this in case there was an overflow error
+				}
 				else if (Lines[i].Count >= 2 && Lines[i][0].type == TokenType.VariableIdentifier && Lines[i][1].type == TokenType.EqualOperator)
 				{
 					if (CowSpeak.GetVariable(Lines[i][0].identifier, false) == null){
@@ -193,8 +196,13 @@ namespace CowSpeak
 					} // var not found
 
 					for (int v = 0; v < CowSpeak.Vars.Count; v++)
+					{
 						if (Lines[i][0].identifier == CowSpeak.Vars[v].Name)
+						{
 							CowSpeak.Vars[v].byteArr = retVal.byteArr;
+							CowSpeak.Vars[v].Get(); // Do this in case there was an overflow error
+						}
+					}
 				} // type is not specified, var must already be defined
 			}
 		}
