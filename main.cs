@@ -42,6 +42,14 @@ class Shell
 			{
 				System.Console.WriteLine("(" + (ex.ErrorFile != "" ? ex.ErrorFile + ", " : "") + ex.ErrorLine + ") " + ex.Message);
 			}
+			catch (System.Reflection.TargetInvocationException ex)
+			{
+				System.Console.WriteLine(ex.GetBaseException().Message);
+			}
+			catch (System.Exception ex)
+			{
+				System.Console.WriteLine(ex.Message);
+			}
 		}
 	}
 }
