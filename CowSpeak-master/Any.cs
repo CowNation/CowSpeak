@@ -2,33 +2,44 @@ namespace CowSpeak
 {
 	public class Any
 	{
-		public ByteArray byteArr = new ByteArray();
-		public Type vType;
+		public ByteArray bytes = new ByteArray();
+		public Type Type;
 
 		public Any()
 		{
 
 		}
 		
-		public Any(Type vType) => this.vType = vType;
-
-		public Any(Type vType, object initialValue)
+		public Any(object obj)
 		{
-			this.vType = vType;
-			Set(initialValue);
+			this.Type = Type.GetTypeFromRep(obj.GetType());
+			this.Value = obj;
 		}
 
-		public void Set(object to) => byteArr.Set(to);
+		public Any(Type Type) => this.Type = Type;
 
-		public object Get()
+		public Any(Type Type, object initialValue)
 		{
-			try
+			this.Type = Type;
+			this.Value = initialValue;
+		}
+
+		public object Value
+		{
+			get
 			{
-				return System.Convert.ChangeType(byteArr.Get(), vType.rep);
+				try
+				{
+					return System.Convert.ChangeType(bytes.Get(), Type.rep);
+				}
+				catch (System.OverflowException ex)
+				{
+					throw new Exception(ex.Message); // ex might be thrown for some other reason
+				}
 			}
-			catch (System.OverflowException)
+			set
 			{
-				throw new Exception("Value was either too large or too small for an " + vType.Name); // ex might be thrown for some other reason, but im too drunk to look into it rn
+				bytes.Set(value);
 			}
 		}
 	}

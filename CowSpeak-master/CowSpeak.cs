@@ -24,7 +24,7 @@ namespace CowSpeak
 				Variable obj = GetVariable(functionName.Substring(0, functionName.IndexOf(".")), false); // interpret variable name to the left of the period as a variable
 
 				if (obj != null)
-					functionName = obj.vType.Name + functionName.Substring(functionName.IndexOf("."));
+					functionName = obj.Type.Name + functionName.Substring(functionName.IndexOf("."));
 			} // if it has a period, it's probably a method
 
 			foreach (FunctionBase Function in Functions)

@@ -25,13 +25,28 @@ namespace CowSpeak
 			return new Type[]{Integer, Integer64, Decimal, String, Character, Boolean, Void, Any};
 		} // returns array of all static types
 
-		public static Type GetType(string typeName)
+		public static Type GetTypeFromRep(System.Type rep, bool _throw = true)
+		{
+			foreach (Type type in GetTypes())
+			{
+				if (type.rep == rep)
+					return type;
+			}
+			if (_throw)
+				throw new Exception("Cannot determine type from representation: " + rep.Name);
+			return null;
+		}
+
+		public static Type GetType(string typeName, bool _throw = false)
 		{
 			foreach (Type type in GetTypes())
 				if (type.Name == typeName)
 					return type;
 
-			throw new Exception("Type '" + typeName + "' does not exist");
+			if (_throw)
+				throw new Exception("Type '" + typeName + "' does not exist");
+
+			return null;
 		}
 	}
 }

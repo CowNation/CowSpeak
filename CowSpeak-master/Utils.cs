@@ -33,18 +33,12 @@ namespace CowSpeak
 				bytes[i] = System.Convert.ToByte(hexString.Substring(i * 2, 2), 16);
 			}
 
-			return Encoding.Unicode.GetString(bytes); // returns: "Hello world" for "48656C6C6F20776F726C64"
+			return Encoding.Unicode.GetString(bytes);
 		}
 
-		public static bool IsHexadecimal(string str)
-		{
-			return Utils.OccurrencesOf(str, "0x") == 1 && str.IndexOf("0x") == 0;
-		}
+		public static bool IsHexadecimal(string str) => Utils.OccurrencesOf(str, "0x") == 1 && str.IndexOf("0x") == 0;
 
-		public static int OccurrencesOf(this string str, string splitter)
-		{
-			return str.Split(splitter).Length - 1;
-		}
+		public static int OccurrencesOf(this string str, string splitter) => str.Split(splitter).Length - 1;
 
 		public static string[] Split(this string str, string splitter)
 		{
@@ -58,10 +52,7 @@ namespace CowSpeak
 			return ret.ToArray();
 		}
 
-		public static bool IsOperator(TokenType type)
-		{
-			return type.ToString().IndexOf("Operator") != -1;
-		}
+		public static bool IsOperator(TokenType type) => type.ToString().IndexOf("Operator") != -1;
 
 		public static T TryParse<T>(string inValue)
 		{
@@ -81,15 +72,9 @@ namespace CowSpeak
 			return null;
 		}
 
-		public static List< string > GetContainedLines(List< string > Lines, int endingBracket, int i)
-		{
-			return Lines.GetRange(i + 1, endingBracket - (i + 1));
-		}
+		public static List< string > GetContainedLines(List< string > Lines, int endingBracket, int i) => Lines.GetRange(i + 1, endingBracket - (i + 1));
 
-		public static List< Line > pGetContainedLines(List< Line > Lines, int endingBracket, int i)
-		{
-			return Lines.GetRange(i + 1, endingBracket - (i + 1));
-		}
+		public static List< Line > pGetContainedLines(List< Line > Lines, int endingBracket, int i) => Lines.GetRange(i + 1, endingBracket - (i + 1));
 
 		public static List< string > GetContainedLines(List< Line > Lines, int endingBracket, int i)
 		{
@@ -209,16 +194,54 @@ namespace CowSpeak
 			return true;
 		}
 
-		public static bool IsDigitsOnly(string str)
+		public static bool IsNumber(string str)
 		{
-			if (str == "-")
+			if (str == "-" || str.OccurrencesOf(".") > 1 || str.OccurrencesOf("-") > 1)
 				return false;
 
-			foreach (char c in str)
-				if ((c < '0' || c > '9') && c != '.' && c != '-')
+			for (int i = 0; i < str.Length; i++)
+			{
+				if (((str[i] < '0' || str[i] > '9') || (str[i] == '-' && i != 0)) && str[i] != '.')
 					return false;
+			}
 
 			return true;
+		}
+
+		public static bool IsCharable(Token token)
+		{
+			if (token.type == TokenType.FunctionCall)
+			{
+				FunctionBase func = CowSpeak.GetFunction(token.identifier, false);
+				return func != null && func.type == Type.Character;	
+			}
+			else if (token.type == TokenType.VariableIdentifier)
+			{
+				Variable _var = CowSpeak.GetVariable(token.identifier, false);
+				return _var != null && _var.Type == Type.Character;
+			}
+			else if (token.type == TokenType.FunctionChain)
+				return FunctionChain.GetType(token.identifier) == Type.Character;
+			else
+				return false;
+		}
+
+		public static bool IsStringable(Token token)
+		{
+			if (token.type == TokenType.FunctionCall)
+			{
+				FunctionBase func = CowSpeak.GetFunction(token.identifier, false);
+				return func != null && func.type == Type.String;	
+			}
+			else if (token.type == TokenType.VariableIdentifier)
+			{
+				Variable _var = CowSpeak.GetVariable(token.identifier, false);
+				return _var != null && _var.Type == Type.String;
+			}
+			else if (token.type == TokenType.FunctionChain)
+				return FunctionChain.GetType(token.identifier) == Type.String;
+			else
+				return false;
 		}
 	}
 }

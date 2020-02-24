@@ -52,8 +52,8 @@ namespace CowSpeak
 
 			Any returnedValue = new Line(ReturnedLine.GetRange(1, ReturnedLine.Count - 1)).Exec();
 
-			if (!Conversion.IsCompatible(returnedValue.vType, type))
-				throw new Exception("Incompatible return type ('" + returnedValue.vType.Name + "' is incompatible with '" + type.Name + "')");
+			if (!Conversion.IsCompatible(returnedValue.Type, type))
+				throw new Exception("Incompatible return type ('" + returnedValue.Type.Name + "' is incompatible with '" + type.Name + "')");
 
 			CowSpeak.CurrentFile = CurrentFile;
 
@@ -110,7 +110,7 @@ namespace CowSpeak
 			for (int i = 0; i < Parameters.Length; i++)
 			{
 				Parameter parameter = Parameters[i];
-				CowSpeak.Vars.Insert(0, new Variable(parameter.Type, parameter.Name, parameters[i].Get()));
+				CowSpeak.Vars.Insert(0, new Variable(parameter.Type, parameter.Name, parameters[i].Value));
 			}
 
 			Any returnedValue = ExecuteLines();

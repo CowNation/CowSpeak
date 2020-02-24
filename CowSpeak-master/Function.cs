@@ -78,7 +78,8 @@ namespace CowSpeak
 				cleanedUp = cleanedUp.Replace(((char)0x1f).ToString(), " ").Replace(((char)0x1E).ToString(), ","); // remove quotes/apostrophes & remove string space placeholders
 				Token token = null;
 
-				if (parameter.Split('\"').Length - 1 <= 2 && parameter.IndexOf(" ") == -1){
+				if (parameter.Split('\"').Length - 1 <= 2 && parameter.IndexOf(" ") == -1)
+				{
 					token = Lexer.ParseToken(parameter, false); // a flaw in the parsing function for strings would take a string chain if it starts and ends with a string as 1 string (this is a janky workaround)
 				}
 
@@ -93,17 +94,22 @@ namespace CowSpeak
 				else if (token.type == TokenType.VariableIdentifier)
 				{
 					Variable _var = CowSpeak.GetVariable(token.identifier);
-					parameters.Add(new Any(_var.vType, _var.Get()));
+					parameters.Add(new Any(_var.Type, _var.Value));
 					continue;
 				}
 				else if (token.type == TokenType.FunctionCall)
 				{
 					while ((int)token.identifier[0] < 'A' || (int)token.identifier[0] > 'z')
-						token.identifier = token.identifier.Remove(0, 1);
+						token.identifier = token.identifier.Remove(0, 1); // i don't remember why this is here tbh
 					FunctionBase func = CowSpeak.GetFunction(token.identifier);
 					if (func.type == Type.Void)
 						throw new Exception("Cannot pass void function as a parameter");
-					parameters.Add(new Any(func.type, func.Execute(token.identifier).Get()));
+					parameters.Add(new Any(func.type, func.Execute(token.identifier).Value));
+					continue;
+				}
+				else if (token.type == TokenType.FunctionChain)
+				{
+					parameters.Add(FunctionChain.Evaluate(token.identifier));
 					continue;
 				}
 				else if (token.type == TokenType.String)
@@ -136,8 +142,8 @@ namespace CowSpeak
 			{
 				int usedIndex = isMethod ? i + 1 : i; // first object of usedParams in a method call is the object the method is being called on
 
-				if (!Conversion.IsCompatible(usedParams[usedIndex].vType, Parameters[i].Type))
-					throw new Exception("Parameter '" + Parameters[i].Type.Name + " " + Parameters[i].Name + "' is incompatible with '" + usedParams[usedIndex].vType.Name + "'");
+				if (!Conversion.IsCompatible(usedParams[usedIndex].Type, Parameters[i].Type))
+					throw new Exception("Parameter '" + Parameters[i].Type.Name + " " + Parameters[i].Name + "' is incompatible with '" + usedParams[usedIndex].Type.Name + "'");
 			}
 		}
 

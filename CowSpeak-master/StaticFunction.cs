@@ -24,7 +24,7 @@ namespace CowSpeak
 					Params += ", ";
 			}
 
-   			this.ProperUsage = type.Name + " " + Name + "(" + Params +  ")";
+   			this.ProperUsage = type.Name + " " + Name + "(" + Params + ")";
 			this.Name = Name;
 			this.Parameters = Parameters;
 			this.isMethod = isMethod;
@@ -41,7 +41,7 @@ namespace CowSpeak
 			if (isMethod && Parameters.Length != parameters.Count - 1)
 			{
 				Variable methodVar = CowSpeak.GetVariable(usage_temp.Substring(0, usage_temp.IndexOf(".")));
-				parameters.Insert(0, new Any(methodVar.vType, methodVar.Get()));
+				parameters.Insert(0, new Any(methodVar.Type, methodVar.Value));
 			}
 
 			CheckParameters(parameters);

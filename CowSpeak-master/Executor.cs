@@ -133,18 +133,18 @@ namespace CowSpeak
 						StaticFunction Loop = new StaticFunction("Loop", null, Type.Void, new Parameter[]{ new Parameter(Type.String, "IndexVariableName"), new Parameter(Type.Integer, "StartAt"), new Parameter(Type.Integer, "EndAt") });
 						Loop.CheckParameters(loopParams.ToList()); // throws errors if given parameters are bad
 
-						string varName = loopParams[0].Get().ToString();
-						int start = (int)loopParams[1].Get();
-						int end = (int)loopParams[2].Get();
-
+						string varName = loopParams[0].Value.ToString();
+						//System.Console.WriteLine(loopParams[1].Type.Name + "," + loopParams[2].Type.Name);				
+						long start = loopParams[1].Type == Type.Integer64 ? (long)loopParams[1].Value : (int)loopParams[1].Value;
+						long end = loopParams[2].Type == Type.Integer64 ? (long)loopParams[2].Value : (int)loopParams[2].Value;
 
 						CowSpeak.CreateVariable(new Variable(Type.Integer, varName));
 
-						for (int p = start; p < end; p++)
+						for (long p = start; p < end; p++)
 						{
 							Scope scope = new Scope();
 
-							CowSpeak.GetVariable(varName).Set(p);
+							CowSpeak.GetVariable(varName).Value = p;
 
 							new Lexer(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
 
@@ -179,15 +179,15 @@ namespace CowSpeak
 
 				Any retVal = Lines[i].Exec(); // Execute line
 
-				if (Lines[i].Count >= 3 && Lines[i][1].type == TokenType.VariableIdentifier && Lines[i][2].type == TokenType.EqualOperator && !Conversion.IsCompatible(CowSpeak.GetVariable(Lines[i][1].identifier).vType, retVal.vType))
-					throw new Exception("Cannot set '" + Lines[i][1].identifier + "', type '" + CowSpeak.GetVariable(Lines[i][1].identifier).vType.Name + "' is incompatible with '" + retVal.vType.Name + "'"); // check if types are compatible
-				else if (Lines[i].Count >= 2 && Lines[i][0].type == TokenType.VariableIdentifier && Lines[i][1].type == TokenType.EqualOperator && !Conversion.IsCompatible(CowSpeak.GetVariable(Lines[i][0].identifier).vType, retVal.vType))
-					throw new Exception("Cannot set '" + Lines[i][0].identifier + "', type '" + CowSpeak.GetVariable(Lines[i][0].identifier).vType.Name + "' is incompatible with '" + retVal.vType.Name + "'"); // check if types are compatible
+				if (Lines[i].Count >= 3 && Lines[i][1].type == TokenType.VariableIdentifier && Lines[i][2].type == TokenType.EqualOperator && !Conversion.IsCompatible(CowSpeak.GetVariable(Lines[i][1].identifier).Type, retVal.Type))
+					throw new Exception("Cannot set '" + Lines[i][1].identifier + "', type '" + CowSpeak.GetVariable(Lines[i][1].identifier).Type.Name + "' is incompatible with '" + retVal.Type.Name + "'"); // check if types are compatible
+				else if (Lines[i].Count >= 2 && Lines[i][0].type == TokenType.VariableIdentifier && Lines[i][1].type == TokenType.EqualOperator && !Conversion.IsCompatible(CowSpeak.GetVariable(Lines[i][0].identifier).Type, retVal.Type))
+					throw new Exception("Cannot set '" + Lines[i][0].identifier + "', type '" + CowSpeak.GetVariable(Lines[i][0].identifier).Type.Name + "' is incompatible with '" + retVal.Type.Name + "'"); // check if types are compatible
 
 				if (shouldBeSet)
 				{
-					CowSpeak.Vars[CowSpeak.Vars.Count - 1].byteArr = retVal.byteArr;
-					CowSpeak.Vars[CowSpeak.Vars.Count - 1].Get(); // Do this in case there was an overflow error
+					CowSpeak.Vars.Last().bytes = retVal.bytes;
+					var val = CowSpeak.Vars.Last().Value; // Do this in case there was an overflow error
 				}
 				else if (Lines[i].Count >= 2 && Lines[i][0].type == TokenType.VariableIdentifier && Lines[i][1].type == TokenType.EqualOperator)
 				{
@@ -199,8 +199,8 @@ namespace CowSpeak
 					{
 						if (Lines[i][0].identifier == CowSpeak.Vars[v].Name)
 						{
-							CowSpeak.Vars[v].byteArr = retVal.byteArr;
-							CowSpeak.Vars[v].Get(); // Do this in case there was an overflow error
+							CowSpeak.Vars[v].bytes = retVal.bytes;
+							var val = CowSpeak.Vars[v].Value; // Do this in case there was an overflow error
 						}
 					}
 				} // type is not specified, var must already be defined

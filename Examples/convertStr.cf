@@ -4,9 +4,7 @@ string ToUpper(string str) {
 	string result = ""
 
 	loop("index", 0, str.Length()) {
-		character char = str.CharacterAt(index)
-
-		result = result + char.ToUpper()
+		result = result + str.CharacterAt(index).ToUpper()
 	}
 
 	return result
@@ -16,9 +14,7 @@ string ToLower(string str) {
 	string result = ""
 
 	loop("index", 0, str.Length()) {
-		character char = str.CharacterAt(index)
-
-		result = result + char.ToLower()
+		result = result + str.CharacterAt(index).ToLower()
 	}
 
 	return result

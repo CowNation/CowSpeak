@@ -8,7 +8,7 @@ namespace CowSpeak{
 
 		public Variable(Type varType, string Name, object Value) : base(varType) {
 			this.Name = Name;
-			Set(Value);
+			this.Value = Value;
 		}
 	};
 }

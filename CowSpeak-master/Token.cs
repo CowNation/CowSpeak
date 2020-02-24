@@ -17,6 +17,7 @@ namespace CowSpeak
 		AndOperator,
 
 		FunctionCall,
+		FunctionChain,
 
 		VariableIdentifier,
 		TypeIdentifier,

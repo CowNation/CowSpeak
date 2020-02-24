@@ -9,51 +9,21 @@ namespace CowSpeak
 
 		}
 
-		private static bool isStringableVar(Token token)
-		{
-			if (token.type != TokenType.VariableIdentifier)
-				return false;
-			Variable _var = CowSpeak.GetVariable(token.identifier, false);
-			return _var != null && _var.vType == Type.String;
-		}
-
-		private static bool isStringableFunc(Token token)
-		{
-			if (token.type != TokenType.FunctionCall)
-				return false;
-			FunctionBase func = CowSpeak.GetFunction(token.identifier, false);
-			return func != null && func.type == Type.String;	
-		}
-
-		private static bool isCharableVar(Token token)
-		{
-			if (token.type != TokenType.VariableIdentifier)
-				return false;
-			Variable _var = CowSpeak.GetVariable(token.identifier, false);
-			return _var != null && _var.vType == Type.Character;
-		}
-
-		private static bool isCharableFunc(Token token)
-		{
-			if (token.type != TokenType.FunctionCall)
-				return false;
-			FunctionBase func = CowSpeak.GetFunction(token.identifier, false);
-			return func != null && func.type == Type.Character;	
-		}
-
 		private static Any FixCharChain(List< Token > toEval, int i, string identifier)
 		{
-			if ((toEval[i].type == TokenType.Character || isCharableFunc(toEval[i]) || isCharableVar(toEval[i])) && i == toEval.Count - 1)
+			if ((toEval[i].type == TokenType.Character || Utils.IsCharable(toEval[i])) && i == toEval.Count - 1)
 			{
 				Any result = new Any();
-				result.vType = Type.Character;
+				result.Type = Type.Character;
 
 				if (toEval[i].type == TokenType.Character)
-					result.Set(toEval[i].identifier != "" ? toEval[i].identifier[0] : (char)0);
+					result.Value = toEval[i].identifier != "" ? toEval[i].identifier[0] : (char)0;
 				else if (toEval[i].type == TokenType.FunctionCall)
-					result.Set((char)CowSpeak.GetFunction(identifier).Execute(identifier).Get());
+					result.Value = (char)CowSpeak.GetFunction(identifier).Execute(identifier).Value;
+				else if (toEval[i].type == TokenType.FunctionChain)
+					result.Value = (char)FunctionChain.Evaluate(identifier).Value;
 				else
-					result.Set((char)CowSpeak.GetVariable(toEval[i].identifier).Get()); // stringable variable
+					result.Value = (char)CowSpeak.GetVariable(toEval[i].identifier).Value; // stringable variable
 
 				return result;
 			}
@@ -63,21 +33,23 @@ namespace CowSpeak
 
 		private static Any TryStrChain(List< Token > toEval, int i, string identifier)
 		{
-			if (toEval[i].type == TokenType.String || isStringableVar(toEval[i]) || isStringableFunc(toEval[i]) || toEval[i].type == TokenType.Character || isCharableVar(toEval[i]) || isCharableFunc(toEval[i]))
+			if (toEval[i].type == TokenType.String || Utils.IsStringable(toEval[i]) || toEval[i].type == TokenType.Character || Utils.IsCharable(toEval[i]))
 			{
 				// who wants some spaghetti?
 				Any result = new Any();
-				result.vType = Type.String;
+				result.Type = Type.String;
 				List< string > additors = new List< string >();
 
 				if (toEval[i].type == TokenType.String || toEval[i].type == TokenType.Character)
 					additors.Add(toEval[i].identifier);
 				else if (toEval[i].type == TokenType.VariableIdentifier)
-					additors.Add(CowSpeak.GetVariable(toEval[i].identifier).Get().ToString()); // stringable variable
+					additors.Add(CowSpeak.GetVariable(toEval[i].identifier).Value.ToString()); // stringable variable
 				else if (toEval[i].type == TokenType.FunctionCall)
-					additors.Add(CowSpeak.GetFunction(identifier).Execute(identifier).Get().ToString());
+					additors.Add(CowSpeak.GetFunction(identifier).Execute(identifier).Value.ToString());
+				else if (toEval[i].type == TokenType.FunctionChain)
+					additors.Add(FunctionChain.Evaluate(identifier).Value.ToString());
 				else
-					throw new Exception("An unknown error has occured in 'TryStrChain'");
+					throw new Exception("An unknown error has occured in 'TryStrChain' (Could not determine type in StringChain)");
 
 				int index = i;
 				while (true)
@@ -90,19 +62,21 @@ namespace CowSpeak
 						break;
 					
 					if (toEval[index + 1].type == TokenType.VariableIdentifier)
-						additors.Add(CowSpeak.GetVariable(toEval[index + 1].identifier).Get().ToString());
+						additors.Add(CowSpeak.GetVariable(toEval[index + 1].identifier).Value.ToString());
 					else if (toEval[index + 1].type == TokenType.String || toEval[index + 1].type == TokenType.Number || toEval[index + 1].type == TokenType.Character)
 						additors.Add(toEval[index + 1].identifier);
 					else if (toEval[index + 1].type == TokenType.FunctionCall)
-						additors.Add(CowSpeak.GetFunction(toEval[index + 1].identifier).Execute(toEval[index + 1].identifier).Get().ToString()); // stringable func
+						additors.Add(CowSpeak.GetFunction(toEval[index + 1].identifier).Execute(toEval[index + 1].identifier).Value.ToString()); // stringable func
+					else if (toEval[index + 1].type == TokenType.FunctionChain)
+						additors.Add(FunctionChain.Evaluate(toEval[index + 1].identifier).Value.ToString());
 					else 
 						break;
 				}
 
 				if (additors.Count == 1)
-					result.Set(additors[0]);
+					result.Value = additors[0];
 				else
-					result.Set(Utils.AddStrings(additors));
+					result.Value = Utils.AddStrings(additors);
 
 				return result;
 			}
@@ -154,7 +128,7 @@ namespace CowSpeak
 					return strChain;
 
 				if (toEval[i].type == TokenType.VariableIdentifier)
-					identifier = CowSpeak.GetVariable(identifier).Get().ToString(); // replace variable name with it's value
+					identifier = CowSpeak.GetVariable(identifier).Value.ToString(); // replace variable name with it's value
 				if (toEval[i].type == TokenType.WhileConditional || toEval[i].type == TokenType.IfConditional || toEval[i].type == TokenType.EndBracket)
 					continue;
 				else if (toEval[i].type == TokenType.FunctionCall)
@@ -165,12 +139,21 @@ namespace CowSpeak
 					{
 						if (returned == null)
 							return null; // tocleanup
-						return new Any(func.type, returned.Get());
+						return new Any(func.type, returned.Value);
 					}
 					if (returned != null)
-						identifier = returned.Get().ToString(); // replace function call with it's return value
+						identifier = returned.Value.ToString(); // replace function call with it's return value
 					else
 						identifier = "";
+				}
+				else if (toEval[i].type == TokenType.FunctionChain)
+				{
+					Any EvaluatedChain = FunctionChain.Evaluate(identifier);
+
+					if (toEval.Count == 1)
+						return EvaluatedChain;
+
+					identifier = EvaluatedChain.Value.ToString();
 				}
 				
 				Expression += identifier;
@@ -179,30 +162,26 @@ namespace CowSpeak
 			if (Expression.Length == 0)
 				return new Any(Type.Integer, 0);
 
-			if (Expression.OccurrencesOf(" ") == 0 && Utils.IsDigitsOnly(Expression))
+			if (Expression.OccurrencesOf(" ") == 0 && Utils.IsNumber(Expression))
 			{
 				Any val = new Any();
 				if (Expression.IndexOf(".") != -1)
 				{
-					val.vType = Type.Decimal;
-					val.Set(double.Parse(Expression));
+					val.Type = Type.Decimal;
+					val.Value = double.Parse(Expression);
 				}
 				else
 				{
-					val.vType = Type.Integer64;
-					val.Set(long.Parse(Expression));
+					val.Type = Type.Integer64;
+					val.Value = long.Parse(Expression);
+					if ((long)val.Value < int.MaxValue)
+						val.Type = Type.Integer;
 				}
 				
 				return val;
 			}
 
-			Any evaluatedValue = new Any();
-			evaluatedValue.vType = Type.Decimal;
-			evaluatedValue.Set(Evaluate.EvaluateExpression(Expression));
-			if (evaluatedValue.Get().ToString().IndexOf(".") == -1 || evaluatedValue.Get().ToString().IndexOf("E") != -1)
-				evaluatedValue.vType = Type.Integer64; // decimal not found, we can convert to int
-			System.Console.WriteLine(evaluatedValue.Get());
-			return evaluatedValue;
+			return new Any(Evaluate.EvaluateExpression(Expression));
 		}
 	}
 }

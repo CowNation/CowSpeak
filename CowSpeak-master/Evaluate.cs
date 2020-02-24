@@ -5,11 +5,11 @@ namespace CowSpeak
 {
 	public static class Evaluate
 	{
-		public static double EvaluateExpression(string expression)
+		public static object EvaluateExpression(string expression)
 		{
 			try
 			{
-				return System.Convert.ToDouble(new DataTable().Compute(expression, null));
+				return new DataTable().Compute(expression, null);
 			}
 			catch (System.Data.EvaluateException ex)
 			{
@@ -31,27 +31,27 @@ namespace CowSpeak
 
 					Any _left = new Line(new List< Token >{ Tokens[index - 1] }).Exec();
 					Any _right = new Line(new List< Token >{ Tokens[index + 1] }).Exec();
-					if (!Conversion.IsCompatible(_left.vType, _right.vType))
-						throw new Exception(_left.vType.Name + " is incompatible with " + _right.vType.Name);
+					if (!Conversion.IsCompatible(_left.Type, _right.Type))
+						throw new Exception(_left.Type.Name + " is incompatible with " + _right.Type.Name);
 
 					Token answer = new Token(TokenType.Number, "");
 					if (_operator.type == TokenType.IsEqualOperator)
-						answer.identifier = (_left.Get().ToString() == _right.Get().ToString()).ToString();
+						answer.identifier = (_left.Value.ToString() == _right.Value.ToString()).ToString();
 					else if (_operator.type == TokenType.IsNotEqualOperator)
-						answer.identifier = (_left.Get().ToString() != _right.Get().ToString()).ToString();
+						answer.identifier = (_left.Value.ToString() != _right.Value.ToString()).ToString();
 					else if (_operator.type == TokenType.IsGreaterThanOperator || _operator.type == TokenType.IsLessThanOperator || _operator.type == TokenType.IsGreaterThanOrEqualOperator || _operator.type == TokenType.IsLessThanOrEqualOperator)
 					{
-						if (!Utils.IsDigitsOnly(_left.Get().ToString()) || !Utils.IsDigitsOnly(_right.Get().ToString()))
+						if (!Utils.IsNumber(_left.Value.ToString()) || !Utils.IsNumber(_right.Value.ToString()))
 							throw new Exception("Cannot perform '" + _operator.type.ToString() + "' with non-number operands");
 
 						if (_operator.type == TokenType.IsGreaterThanOperator)
-							answer.identifier = (System.Convert.ToDouble(_left.Get()) > System.Convert.ToDouble(_right.Get())).ToString();
+							answer.identifier = (System.Convert.ToDouble(_left.Value) > System.Convert.ToDouble(_right.Value)).ToString();
 						else if (_operator.type == TokenType.IsLessThanOperator)
-							answer.identifier = (System.Convert.ToDouble(_left.Get()) < System.Convert.ToDouble(_right.Get())).ToString();
+							answer.identifier = (System.Convert.ToDouble(_left.Value) < System.Convert.ToDouble(_right.Value)).ToString();
 						else if (_operator.type == TokenType.IsGreaterThanOrEqualOperator)
-							answer.identifier = (System.Convert.ToDouble(_left.Get()) >= System.Convert.ToDouble(_right.Get())).ToString();
+							answer.identifier = (System.Convert.ToDouble(_left.Value) >= System.Convert.ToDouble(_right.Value)).ToString();
 						else if (_operator.type == TokenType.IsLessThanOrEqualOperator)
-							answer.identifier = (System.Convert.ToDouble(_left.Get()) <= System.Convert.ToDouble(_right.Get())).ToString();
+							answer.identifier = (System.Convert.ToDouble(_left.Value) <= System.Convert.ToDouble(_right.Value)).ToString();
 					}
 					else
 						throw new Exception("Cannot evaluate non-comparison token: " + answer.type.ToString());
