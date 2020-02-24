@@ -32,3 +32,5 @@ If you experience an issue where new printed lines are being written over previo
 [v5 (Added support for parameters and conditional statements on October 8, 2019)](https://github.com/CowNation/CowSpeak/tree/72e3cfb9407a0c6485eb1945b61467331320e43f)
 
 [v6 (Added support for user defined functions and recoded function system on November 20, 2019)](https://github.com/CowNation/CowSpeak/tree/b6c29a7e948dfcfc52dbf721a62bf82a8de469c1)
+
+[v6.5 (Added support for FunctionChains and major bug fixes and improvements February 24, 2020)](https://github.com/CowNation/CowSpeak/tree/6b94fee059b53e8fea5a3d3efa2a0c5ad34b1b86)
