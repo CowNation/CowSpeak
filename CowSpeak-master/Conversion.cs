@@ -1,6 +1,6 @@
 namespace CowSpeak
 {
-	public class Conversion
+	internal class Conversion
 	{
 		public static bool IsCompatible(Type from, Type to)
 		{

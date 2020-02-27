@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CowSpeak
 {
-	public static class Utils
+	internal static class Utils
 	{
 		public static System.Random rand = new System.Random();
 

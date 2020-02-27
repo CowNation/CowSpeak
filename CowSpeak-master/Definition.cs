@@ -1,11 +1,11 @@
 namespace CowSpeak{
-	public enum DefinitionType
+	internal enum DefinitionType
 	{
 		Language,
 		User
 	}
 
-	public struct Definition
+	internal struct Definition
 	{
 		public string from;
 		public string to;

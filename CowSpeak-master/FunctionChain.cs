@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace CowSpeak
 {
-	public static class FunctionChain
+	internal static class FunctionChain
 	{
 		public static bool IsChain(string token)
 		{

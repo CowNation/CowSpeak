@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace CowSpeak
 {
-	public class Scope
+	internal class Scope
 	{
 		public Scope()
 		{

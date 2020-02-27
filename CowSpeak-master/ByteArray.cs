@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace CowSpeak
 {
-	public class ByteArray
+	internal class ByteArray
 	{
 		public ByteArray()
 		{

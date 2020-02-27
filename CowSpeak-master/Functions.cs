@@ -6,7 +6,7 @@ using System.Net;
 
 namespace CowSpeak
 {
-	static class Functions
+	internal static class Functions
 	{
 		#region ALL_METHODS
 		[FunctionAttr("Any.ToString", Syntax.Types.String, "", true)]

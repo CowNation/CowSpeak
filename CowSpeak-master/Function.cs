@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace CowSpeak
 {
-	public class Parameter
+	internal class Parameter
 	{
 		public string Name;
 		public Type Type;
@@ -19,7 +19,7 @@ namespace CowSpeak
 		}
 	}
 
-	public abstract class FunctionBase
+	internal abstract class FunctionBase
 	{
 		public string Name;
 		public Type type;

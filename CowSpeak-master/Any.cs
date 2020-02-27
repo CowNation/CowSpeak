@@ -1,6 +1,6 @@
 namespace CowSpeak
 {
-	public class Any
+	internal class Any
 	{
 		public ByteArray bytes = new ByteArray();
 		public Type Type;

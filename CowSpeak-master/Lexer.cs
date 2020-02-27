@@ -7,7 +7,7 @@ using System.Globalization;
 
 namespace CowSpeak
 {
-	public class Lexer
+	internal class Lexer
 	{
 		public List< Line > Lines = new List< Line >();
 

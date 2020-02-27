@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace CowSpeak
 {
-	public static class Executor
+	internal static class Executor
 	{
 		public static int GetClosingBracket(List< Line > Lines, int start)
 		{

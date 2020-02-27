@@ -13,11 +13,11 @@ namespace CowSpeak
 
 	public class CowSpeak
 	{
-		public static List< FunctionBase > Functions = FunctionAttr.GetFunctions();
+		internal static List< FunctionBase > Functions = FunctionAttr.GetFunctions();
 
-		public static List< Definition > Definitions = new List< Definition >();
+		internal static List< Definition > Definitions = new List< Definition >();
 
-		public static FunctionBase GetFunction(string functionName, bool _throw = true)
+		internal static FunctionBase GetFunction(string functionName, bool _throw = true)
 		{
 			if (functionName.IndexOf(".") != -1)
 			{
@@ -46,14 +46,14 @@ namespace CowSpeak
 			return null;
 		}
 
-		public static void ClearUserFunctions()
+		internal static void ClearUserFunctions()
 		{
 			for (int i = 0; i < Functions.Count; i++)
 				if (Functions[i].DefinitionType == DefinitionType.User)
 					Functions.RemoveAt(i);
 		}
 
-		public static void ClearUserDefinitions()
+		internal static void ClearUserDefinitions()
 		{
 			for (int i = 0; i < Definitions.Count; i++)
 				if (Definitions[i].DefinitionType == DefinitionType.User)
@@ -65,9 +65,9 @@ namespace CowSpeak
 		public static int CurrentLine = -1;
 		public static string CurrentFile = "";
 
-		public static List< Variable > Vars = new List< Variable >();
+		internal static List< Variable > Vars = new List< Variable >();
 
-		public static void CreateVariable(Variable variable)
+		internal static void CreateVariable(Variable variable)
 		{
 			if (GetVariable(variable.Name, false) != null) // already exists
 				throw new Exception("Cannot create variable '" + variable.Name + "', a variable by that name already exists");
@@ -75,7 +75,7 @@ namespace CowSpeak
 			Vars.Add(variable);
 		}
 
-		public static void CreateFunction(FunctionBase func)
+		internal static void CreateFunction(FunctionBase func)
 		{
 			if (GetFunction(func.Name, false) != null) // already exists
 				throw new Exception("Cannot create function '" + func.Name + "', a function by that name already exists");
@@ -83,7 +83,7 @@ namespace CowSpeak
 			Functions.Add(func);
 		}
 
-		public static Variable GetVariable(string varName, bool _throw = true)
+		internal static Variable GetVariable(string varName, bool _throw = true)
 		{
 			foreach (Variable Var in Vars)
 				if (Var.Name == varName)
@@ -93,11 +93,6 @@ namespace CowSpeak
 				throw new Exception("Could not find variable: " + varName);
 
 			return null;
-		}
-
-		public static void ImportModule() // The file is ran normally except all definitions and functions
-		{
-
 		}
 
 		public static void Exec(string fileName, bool _Debug = false)

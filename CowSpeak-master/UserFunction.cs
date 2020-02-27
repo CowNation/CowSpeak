@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace CowSpeak
 {
-	public class UserFunction : FunctionBase
+	internal class UserFunction : FunctionBase
 	{
 		List< Line > Definition; // lines contained inside of the function
 		int DefinitionOffset; // offset of where the definition is so CowSpeak.CurrentLine is correct

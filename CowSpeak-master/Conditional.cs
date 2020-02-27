@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace CowSpeak
 {
-	public class Conditional
+	internal class Conditional
 	{
 		public string text = "";
 		

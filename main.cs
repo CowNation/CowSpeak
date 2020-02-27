@@ -3,6 +3,23 @@ using System.IO;
 using System.Collections.Generic;
 using CowSpeak;
 
+static class Extensions
+{
+	public static int OccurrencesOf(this string str, string splitter) => str.Split(splitter).Length - 1;
+
+	public static string[] Split(this string str, string splitter)
+	{
+		List<string> ret = new List<string>();
+		while (str.IndexOf(splitter) != -1)
+		{
+			ret.Add(str.Substring(0, str.IndexOf(splitter)));
+			str = str.Remove(0, str.IndexOf(splitter) + splitter.Length);
+		}
+		ret.Add(str);
+		return ret.ToArray();
+	}
+}
+
 class Shell
 {
 	public static void Main(string[] args)

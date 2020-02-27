@@ -3,7 +3,7 @@ using System.Data;
 
 namespace CowSpeak
 {
-	public static class Evaluate
+	internal static class Evaluate
 	{
 		public static object EvaluateExpression(string expression)
 		{

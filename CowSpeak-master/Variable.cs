@@ -1,5 +1,5 @@
 namespace CowSpeak{
-	public class Variable : Any {
+	internal class Variable : Any {
 		public string Name;
 
 		public Variable(Type vType, string Name) : base(vType) {

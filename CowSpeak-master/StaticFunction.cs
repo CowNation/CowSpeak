@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace CowSpeak
 {
-	public class StaticFunction : FunctionBase
+	internal class StaticFunction : FunctionBase
 	{
 		public MethodInfo Definition;
 
@@ -60,7 +60,7 @@ namespace CowSpeak
 		}
 	}
 
-	class FunctionAttr : System.Attribute
+	internal class FunctionAttr : System.Attribute
 	{
 		public string Name;
 		public Type vType = null;
