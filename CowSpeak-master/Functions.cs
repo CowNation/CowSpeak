@@ -23,14 +23,12 @@ namespace CowSpeak
 			return new Any(Type.Integer, Utils.OccurrencesOf(parameters[0].Value.ToString(), parameters[1].Value.ToString()));
 		}
 
-		[FunctionAttr(Syntax.Types.String + ".Sub" + Syntax.Types.c_String, Syntax.Types.String, Syntax.Types.Integer + " startIndex, " + Syntax.Types.Integer + " endIndex", true)]
+		[FunctionAttr(Syntax.Types.String + ".Sub" + Syntax.Types.c_String, Syntax.Types.String, Syntax.Types.Integer + " index, " + Syntax.Types.Integer + " length", true)]
 		public static Any SubString(Any[] parameters)
 		{
 			string str = parameters[0].Value.ToString();
-			int startIndex = (int)parameters[1].Value;
-			int endIndex = (int)parameters[2].Value;
 
-			return new Any(Type.String, str.Substring(startIndex, endIndex - startIndex));
+			return new Any(Type.String, str.Substring((int)parameters[1].Value, (int)parameters[2].Value));
 		}
 
 		[FunctionAttr(Syntax.Types.String + "." + Syntax.Types.c_Character + "At", Syntax.Types.Character, Syntax.Types.Integer + " index", true)]
@@ -45,20 +43,16 @@ namespace CowSpeak
 			return new Any(Type.Integer, parameters[0].Value.ToString().Length);
 		}
 
-		[FunctionAttr(Syntax.Types.String + ".Remove", Syntax.Types.String, Syntax.Types.Integer + " startIndex, " + Syntax.Types.Integer + " endIndex", true)]
+		[FunctionAttr(Syntax.Types.String + ".Remove", Syntax.Types.String, Syntax.Types.Integer + " index, " + Syntax.Types.Integer + " length", true)]
 		public static Any Remove(Any[] parameters)
 		{
-			int startIndex = (int)parameters[1].Value;
-			int endIndex = (int)parameters[2].Value;
-			return new Any(Type.String, parameters[0].Value.ToString().Remove(startIndex, endIndex - startIndex));
+			return new Any(Type.String, parameters[0].Value.ToString().Remove((int)parameters[1].Value, (int)parameters[2].Value));
 		}
 
-		[FunctionAttr(Syntax.Types.String + ".Insert", Syntax.Types.String, Syntax.Types.Integer + " startIndex, " + Syntax.Types.String + " value", true)]
+		[FunctionAttr(Syntax.Types.String + ".Insert", Syntax.Types.String, Syntax.Types.Integer + " index, " + Syntax.Types.String + " value", true)]
 		public static Any Insert(Any[] parameters)
 		{
-			int index = (int)parameters[1].Value;
-			string toPut = parameters[2].Value.ToString();
-			return new Any(Type.String, parameters[0].Value.ToString().Insert(index, toPut));
+			return new Any(Type.String, parameters[0].Value.ToString().Insert((int)parameters[1].Value, parameters[2].Value.ToString()));
 		}
 
 		[FunctionAttr(Syntax.Types.String + ".IndexOf", Syntax.Types.Integer, Syntax.Types.String + " value", true)]

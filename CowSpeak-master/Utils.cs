@@ -101,6 +101,21 @@ namespace CowSpeak
 			return containedLines;
 		}
 
+		public static bool IsIndexBetween(this string str, int index, string start, string end){
+			string leftOf = str.Substring(0, index);
+			int starts = leftOf.Split(start).Length - 1;
+
+			if (start != end)
+			{
+				int lastStart = leftOf.LastIndexOf(start);
+				int lastEnd = leftOf.LastIndexOf(end);
+				int ends = leftOf.Split(end).Length - 1;
+				return lastStart != -1 && (lastStart > lastEnd || starts > ends);
+			}
+			else
+				return starts % 2 != 0;
+		}
+
 		public static bool IsIndexBetween(this string str, int index, char start, char end){
 			string leftOf = str.Substring(0, index);
 			int starts = leftOf.Split(start).Length - 1;
@@ -188,6 +203,8 @@ namespace CowSpeak
 
 		public static bool IsLettersOnly(string s)
 		{
+			if (s == "")
+				return false;
 			foreach (char c in s)
 				if (!System.Char.IsLetter(c) && c != '_')
 					return false;

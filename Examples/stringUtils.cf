@@ -1,12 +1,11 @@
 string GetTextBetween(string str, string leftOf, string rightOf) {
-	integer leftOccurence = str.IndexOf(leftOf)
-	integer rightOccurence = str.IndexOf(rightOf)
-	return str.SubString(leftOccurence + leftOf.Length(), rightOccurence)
+	integer TextStart = str.IndexOf(leftOf) + leftOf.Length()
+	return str.SubString(TextStart, str.IndexOf(rightOf) - TextStart)
 }
 
 string ReplaceFirstOf(string str, string lookFor, string replaceWith) {
 	integer index = str.IndexOf(lookFor)
-	str = str.Remove(index, index + lookFor.Length())
+	str = str.Remove(index, lookFor.Length())
 	str = str.Insert(index, replaceWith)
 	return str
 }

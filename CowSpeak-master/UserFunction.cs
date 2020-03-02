@@ -113,7 +113,9 @@ namespace CowSpeak
 				CowSpeak.Vars.Insert(0, new Variable(parameter.Type, parameter.Name, parameters[i].Value));
 			}
 
+			CowSpeak.StackTrace.Add(Usage);
 			Any returnedValue = ExecuteLines();
+			CowSpeak.StackTrace.RemoveAt(CowSpeak.StackTrace.Count - 1);
 
 			scope.End();
 

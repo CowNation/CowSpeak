@@ -92,7 +92,7 @@ namespace CowSpeak
 				return new Token(TokenType.Number, token);
 			else if (FunctionChain.IsChain(token))
 				return new Token(TokenType.FunctionChain, token);
-			else if (token.IndexOf("(") != -1 && token[token.Length - 1] == ')')
+			else if (token.IndexOf("(") > 0 && token[token.Length - 1] == ')')
 				return new Token(TokenType.FunctionCall, token);
 			else if (Utils.IsLettersOnly(token))
 				return new Token(TokenType.VariableIdentifier, token);
@@ -109,7 +109,7 @@ namespace CowSpeak
 				return new List< Token >(); // don't parse empty line
 
 			line = Utils.ReplaceBetween(line, ' ', '\"', '\"', (char)0x1f);
-			//line = Utils.ReplaceBetween(line, ' ', '(', ')', (char)0x1D);
+
 			string _line = line;
 			for (int Occurrence = 0; Occurrence < Utils.OccurrencesOf(line, " "); Occurrence++)
 			{
@@ -118,7 +118,7 @@ namespace CowSpeak
 
 				if (letter == ' ' && line.IsIndexBetween(i, '(', ')'))
 				{
-					char before = line[line.Substring(0, i).LastIndexOf("(") - 1]; // char before the (
+					char before = line[line.Substring(0, i).IndexOf("(") - 1]; // char before the (
 					if ((before >= 'A' && before <= 'Z') || (before >= 'a' && before <= 'z'))
 					{
 						StringBuilder fileLine = new StringBuilder(_line);

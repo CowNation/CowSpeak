@@ -18,10 +18,10 @@ namespace CowSpeak
 
 		public Any(Type Type) => this.Type = Type;
 
-		public Any(Type Type, object initialValue)
+		public Any(Type Type, object Value)
 		{
 			this.Type = Type;
-			this.Value = initialValue;
+			this.Value = Value;
 		}
 
 		public object Value
@@ -34,7 +34,7 @@ namespace CowSpeak
 				}
 				catch (System.OverflowException ex)
 				{
-					throw new Exception(ex.Message); // ex might be thrown for some other reason
+					throw new Exception(ex.Message); // usually caused by an integer being assigned an out of range value
 				}
 			}
 			set

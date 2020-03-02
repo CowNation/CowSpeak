@@ -48,7 +48,10 @@ namespace CowSpeak
 
 			try
 			{
-				return Definition.Invoke(null, new object[]{ parameters.ToArray() }) as Any; // obj is null because the function should be static
+				CowSpeak.StackTrace.Add(Usage);
+				Any ReturnValue =  Definition.Invoke(null, new object[]{ parameters.ToArray() }) as Any; // obj is null because the function should be static
+				CowSpeak.StackTrace.RemoveAt(CowSpeak.StackTrace.Count - 1);
+				return ReturnValue;
 			}
 			catch (System.Reflection.TargetInvocationException ex)
 			{

@@ -64,6 +64,7 @@ namespace CowSpeak
 
 		public static int CurrentLine = -1;
 		public static string CurrentFile = "";
+		public static List< string > StackTrace = new List< string >();
 
 		internal static List< Variable > Vars = new List< Variable >();
 
