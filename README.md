@@ -6,7 +6,7 @@ CowSpeak is an open source interpreted programming language made in C# with a C 
 ## Info
 This language uses CowConfig. To see CowConfig go to https://github.com/CowNation/CowConfig
 
-If you experience an issue where new printed lines are being written over previous lines after inputting, add a newline after getting a user input. Some compilers don't go to the next line after the user inputs enter.
+If you experience an issue where new printed lines are being written over previous lines after inputting, add a newline after getting a user input. Some operating system's consoles don't go to the next line after the user inputs enter.
 ## Features
 * Data types: boolean, integer, string, and decimal
 * Most standard operators you would expect (+, -, *, /, =, ^, %)
