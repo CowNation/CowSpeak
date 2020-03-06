@@ -34,8 +34,8 @@ namespace CowSpeak
 					if (!Conversion.IsCompatible(_left.Type, _right.Type))
 						throw new Exception(_left.Type.Name + " is incompatible with " + _right.Type.Name);
 
-					string leftValue = (_left.Type == Type.Boolean ? Utils.FixBoolean(_left.Value.ToString()) : _left.Value.ToString());
-					string rightValue = (_right.Type == Type.Boolean ? Utils.FixBoolean(_right.Value.ToString()) : _right.Value.ToString());
+					string leftValue = _left.Value.ToString();
+					string rightValue = _right.Value.ToString();
 
 					Token answer = new Token(TokenType.Number, "");
 					if (_operator.type == TokenType.IsEqualOperator)
@@ -58,8 +58,6 @@ namespace CowSpeak
 					}
 					else
 						throw new Exception("Cannot evaluate non-comparison token: " + answer.type.ToString());
-
-					answer.identifier = Utils.FixBoolean(answer.identifier);
 
 					Tokens.RemoveAt(index + 1);
 					Tokens.RemoveAt(index);
@@ -84,7 +82,7 @@ namespace CowSpeak
 				throw new Exception(errMsg);
 			}
 
-			return Tokens[0].identifier == "1" || Tokens[0].identifier == "True";
+			return Tokens[0].identifier == "True";
 		} 
 	}
 }

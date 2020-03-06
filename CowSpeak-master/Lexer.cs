@@ -17,7 +17,7 @@ namespace CowSpeak
 				if (token == Definition.from)
 					token = Definition.to;
 
-			token = Utils.FixBoolean(token);
+			//token = Utils.FixBoolean(token);
 
 			if (Utils.IsHexadecimal(token))
 				token = int.Parse(token.Substring(2), System.Globalization.NumberStyles.HexNumber).ToString(); // determine if it's a hexadecimal number
@@ -28,8 +28,11 @@ namespace CowSpeak
 
 			switch (token)
 			{
+				case "True":
+				case "False":
+					return new Token(TokenType.Boolean, token);
 				case Syntax.Statements.Delete:
-					return new Token(TokenType.DeleteIdentifier, token);
+					return new Token(TokenType.DeleteStatement, token);
 				case Syntax.Statements.Return:
 					return new Token(TokenType.ReturnStatement, token);
 				case Syntax.Comparators.IsEqual:
@@ -184,7 +187,7 @@ namespace CowSpeak
 			{
 				CowSpeak.CurrentLine = i + 1 + CurrentLineOffset;
 
-				fileLines[i] = Utils.FixBoolean(fileLines[i].Replace(@"\n", System.Environment.NewLine)); // interpret \n as a newline in strings & support for setting booleans using true and false
+				fileLines[i] = fileLines[i].Replace(@"\n", System.Environment.NewLine);//Utils.FixBoolean(fileLines[i].Replace(@"\n", System.Environment.NewLine)); // interpret \n as a newline in strings & support for setting booleans using true and false
 
 				while (fileLines[i].IndexOf("	") == 0 || fileLines[i].IndexOf(" ") == 0)
 					fileLines[i] = fileLines[i].Remove(0, 1);

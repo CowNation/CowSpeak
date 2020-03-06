@@ -160,10 +160,10 @@ namespace CowSpeak
 				if (i >= Lines.Count)
 					break;
 
-				if (Lines[i].Count == 2 && Lines[i][0].type == TokenType.DeleteIdentifier && Lines[i][1].type == TokenType.VariableIdentifier)
+				if (Lines[i].Count == 2 && Lines[i][0].type == TokenType.DeleteStatement && Lines[i][1].type == TokenType.VariableIdentifier)
 				{
 					Variable target = CowSpeak.GetVariable(Lines[i][1].identifier);
-					CowSpeak.Vars.Remove(CowSpeak.GetVariable(target.Name));
+					CowSpeak.Vars.Remove(target);
 
 					continue; // prevent execution
 				} // must handle this before the other lines are evaluated to avoid wrong exceptions

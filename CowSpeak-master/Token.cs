@@ -21,12 +21,12 @@ namespace CowSpeak
 
 		VariableIdentifier,
 		TypeIdentifier,
-		DeleteIdentifier,
 
 		Number,
 		String,
 		Character,
 		Parenthesis,
+		Boolean,
 
 		IfConditional,
 		ElseConditional,
@@ -36,6 +36,7 @@ namespace CowSpeak
 		StartBracket,
 		EndBracket,
 
+		DeleteStatement,
 		ReturnStatement
 	}
 

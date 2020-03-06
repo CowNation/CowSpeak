@@ -10,7 +10,7 @@ namespace CowSpeak
 	internal static class Functions
 	{
 		#region ALL_METHODS
-		[FunctionAttr("Any.ToString", true)]
+		[MethodAttr("Any.ToString")]
 		public static string ToString(Variable obj)
 		{
 			if (obj.Type.rep.IsArray)
@@ -30,42 +30,60 @@ namespace CowSpeak
 		}
 		#endregion
 
-		#region ARRAY_FUNCTIONS
-		[FunctionAttr("Array.Length", true)]
+		#region ARRAY_METHODS
+		[MethodAttr("Array.Length")]
 		public static int ArrayLength(Variable obj) => ((System.Array)obj.Value).Length;
+		
+		[MethodAttr("Array.SetValue")]
+		public static void SetValue(Variable obj, int index, object value)
+		{
+			var Value = (System.Array)obj.Value;
+			Value.SetValue(value, index);
+			obj.Value = Value;
+		}
+
+		[MethodAttr("Array.GetValue")]
+		public static object GetValue(Variable obj, int index) => ((System.Array)obj.Value).GetValue(index);
 		#endregion
 
-		#region ARRAY_CONSTRUCTORS
-		[FunctionAttr("Byte_Array")]
-		public static byte[] ByteArray(int length) => new byte[length];
-		#endregion
+		[FunctionAttr("Array")]
+		public static System.Array Array(int length, object initialValue) // creates an array based on initialValue's type
+		{
+			System.Console.WriteLine(initialValue.GetType() + " - " + initialValue);
+			var arr = System.Array.CreateInstance(initialValue.GetType(), length);
+			if (Type.GetType(arr.GetType(), false) == null)
+				throw new Exception("Invalid type of object passed as initialValue"); // This may not be possible but better safe then sorry
+			for (int i = 0; i < arr.Length; i++)
+				arr.SetValue(initialValue, i);
+			return arr;
+		}
 
 		#region STRING_METHODS
-		[FunctionAttr(Syntax.Types.String + ".OccurrencesOf", true)]
+		[MethodAttr(Syntax.Types.String + ".OccurrencesOf")]
 		public static int OccurrencesOf(Variable obj, string counter) => Utils.OccurrencesOf(obj.Value.ToString(), counter);
 
-		[FunctionAttr(Syntax.Types.String + ".Sub" + Syntax.Types.c_String, true)]
+		[MethodAttr(Syntax.Types.String + ".Sub" + Syntax.Types.c_String)]
 		public static string SubString(Variable obj, int index, int length) => obj.Value.ToString().Substring(index, length);
 
-		[FunctionAttr(Syntax.Types.String + "." + Syntax.Types.c_Character + "At", true)]
+		[MethodAttr(Syntax.Types.String + "." + Syntax.Types.c_Character + "At")]
 		public static char CharacterAt(Variable obj, int index) => obj.Value.ToString()[index];
 
-		[FunctionAttr(Syntax.Types.String + ".Length", true)]
+		[MethodAttr(Syntax.Types.String + ".Length")]
 		public static int StringLength(Variable obj) => obj.Value.ToString().Length;
 
-		[FunctionAttr(Syntax.Types.String + ".Remove", true)]
+		[MethodAttr(Syntax.Types.String + ".Remove")]
 		public static string Remove(Variable obj, int index, int length) => obj.Value.ToString().Remove(index, length);
 
-		[FunctionAttr(Syntax.Types.String + ".Insert", true)]
+		[MethodAttr(Syntax.Types.String + ".Insert")]
 		public static string Insert(Variable obj, int index, string value) => obj.Value.ToString().Insert(index, value);
 
-		[FunctionAttr(Syntax.Types.String + ".IndexOf", true)]
+		[MethodAttr(Syntax.Types.String + ".IndexOf")]
 		public static int IndexOf(Variable obj, string value) => obj.Value.ToString().IndexOf(value);
 
-		[FunctionAttr(Syntax.Types.String + ".LastIndexOf", true)]
+		[MethodAttr(Syntax.Types.String + ".LastIndexOf")]
 		public static int LastIndexOf(Variable obj, string value) => obj.Value.ToString().LastIndexOf(value);
 
-		[FunctionAttr(Syntax.Types.String + ".To" + Syntax.Types.c_Integer, true)]
+		[MethodAttr(Syntax.Types.String + ".To" + Syntax.Types.c_Integer)]
 		public static int ToInteger(Variable obj)
 		{
 			int o;
@@ -80,7 +98,7 @@ namespace CowSpeak
 				throw new Exception("Could not convert " + Syntax.Types.String + " to an " + Syntax.Types.Integer);
 		}
 
-		[FunctionAttr(Syntax.Types.String + ".To" + Syntax.Types.c_Decimal, true)]
+		[MethodAttr(Syntax.Types.String + ".To" + Syntax.Types.c_Decimal)]
 		public static double ToDecimal(Variable obj)
 		{
 			double o;
@@ -93,29 +111,29 @@ namespace CowSpeak
 		#endregion
 
 		#region CHARACTER_METHODS
-		[FunctionAttr(Syntax.Types.Character + ".ToUpper", true)]
+		[MethodAttr(Syntax.Types.Character + ".ToUpper")]
 		public static char ToUpper(Variable obj) => System.Char.ToUpper((char)obj.Value);
 
-		[FunctionAttr(Syntax.Types.Character + ".ToLower", true)]
+		[MethodAttr(Syntax.Types.Character + ".ToLower")]
 		public static char ToLower(Variable obj) => System.Char.ToLower((char)obj.Value);
 
-		[FunctionAttr(Syntax.Types.Character + ".ToInteger", true)]
+		[MethodAttr(Syntax.Types.Character + ".ToInteger")]
 		public static int CharacterToInteger(Variable obj) => (int)((char)obj.Value);
 		#endregion
 
 		#region INTEGER_METHODS
-		[FunctionAttr(Syntax.Types.Integer + ".ToHexadecimal", true)]
+		[MethodAttr(Syntax.Types.Integer + ".ToHexadecimal")]
 		public static string ToHexadecimal(Variable obj) => ((int)obj.Value).ToString("X");
 
-		[FunctionAttr(Syntax.Types.Integer + ".ToCharacter", true)]
+		[MethodAttr(Syntax.Types.Integer + ".ToCharacter")]
 		public static char ToCharacter(Variable obj) => (char)(int)obj.Value;
 		#endregion
 
 		#region INTEGER64_METHODS
-		[FunctionAttr(Syntax.Types.Integer64 + ".ToHexadecimal", true)]
+		[MethodAttr(Syntax.Types.Integer64 + ".ToHexadecimal")]
 		public static string ToHexadecimal64(Variable obj) => ((long)obj.Value).ToString("X");
 
-		[FunctionAttr(Syntax.Types.Integer64 + ".ToCharacter", true)]
+		[MethodAttr(Syntax.Types.Integer64 + ".ToCharacter")]
 		public static char ToCharacter64(Variable obj) => (char)(long)obj.Value;
 		#endregion
 
@@ -187,7 +205,7 @@ namespace CowSpeak
 		[FunctionAttr("Sleep")]
 		public static void Sleep(int ms) => Thread.Sleep(ms);
 
-		[FunctionAttr("Read")]
+		[FunctionAttr("InputKey")]
 		public static char ReadCharacter() => (char)System.Console.ReadKey().KeyChar;
 
 		[FunctionAttr("ClearConsole")]

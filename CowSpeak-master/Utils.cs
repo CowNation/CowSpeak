@@ -141,30 +141,6 @@ namespace CowSpeak
 			return pos;
 		}
 
-		public static string FixBoolean(string str)
-		{
-			if (str.IndexOf("True") == -1 && str.IndexOf("False") == -1)
-				return str; 
-
-			for (int i = 0; i < OccurrencesOf(str, "True"); i++)
-			{
-				int at = OrdinalIndexOf(str, "True", i);
-				string sub = str.Substring(at, 4);
-				if (sub == "True" && !str.IsIndexBetween(at, '\"', '\"'))
-					str = str.Remove(at, 4).Insert(at, "1");
-			}
-
-			for (int i = 0; i < OccurrencesOf(str, "False"); i++)
-			{
-				int at = OrdinalIndexOf(str, "False", i);
-				string sub = str.Substring(at, 5);
-				if (sub == "False" && !str.IsIndexBetween(at, '\"', '\"'))
-					str = str.Remove(at, 5).Insert(at, "0");
-			}
-
-			return str;
-		}
-
 		public static string ReplaceBetween(string str, char toReplace, char start, char end, char substitution = (char)0x1a){
 			string _str = str;
 			for (int Occurrence = 0; Occurrence < OccurrencesOf(str, toReplace.ToString()); Occurrence++)
