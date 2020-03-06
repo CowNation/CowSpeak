@@ -114,11 +114,7 @@ namespace CowSpeak
 					Parameters.Add(new Parameter(paramType, _param.Name));
 				}
 
-				Type ReturnType = Type.GetType(method.ReturnType, false);
-				if (method.ReturnType == typeof(object))
-					ReturnType = Type.Any;
-
-                functions.Add(new StaticFunction(functionAttr.Name, method, ReturnType, Parameters.ToArray(), functionAttr.isMethod));
+                functions.Add(new StaticFunction(functionAttr.Name, method, Type.GetType(method.ReturnType), Parameters.ToArray(), functionAttr.isMethod));
             }
 
             return functions;

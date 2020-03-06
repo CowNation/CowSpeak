@@ -11,7 +11,7 @@ namespace CowSpeak
 			this.rep = rep;
 		}
 
-		public static Type Any = new Type(Syntax.Types.Any, typeof(void));
+		public static Type Any = new Type(Syntax.Types.Any, typeof(object));
 		public static Type Void = new Type(Syntax.Types.Void, typeof(void));
 		public static Type Integer = new Type(Syntax.Types.Integer, typeof(int));
 		public static Type Integer64 = new Type(Syntax.Types.Integer64, typeof(long));
