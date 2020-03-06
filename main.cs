@@ -63,10 +63,6 @@ class Shell
 			{
 				System.Console.WriteLine(ex.GetBaseException().Message);
 			}
-			catch (System.Exception ex)
-			{
-				System.Console.WriteLine(ex.Message);
-			}
 		}
 	}
 }

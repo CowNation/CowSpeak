@@ -13,23 +13,33 @@ namespace CowSpeak
 
 	public class CowSpeak
 	{
-		internal static List< FunctionBase > Functions = FunctionAttr.GetFunctions();
+		internal static List< FunctionBase > Functions = null;
 
 		internal static List< Definition > Definitions = new List< Definition >();
 
 		internal static FunctionBase GetFunction(string functionName, bool _throw = true)
 		{
+			bool isValidMethodCall = false;
 			if (functionName.IndexOf(".") != -1)
 			{
 				Variable obj = GetVariable(functionName.Substring(0, functionName.IndexOf(".")), false); // interpret variable name to the left of the period as a variable
 
 				if (obj != null)
-					functionName = obj.Type.Name + functionName.Substring(functionName.IndexOf("."));
+				{
+					isValidMethodCall = true;
+					if (obj.Type.rep.IsArray)
+						functionName = "Array" + functionName.Substring(functionName.IndexOf("."));
+					else
+						functionName = obj.Type.Name + functionName.Substring(functionName.IndexOf("."));
+				}
 			} // if it has a period, it's probably a method
 
-			foreach (FunctionBase Function in Functions)
-				if (functionName.IndexOf(Function.Name) == 0)
-					return Function;
+			if (isValidMethodCall || functionName.IndexOf(".") == -1 || Type.GetType(functionName.Substring(0, functionName.IndexOf(".")), false) == null)
+			{
+				foreach (FunctionBase Function in Functions)
+					if (functionName.IndexOf(Function.Name) == 0)
+						return Function;
+			}
 
 			if (functionName.IndexOf(".") != -1)
 			{
@@ -98,6 +108,9 @@ namespace CowSpeak
 
 		public static void Exec(string fileName, bool _Debug = false)
 		{
+			if (Functions == null)
+				Functions = FunctionAttr.GetFunctions();
+
 			CurrentFile = fileName;
 			Debug = _Debug;
 			FileType Type;
@@ -119,6 +132,9 @@ namespace CowSpeak
 
 		public static void Exec(string[] lines, bool _Debug = false)
 		{
+			if (Functions == null)
+				Functions = FunctionAttr.GetFunctions();
+
 			CurrentFile = "";
 			Debug = _Debug;
 

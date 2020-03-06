@@ -218,7 +218,10 @@ namespace CowSpeak
 
 			for (int i = 0; i < str.Length; i++)
 			{
-				if (((str[i] < '0' || str[i] > '9') || (str[i] == '-' && i != 0)) && str[i] != '.')
+				if (str[i] == '-' && i == 0)
+					continue;
+
+				if ((str[i] < '0' || str[i] > '9') && str[i] != '.')
 					return false;
 			}
 

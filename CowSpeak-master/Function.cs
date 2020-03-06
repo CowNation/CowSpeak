@@ -42,10 +42,7 @@ namespace CowSpeak
 			}
 		}
 
-		public bool isVoid()
-		{
-			return type == Type.Void;
-		}
+		public bool isVoid() => type == Type.Void;
 
 		public static Any[] ParseParameters(string s_parameters)
 		{
@@ -135,15 +132,13 @@ namespace CowSpeak
 
 		public void CheckParameters(List< Any > usedParams)
 		{
-			if ((isMethod && Parameters.Length != usedParams.Count - 1) || (!isMethod && Parameters.Length != usedParams.Count))
+			if (Parameters.Length != usedParams.Count)
 				throw new Exception("Invalid number of parameters passed in FunctionCall: '" + Name + "'");
 
 			for (int i = 0; i < Parameters.Length; i++)
 			{
-				int usedIndex = isMethod ? i + 1 : i; // first object of usedParams in a method call is the object the method is being called on
-
-				if (!Conversion.IsCompatible(usedParams[usedIndex].Type, Parameters[i].Type))
-					throw new Exception("Parameter '" + Parameters[i].Type.Name + " " + Parameters[i].Name + "' is incompatible with '" + usedParams[usedIndex].Type.Name + "'");
+				if (!Conversion.IsCompatible(usedParams[i].Type, Parameters[i].Type))
+					throw new Exception("Parameter '" + Parameters[i].Type.Name + " " + Parameters[i].Name + "' is incompatible with '" + usedParams[i].Type.Name + "'");
 			}
 		}
 

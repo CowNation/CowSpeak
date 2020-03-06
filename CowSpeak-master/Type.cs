@@ -20,12 +20,14 @@ namespace CowSpeak
 		public static Type Boolean = new Type(Syntax.Types.Boolean, typeof(bool));
 		public static Type Character = new Type(Syntax.Types.Character, typeof(char));
 
+		public static Type ByteArray = new Type("ByteArray", typeof(byte[]));
+
 		public static Type[] GetTypes()
 		{
-			return new Type[]{Integer, Integer64, Decimal, String, Character, Boolean, Void, Any};
+			return new Type[]{ByteArray, Integer, Integer64, Decimal, String, Character, Boolean, Void, Any};
 		} // returns array of all static types
 
-		public static Type GetTypeFromRep(System.Type rep, bool _throw = true)
+		public static Type GetType(System.Type rep, bool _throw = true)
 		{
 			foreach (Type type in GetTypes())
 			{

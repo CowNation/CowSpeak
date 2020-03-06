@@ -13,16 +13,9 @@ namespace CowSpeak
 
 		public static Token ParseToken(string token, bool _throw = true)
 		{
-			try
-			{
-				foreach (Definition Definition in CowSpeak.Definitions)
-					if (token == Definition.from)
-						token = Definition.to;
-			}
-			catch (System.NullReferenceException)
-			{
-
-			} // CowSpeak has not been initialized yet, usually means that this func has been called while getting static funcs
+			foreach (Definition Definition in CowSpeak.Definitions)
+				if (token == Definition.from)
+					token = Definition.to;
 
 			token = Utils.FixBoolean(token);
 

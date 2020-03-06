@@ -38,10 +38,12 @@ namespace CowSpeak
 			string usage_temp = usage;
 			usage = usage.Substring(usage.IndexOf("(")); // reduce it to parentheses and params inside of them
 			List< Any > parameters = ParseParameters(usage).ToList();
+			Variable Object = null;
 			if (isMethod && Parameters.Length != parameters.Count - 1)
 			{
-				Variable methodVar = CowSpeak.GetVariable(usage_temp.Substring(0, usage_temp.IndexOf(".")));
-				parameters.Insert(0, new Any(methodVar.Type, methodVar.Value));
+				if (usage_temp.IndexOf(".") == -1)
+					throw new Exception(Name + " can only be called as a method");
+				Object = CowSpeak.GetVariable(usage_temp.Substring(0, usage_temp.IndexOf(".")));
 			}
 
 			CheckParameters(parameters);
@@ -49,9 +51,23 @@ namespace CowSpeak
 			try
 			{
 				CowSpeak.StackTrace.Add(Usage);
-				Any ReturnValue =  Definition.Invoke(null, new object[]{ parameters.ToArray() }) as Any; // obj is null because the function should be static
+
+				List<object> InvocationParams = new List<object>();
+				if (isMethod)
+					InvocationParams.Add(Object);
+				foreach (var parameter in parameters)
+					InvocationParams.Add(parameter.Value);
+				
+				object ReturnValue = Definition.Invoke(null, InvocationParams.ToArray()); // obj is null because the function should be static
 				CowSpeak.StackTrace.RemoveAt(CowSpeak.StackTrace.Count - 1);
-				return ReturnValue;
+
+				if (ReturnValue == null)
+					return null;
+
+				if (ReturnValue is Any)
+					return (Any)ReturnValue;
+				
+				return new Any(Type.GetType(ReturnValue.GetType()), ReturnValue);
 			}
 			catch (System.Reflection.TargetInvocationException ex)
 			{
@@ -66,39 +82,19 @@ namespace CowSpeak
 	internal class FunctionAttr : System.Attribute
 	{
 		public string Name;
-		public Type vType = null;
 		public bool isMethod;
-		public List< Parameter > Parameters = new List< Parameter >();
 
-		public FunctionAttr(string Name, string typeName, string _Parameters, bool isMethod = false){
-			foreach (Type type in Type.GetTypes())
-			{
-				if (type.Name == typeName)
-				{
-					vType = type;
-					break;
-				}
-			}
-
+		public FunctionAttr(string Name, bool isMethod = false)
+		{
 			this.Name = Name;
 			this.isMethod = isMethod;
-
-			if (_Parameters != "")
-			{
-				string[] SplitParameters = _Parameters.Split(',');
-				foreach (string Parameter in SplitParameters)
-				{
-					List< Token > Tokens = Lexer.ParseLine(Parameter);
-					Parameters.Add(new Parameter(Utils.GetType(Tokens[0].identifier), Tokens[1].identifier));
-				}
-			}
 		}
 
 		public static List< FunctionBase > GetFunctions()
 		{
             List< FunctionBase > functions = new List< FunctionBase >();
 
-			var methods = typeof(Functions).GetMethods().Where(m => m.GetCustomAttributes(typeof(FunctionAttr), false).Length > 0).ToArray(); // Get all methods from the function class with this attribute
+			var methods = typeof(Functions).GetMethods().Where(m => m.GetCustomAttributes(typeof(FunctionAttr), false).Length > 0); // Get all methods from the function class with this attribute
 
             foreach (MethodInfo method in methods)
 			{
@@ -107,7 +103,22 @@ namespace CowSpeak
                 if (functionAttr == null || method == null)
                     continue; // skip method, it does not have this attribute
 
-                functions.Add(new StaticFunction(functionAttr.Name, method, functionAttr.vType, functionAttr.Parameters.ToArray(), functionAttr.isMethod));
+				// Convert MethodInfo parameters to StaticFunction parameters
+				List<Parameter> Parameters = new List<Parameter>();
+				foreach (var _param in method.GetParameters())
+				{
+					var paramType = Type.GetType(_param.ParameterType, false);
+					if (paramType == null)
+						continue;
+
+					Parameters.Add(new Parameter(paramType, _param.Name));
+				}
+
+				Type ReturnType = Type.GetType(method.ReturnType, false);
+				if (method.ReturnType == typeof(object))
+					ReturnType = Type.Any;
+
+                functions.Add(new StaticFunction(functionAttr.Name, method, ReturnType, Parameters.ToArray(), functionAttr.isMethod));
             }
 
             return functions;

@@ -12,7 +12,7 @@ namespace CowSpeak
 		
 		public Any(object obj)
 		{
-			this.Type = Type.GetTypeFromRep(obj.GetType());
+			this.Type = Type.GetType(obj.GetType());
 			this.Value = obj;
 		}
 
