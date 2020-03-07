@@ -36,7 +36,7 @@ namespace CowSpeak
 			}
 		}
 
-		public object Get()
+		protected object Get()
 		{
 			if (bytes == null)
 				throw new Exception("Object not initialized");
@@ -44,6 +44,6 @@ namespace CowSpeak
 			return ByteArrayToObject(bytes);
 		}
 
-		public void Set(object to) => bytes = ObjectToByteArray(to);
+		protected void Set(object to) => bytes = ObjectToByteArray(to);
 	}
 }

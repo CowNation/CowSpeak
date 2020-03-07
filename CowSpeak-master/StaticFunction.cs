@@ -43,7 +43,7 @@ namespace CowSpeak
 			{
 				if (usage_temp.IndexOf(".") == -1)
 					throw new Exception(Name + " can only be called as a method");
-				Object = CowSpeak.GetVariable(usage_temp.Substring(0, usage_temp.IndexOf(".")));
+				Object = CowSpeak.Vars.Get(usage_temp.Substring(0, usage_temp.IndexOf(".")));
 			}
 
 			CheckParameters(parameters);
@@ -94,9 +94,9 @@ namespace CowSpeak
 			this.Name = Name;
 		}
 
-		public static List< FunctionBase > GetFunctions()
+		public static FunctionList GetFunctions()
 		{
-            List< FunctionBase > functions = new List< FunctionBase >();
+            FunctionList functions = new FunctionList();
 
 			var methods = typeof(Functions).GetMethods().Where(m => m.GetCustomAttributes(typeof(FunctionAttr), false).Length > 0 || m.GetCustomAttributes(typeof(MethodAttr), false).Length > 0); // Get all methods from the function class with the function attributes
 

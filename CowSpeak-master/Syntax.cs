@@ -24,7 +24,6 @@ namespace CowSpeak
 		public static class Statements
 		{
 			public const string Return = "return";
-			public const string Delete = "delete";
 		}
 
 		public static class Conditionals

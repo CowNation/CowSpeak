@@ -208,12 +208,12 @@ namespace CowSpeak
 		{
 			if (token.type == TokenType.FunctionCall)
 			{
-				FunctionBase func = CowSpeak.GetFunction(token.identifier, false);
+				FunctionBase func = CowSpeak.Functions.Get(token.identifier, false);
 				return func != null && func.type == Type.Character;	
 			}
 			else if (token.type == TokenType.VariableIdentifier)
 			{
-				Variable _var = CowSpeak.GetVariable(token.identifier, false);
+				Variable _var = CowSpeak.Vars.Get(token.identifier, false);
 				return _var != null && _var.Type == Type.Character;
 			}
 			else if (token.type == TokenType.FunctionChain)
@@ -226,12 +226,12 @@ namespace CowSpeak
 		{
 			if (token.type == TokenType.FunctionCall)
 			{
-				FunctionBase func = CowSpeak.GetFunction(token.identifier, false);
+				FunctionBase func = CowSpeak.Functions.Get(token.identifier, false);
 				return func != null && func.type == Type.String;	
 			}
 			else if (token.type == TokenType.VariableIdentifier)
 			{
-				Variable _var = CowSpeak.GetVariable(token.identifier, false);
+				Variable _var = CowSpeak.Vars.Get(token.identifier, false);
 				return _var != null && _var.Type == Type.String;
 			}
 			else if (token.type == TokenType.FunctionChain)

@@ -29,8 +29,6 @@ namespace CowSpeak
 				case "True":
 				case "False":
 					return new Token(TokenType.Boolean, token);
-				case Syntax.Statements.Delete:
-					return new Token(TokenType.DeleteStatement, token);
 				case Syntax.Statements.Return:
 					return new Token(TokenType.ReturnStatement, token);
 				case Syntax.Comparators.IsEqual:
@@ -233,7 +231,7 @@ namespace CowSpeak
 
 				if (RecentLine.Count > 0 && RecentLine[0].type == TokenType.FunctionCall && RecentLine[0].identifier.IndexOf("Define(") == 0)
 				{
-					CowSpeak.GetFunction("Define(").Execute(RecentLine[0].identifier);
+					CowSpeak.Functions.Get("Define(").Execute(RecentLine[0].identifier);
 					Lines[Lines.Count - 1] = new Line(new List<Token>()); // line was already handled, clear line
 				} // must handle this function before the other lines are compiled to avoid errors
 			}

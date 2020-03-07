@@ -1,16 +1,15 @@
 namespace CowSpeak
 {
-	internal class Any
+	internal class Any : ByteArray
 	{
-		public ByteArray bytes = new ByteArray();
 		public Type Type;
 
-		public Any()
+		public Any() : base()
 		{
 
 		}
 		
-		public Any(object obj)
+		public Any(object obj) : base()
 		{
 			this.Type = Type.GetType(obj.GetType());
 			this.Value = obj;
@@ -18,7 +17,7 @@ namespace CowSpeak
 
 		public Any(Type Type) => this.Type = Type;
 
-		public Any(Type Type, object Value)
+		public Any(Type Type, object Value) : base()
 		{
 			this.Type = Type;
 			this.Value = Value;
@@ -30,7 +29,7 @@ namespace CowSpeak
 			{
 				try
 				{
-					return System.Convert.ChangeType(bytes.Get(), Type.rep);
+					return System.Convert.ChangeType(Get(), Type.rep);
 				}
 				catch (System.OverflowException ex)
 				{
@@ -39,7 +38,7 @@ namespace CowSpeak
 			}
 			set
 			{
-				bytes.Set(value);
+				Set(value);
 			}
 		}
 	}

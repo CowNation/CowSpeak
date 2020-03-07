@@ -13,55 +13,9 @@ namespace CowSpeak
 
 	public class CowSpeak
 	{
-		internal static List< FunctionBase > Functions = null;
+		internal static FunctionList Functions = null;
 
 		internal static List< Definition > Definitions = new List< Definition >();
-
-		internal static FunctionBase GetFunction(string functionName, bool _throw = true)
-		{
-			bool isValidMethodCall = false;
-			if (functionName.IndexOf(".") != -1)
-			{
-				Variable obj = GetVariable(functionName.Substring(0, functionName.IndexOf(".")), false); // interpret variable name to the left of the period as a variable
-
-				if (obj != null)
-				{
-					isValidMethodCall = true;
-					if (obj.Type.rep.IsArray)
-						functionName = "Array" + functionName.Substring(functionName.IndexOf("."));
-					else
-						functionName = obj.Type.Name + functionName.Substring(functionName.IndexOf("."));
-				}
-			} // if it has a period, it's probably a method
-
-			if (isValidMethodCall || functionName.IndexOf(".") == -1 || Type.GetType(functionName.Substring(0, functionName.IndexOf(".")), false) == null)
-			{
-				foreach (FunctionBase Function in Functions)
-					if (functionName.IndexOf(Function.Name) == 0)
-						return Function;
-			}
-
-			if (functionName.IndexOf(".") != -1)
-			{
-				string anyMethod = "Any" + functionName.Substring(functionName.IndexOf("."));
-
-				foreach (FunctionBase Function in Functions)
-					if (anyMethod.IndexOf(Function.Name) == 0)
-						return Function;
-			} // try to see if it's an 'Any' method
-
-			if (_throw)
-				throw new Exception("Function '" + functionName.Replace(System.Environment.NewLine, "\\n") + "' not found");
-
-			return null;
-		}
-
-		internal static void ClearUserFunctions()
-		{
-			for (int i = 0; i < Functions.Count; i++)
-				if (Functions[i].DefinitionType == DefinitionType.User)
-					Functions.RemoveAt(i);
-		}
 
 		internal static void ClearUserDefinitions()
 		{
@@ -76,35 +30,7 @@ namespace CowSpeak
 		public static string CurrentFile = "";
 		public static List< string > StackTrace = new List< string >();
 
-		internal static List< Variable > Vars = new List< Variable >();
-
-		internal static void CreateVariable(Variable variable)
-		{
-			if (GetVariable(variable.Name, false) != null) // already exists
-				throw new Exception("Cannot create variable '" + variable.Name + "', a variable by that name already exists");
-			
-			Vars.Add(variable);
-		}
-
-		internal static void CreateFunction(FunctionBase func)
-		{
-			if (GetFunction(func.Name, false) != null) // already exists
-				throw new Exception("Cannot create function '" + func.Name + "', a function by that name already exists");
-			
-			Functions.Add(func);
-		}
-
-		internal static Variable GetVariable(string varName, bool _throw = true)
-		{
-			foreach (Variable Var in Vars)
-				if (Var.Name == varName)
-					return Var;
-
-			if (_throw)
-				throw new Exception("Could not find variable: " + varName);
-
-			return null;
-		}
+		internal static VariableList Vars = new VariableList();
 
 		public static void Exec(string fileName, bool _Debug = false)
 		{
@@ -146,7 +72,7 @@ namespace CowSpeak
 			Exec(fileName, _Debug);
 			Vars.Clear();
 			ClearUserDefinitions();
-			ClearUserFunctions();
+			Functions.ClearUserDefined();
 		}
 
 		public static void Run(string[] lines, bool _Debug = false)
@@ -154,7 +80,7 @@ namespace CowSpeak
 			Exec(lines, _Debug);
 			Vars.Clear();
 			ClearUserDefinitions();
-			ClearUserFunctions();
+			Functions.ClearUserDefined();
 		}
 	}
 }

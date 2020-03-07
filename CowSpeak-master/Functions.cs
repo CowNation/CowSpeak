@@ -28,6 +28,9 @@ namespace CowSpeak
 
 			return obj.Value.ToString();
 		}
+
+		[MethodAttr("Any.Delete")]
+		public static void Delete(Variable obj) => CowSpeak.Vars.Remove(obj);
 		#endregion
 
 		#region ARRAY_METHODS

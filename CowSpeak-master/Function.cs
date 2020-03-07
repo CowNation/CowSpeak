@@ -88,7 +88,7 @@ namespace CowSpeak
 				} // unknown identifier, could be an equation waiting to be solved
 				else if (token.type == TokenType.VariableIdentifier)
 				{
-					Variable _var = CowSpeak.GetVariable(token.identifier);
+					Variable _var = CowSpeak.Vars.Get(token.identifier);
 					parameters.Add(new Any(_var.Type, _var.Value));
 					continue;
 				}
@@ -96,7 +96,7 @@ namespace CowSpeak
 				{
 					while ((int)token.identifier[0] < 'A' || (int)token.identifier[0] > 'z')
 						token.identifier = token.identifier.Remove(0, 1); // i don't remember why this is here tbh
-					FunctionBase func = CowSpeak.GetFunction(token.identifier);
+					FunctionBase func = CowSpeak.Functions.Get(token.identifier);
 					if (func.type == Type.Void)
 						throw new Exception("Cannot pass void function as a parameter");
 					parameters.Add(new Any(func.type, func.Execute(token.identifier).Value));
