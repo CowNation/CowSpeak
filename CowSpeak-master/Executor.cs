@@ -179,15 +179,7 @@ namespace CowSpeak
 				if (shouldBeSet)
 				{
 					CowSpeak.Vars.Last().bytes = retVal.bytes;
-
-					try
-					{
-						var val = CowSpeak.Vars.Last().Value; // Do this in case there was an overflow error
-					}
-					catch
-					{
-						System.Console.WriteLine("caught that bugger");
-					}
+					var val = CowSpeak.Vars.Last().Value; // Do this in case there was an overflow error
 				}
 				else if (Lines[i].Count >= 2 && Lines[i][0].type == TokenType.VariableIdentifier && Lines[i][1].type == TokenType.EqualOperator)
 				{

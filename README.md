@@ -10,7 +10,7 @@ If you experience an issue where new printed lines are being written over previo
 ## Features
 * Data types: boolean, integer, string, and decimal
 * Arrays
-* Most standard operators you would expect (+, -, *, /, =, ^, %)
+* Most standard operators you would expect (+, -, *, /, =, %)
 * Single line comments
 * Conditionals (if, else, loop, while)
 * Language defined functions
