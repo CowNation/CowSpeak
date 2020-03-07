@@ -35,3 +35,5 @@ If you experience an issue where new printed lines are being written over previo
 [v6 (Added support for user defined functions and recoded function system on November 20, 2019)](https://github.com/CowNation/CowSpeak/tree/b6c29a7e948dfcfc52dbf721a62bf82a8de469c1)
 
 [v6.5 (Added support for FunctionChains and major bug fixes and improvements February 24, 2020)](https://github.com/CowNation/CowSpeak/tree/6b94fee059b53e8fea5a3d3efa2a0c5ad34b1b86)
+
+[v7 (Added arrays, rewrote StaticFunctions, major bug fixes, and major improvements March 6, 2020)](https://github.com/CowNation/CowSpeak/tree/84b3b0d5186592d87e96f47a9dc55a744850e70a)
