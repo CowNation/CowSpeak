@@ -27,9 +27,9 @@ namespace CowSpeak
 				{
 					string simplified = "";
 					if (token.type == TokenType.VariableIdentifier)
-						simplified = CowSpeak.GetVariable(token.identifier).Value.ToString();
+						simplified = CowSpeak.Vars.Get(token.identifier).Value.ToString();
 					else if (token.type == TokenType.FunctionCall)
-						simplified = CowSpeak.GetFunction(token.identifier).Execute(token.identifier).Value.ToString();
+						simplified = CowSpeak.Functions.Get(token.identifier).Execute(token.identifier).Value.ToString();
 					else
 						simplified = token.identifier;
 					_Evaluated = simplified == "True" || simplified == "1";

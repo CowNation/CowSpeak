@@ -13,18 +13,9 @@ namespace CowSpeak
 
 		public static Token ParseToken(string token, bool _throw = true)
 		{
-			try
-			{
-				foreach (Definition Definition in CowSpeak.Definitions)
-					if (token == Definition.from)
-						token = Definition.to;
-			}
-			catch (System.NullReferenceException)
-			{
-
-			} // CowSpeak has not been initialized yet, usually means that this func has been called while getting static funcs
-
-			token = Utils.FixBoolean(token);
+			foreach (Definition Definition in CowSpeak.Definitions)
+				if (token == Definition.from)
+					token = Definition.to;
 
 			if (Utils.IsHexadecimal(token))
 				token = int.Parse(token.Substring(2), System.Globalization.NumberStyles.HexNumber).ToString(); // determine if it's a hexadecimal number
@@ -35,8 +26,9 @@ namespace CowSpeak
 
 			switch (token)
 			{
-				case Syntax.Statements.Delete:
-					return new Token(TokenType.DeleteIdentifier, token);
+				case "True":
+				case "False":
+					return new Token(TokenType.Boolean, token);
 				case Syntax.Statements.Return:
 					return new Token(TokenType.ReturnStatement, token);
 				case Syntax.Comparators.IsEqual:
@@ -118,7 +110,12 @@ namespace CowSpeak
 
 				if (letter == ' ' && line.IsIndexBetween(i, '(', ')'))
 				{
-					char before = line[line.Substring(0, i).IndexOf("(") - 1]; // char before the (
+					char before;
+					if (line.Substring(0, i).IndexOf("(") - 1 >= 0)
+						before = line[line.Substring(0, i).IndexOf("(") - 1]; // char before the (
+					else
+						continue;
+
 					if ((before >= 'A' && before <= 'Z') || (before >= 'a' && before <= 'z'))
 					{
 						StringBuilder fileLine = new StringBuilder(_line);
@@ -191,7 +188,7 @@ namespace CowSpeak
 			{
 				CowSpeak.CurrentLine = i + 1 + CurrentLineOffset;
 
-				fileLines[i] = Utils.FixBoolean(fileLines[i].Replace(@"\n", System.Environment.NewLine)); // interpret \n as a newline in strings & support for setting booleans using true and false
+				fileLines[i] = fileLines[i].Replace(@"\n", System.Environment.NewLine); // interpret \n as a newline in strings
 
 				while (fileLines[i].IndexOf("	") == 0 || fileLines[i].IndexOf(" ") == 0)
 					fileLines[i] = fileLines[i].Remove(0, 1);
@@ -234,7 +231,7 @@ namespace CowSpeak
 
 				if (RecentLine.Count > 0 && RecentLine[0].type == TokenType.FunctionCall && RecentLine[0].identifier.IndexOf("Define(") == 0)
 				{
-					CowSpeak.GetFunction("Define(").Execute(RecentLine[0].identifier);
+					CowSpeak.Functions.Get("Define(").Execute(RecentLine[0].identifier);
 					Lines[Lines.Count - 1] = new Line(new List<Token>()); // line was already handled, clear line
 				} // must handle this function before the other lines are compiled to avoid errors
 			}

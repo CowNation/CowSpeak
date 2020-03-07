@@ -9,6 +9,7 @@ This language uses CowConfig. To see CowConfig go to https://github.com/CowNatio
 If you experience an issue where new printed lines are being written over previous lines after inputting, add a newline after getting a user input. Some operating system's consoles don't go to the next line after the user inputs enter.
 ## Features
 * Data types: boolean, integer, string, and decimal
+* Arrays
 * Most standard operators you would expect (+, -, *, /, =, ^, %)
 * Single line comments
 * Conditionals (if, else, loop, while)

@@ -19,11 +19,11 @@ namespace CowSpeak
 				if (toEval[i].type == TokenType.Character)
 					result.Value = toEval[i].identifier != "" ? toEval[i].identifier[0] : (char)0;
 				else if (toEval[i].type == TokenType.FunctionCall)
-					result.Value = (char)CowSpeak.GetFunction(identifier).Execute(identifier).Value;
+					result.Value = (char)CowSpeak.Functions.Get(identifier).Execute(identifier).Value;
 				else if (toEval[i].type == TokenType.FunctionChain)
 					result.Value = (char)FunctionChain.Evaluate(identifier).Value;
 				else
-					result.Value = (char)CowSpeak.GetVariable(toEval[i].identifier).Value; // stringable variable
+					result.Value = (char)CowSpeak.Vars.Get(toEval[i].identifier).Value; // stringable variable
 
 				return result;
 			}
@@ -43,9 +43,9 @@ namespace CowSpeak
 				if (toEval[i].type == TokenType.String || toEval[i].type == TokenType.Character)
 					additors.Add(toEval[i].identifier);
 				else if (toEval[i].type == TokenType.VariableIdentifier)
-					additors.Add(CowSpeak.GetVariable(toEval[i].identifier).Value.ToString()); // stringable variable
+					additors.Add(CowSpeak.Vars.Get(toEval[i].identifier).Value.ToString()); // stringable variable
 				else if (toEval[i].type == TokenType.FunctionCall)
-					additors.Add(CowSpeak.GetFunction(identifier).Execute(identifier).Value.ToString());
+					additors.Add(CowSpeak.Functions.Get(identifier).Execute(identifier).Value.ToString());
 				else if (toEval[i].type == TokenType.FunctionChain)
 					additors.Add(FunctionChain.Evaluate(identifier).Value.ToString());
 				else
@@ -62,11 +62,11 @@ namespace CowSpeak
 						break;
 					
 					if (toEval[index + 1].type == TokenType.VariableIdentifier)
-						additors.Add(CowSpeak.GetVariable(toEval[index + 1].identifier).Value.ToString());
+						additors.Add(CowSpeak.Vars.Get(toEval[index + 1].identifier).Value.ToString());
 					else if (toEval[index + 1].type == TokenType.String || toEval[index + 1].type == TokenType.Number || toEval[index + 1].type == TokenType.Character)
 						additors.Add(toEval[index + 1].identifier);
 					else if (toEval[index + 1].type == TokenType.FunctionCall)
-						additors.Add(CowSpeak.GetFunction(toEval[index + 1].identifier).Execute(toEval[index + 1].identifier).Value.ToString()); // stringable func
+						additors.Add(CowSpeak.Functions.Get(toEval[index + 1].identifier).Execute(toEval[index + 1].identifier).Value.ToString()); // stringable func
 					else if (toEval[index + 1].type == TokenType.FunctionChain)
 						additors.Add(FunctionChain.Evaluate(toEval[index + 1].identifier).Value.ToString());
 					else 
@@ -92,13 +92,12 @@ namespace CowSpeak
 			{
 				if (base[i].type == TokenType.FunctionCall)
 				{
-					if (CowSpeak.GetFunction(base[i].identifier).isVoid()){
+					if (CowSpeak.Functions.Get(base[i].identifier).type == Type.Void){
 						if (GetRange(0, Count).IsIndexValid(i - 1) && Utils.IsOperator(base[i-1].type))
 							throw new Exception("Cannot perform operation: '" + base[i-1].identifier + "' on void function");
 						if (GetRange(0, Count).IsIndexValid(i + 1) && Utils.IsOperator(base[i+1].type))
 							throw new Exception("Cannot perform operation: '" + base[i+1].identifier + "' on void function");
 					}
-				
 				}
 			}
 
@@ -128,19 +127,15 @@ namespace CowSpeak
 					return strChain;
 
 				if (toEval[i].type == TokenType.VariableIdentifier)
-					identifier = CowSpeak.GetVariable(identifier).Value.ToString(); // replace variable name with it's value
+					identifier = CowSpeak.Vars.Get(identifier).Value.ToString(); // replace variable name with it's value
 				if (toEval[i].type == TokenType.WhileConditional || toEval[i].type == TokenType.IfConditional || toEval[i].type == TokenType.EndBracket)
 					continue;
 				else if (toEval[i].type == TokenType.FunctionCall)
 				{
-					FunctionBase func = CowSpeak.GetFunction(identifier);
+					FunctionBase func = CowSpeak.Functions.Get(identifier);
 					Any returned = func.Execute(identifier);
 					if (toEval.Count == 1)
-					{
-						if (returned == null)
-							return null; // tocleanup
-						return new Any(func.type, returned.Value);
-					}
+						return returned;
 					if (returned != null)
 						identifier = returned.Value.ToString(); // replace function call with it's return value
 					else

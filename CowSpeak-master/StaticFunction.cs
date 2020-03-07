@@ -38,10 +38,12 @@ namespace CowSpeak
 			string usage_temp = usage;
 			usage = usage.Substring(usage.IndexOf("(")); // reduce it to parentheses and params inside of them
 			List< Any > parameters = ParseParameters(usage).ToList();
+			Variable Object = null;
 			if (isMethod && Parameters.Length != parameters.Count - 1)
 			{
-				Variable methodVar = CowSpeak.GetVariable(usage_temp.Substring(0, usage_temp.IndexOf(".")));
-				parameters.Insert(0, new Any(methodVar.Type, methodVar.Value));
+				if (usage_temp.IndexOf(".") == -1)
+					throw new Exception(Name + " can only be called as a method");
+				Object = CowSpeak.Vars.Get(usage_temp.Substring(0, usage_temp.IndexOf(".")));
 			}
 
 			CheckParameters(parameters);
@@ -49,16 +51,36 @@ namespace CowSpeak
 			try
 			{
 				CowSpeak.StackTrace.Add(Usage);
-				Any ReturnValue =  Definition.Invoke(null, new object[]{ parameters.ToArray() }) as Any; // obj is null because the function should be static
+
+				List<object> InvocationParams = new List<object>();
+				if (isMethod)
+					InvocationParams.Add(Object);
+				foreach (var parameter in parameters)
+					InvocationParams.Add(parameter.Value);
+				
+				object ReturnValue = Definition.Invoke(null, InvocationParams.ToArray()); // obj is null because the function should be static
 				CowSpeak.StackTrace.RemoveAt(CowSpeak.StackTrace.Count - 1);
-				return ReturnValue;
+
+				if (ReturnValue == null)
+					return null; // Probably a void function
+
+				Type ReturnedType = null;
+
+				if (ReturnValue is Any)
+					return (Any)ReturnValue;
+				else if (ReturnValue is System.Array)
+					ReturnedType = Type.GetType(((System.Array)ReturnValue).GetType());
+				else
+					ReturnedType = Type.GetType(ReturnValue.GetType());
+
+				return new Any(ReturnedType, ReturnValue);
 			}
-			catch (System.Reflection.TargetInvocationException ex)
+			catch (TargetInvocationException ex)
 			{
 				System.Exception baseEx = ex.GetBaseException();
 				if (baseEx is Exception)
 					throw baseEx as Exception;
-				throw new Exception("FunctionCall '" + Name + "' returned an exception: " + baseEx.Message);
+				throw new Exception("Function '" + Name + "' returned an exception: " + baseEx.Message);
 			}
 		}
 	}
@@ -66,51 +88,62 @@ namespace CowSpeak
 	internal class FunctionAttr : System.Attribute
 	{
 		public string Name;
-		public Type vType = null;
-		public bool isMethod;
-		public List< Parameter > Parameters = new List< Parameter >();
 
-		public FunctionAttr(string Name, string typeName, string _Parameters, bool isMethod = false){
-			foreach (Type type in Type.GetTypes())
-			{
-				if (type.Name == typeName)
-				{
-					vType = type;
-					break;
-				}
-			}
-
+		public FunctionAttr(string Name)
+		{
 			this.Name = Name;
-			this.isMethod = isMethod;
-
-			if (_Parameters != "")
-			{
-				string[] SplitParameters = _Parameters.Split(',');
-				foreach (string Parameter in SplitParameters)
-				{
-					List< Token > Tokens = Lexer.ParseLine(Parameter);
-					Parameters.Add(new Parameter(Utils.GetType(Tokens[0].identifier), Tokens[1].identifier));
-				}
-			}
 		}
 
-		public static List< FunctionBase > GetFunctions()
+		public static FunctionList GetFunctions()
 		{
-            List< FunctionBase > functions = new List< FunctionBase >();
+            FunctionList functions = new FunctionList();
 
-			var methods = typeof(Functions).GetMethods().Where(m => m.GetCustomAttributes(typeof(FunctionAttr), false).Length > 0).ToArray(); // Get all methods from the function class with this attribute
+			var methods = typeof(Functions).GetMethods().Where(m => m.GetCustomAttributes(typeof(FunctionAttr), false).Length > 0 || m.GetCustomAttributes(typeof(MethodAttr), false).Length > 0); // Get all methods from the function class with the function attributes
 
             foreach (MethodInfo method in methods)
 			{
-				FunctionAttr functionAttr = (FunctionAttr)System.Attribute.GetCustomAttribute(method, typeof(FunctionAttr)); // get attribute for method
+				if (method == null)
+					continue;
 
-                if (functionAttr == null || method == null)
-                    continue; // skip method, it does not have this attribute
+				FunctionAttr functionAttr = (FunctionAttr)System.Attribute.GetCustomAttribute(method, typeof(FunctionAttr)); // get attribute for function
+				MethodAttr methodAttr = (MethodAttr)System.Attribute.GetCustomAttribute(method, typeof(MethodAttr)); // get attribute for method
 
-                functions.Add(new StaticFunction(functionAttr.Name, method, functionAttr.vType, functionAttr.Parameters.ToArray(), functionAttr.isMethod));
+				string Name;
+				bool isMethod = false;
+				if (methodAttr != null)
+				{
+					Name = methodAttr.Name;
+					isMethod = true;
+				}
+				else if (functionAttr != null)
+					Name = functionAttr.Name;
+				else
+					continue; // skip method, it does not have either attribute   
+
+				// Convert MethodInfo parameters to StaticFunction parameters
+				List<Parameter> Parameters = new List<Parameter>();
+				foreach (var _param in method.GetParameters())
+				{
+					var paramType = Type.GetType(_param.ParameterType, false);
+					if (paramType == null)
+						continue;
+
+					Parameters.Add(new Parameter(paramType, _param.Name));
+				}
+
+				var ReturnType = Type.GetType(method.ReturnType, false);
+				if (ReturnType == null)
+					ReturnType = Type.Any;
+
+                functions.Add(new StaticFunction(Name, method, ReturnType, Parameters.ToArray(), isMethod));
             }
 
             return functions;
         } // get a list of all methods from the Functions class that have this attribute
+	}
+
+	internal class MethodAttr : FunctionAttr
+	{
+		public MethodAttr(string Name) : base(Name){}
 	}
 }

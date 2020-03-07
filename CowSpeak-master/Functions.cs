@@ -1,5 +1,6 @@
 using System.Threading;
 using System.Collections.Generic;
+using System.Collections;
 using System.Text;
 using System.IO;
 using System.Net;
@@ -9,175 +10,166 @@ namespace CowSpeak
 	internal static class Functions
 	{
 		#region ALL_METHODS
-		[FunctionAttr("Any.ToString", Syntax.Types.String, "", true)]
-		public static Any ToString(Any[] parameters)
+		[MethodAttr("Any.ToString")]
+		public static string ToString(Variable obj)
 		{
-			return new Any(Type.String, parameters[0].Value.ToString());
+			if (obj.Type.rep.IsArray)
+			{
+				string ret = "{";
+				System.Array Items = (System.Array)obj.Value;
+				IEnumerator myEnumerator = Items.GetEnumerator();
+				while (( myEnumerator.MoveNext() ) && ( myEnumerator.Current != null ))
+					ret += myEnumerator.Current.ToString() + ", ";
+				if (Items.Length > 0)
+					ret = ret.Substring(0, ret.LastIndexOf(", "));
+				ret += "}";
+				return ret;
+			}
+
+			return obj.Value.ToString();
 		}
+
+		[MethodAttr("Any.Delete")]
+		public static void Delete(Variable obj) => CowSpeak.Vars.Remove(obj);
 		#endregion
 
+		#region ARRAY_METHODS
+		[MethodAttr("Array.Length")]
+		public static int ArrayLength(Variable obj) => ((System.Array)obj.Value).Length;
+		
+		[MethodAttr("Array.SetValue")]
+		public static void SetValue(Variable obj, int index, object value)
+		{
+			var Value = (System.Array)obj.Value;
+			Value.SetValue(value, index);
+			obj.Value = Value;
+		}
+
+		[MethodAttr("Array.GetValue")]
+		public static object GetValue(Variable obj, int index) => ((System.Array)obj.Value).GetValue(index);
+		#endregion
+
+		[FunctionAttr("Array")]
+		public static System.Array Array(int length, object initialValue) // creates an array based on initialValue's type
+		{
+			var arr = System.Array.CreateInstance(initialValue.GetType(), length);
+			if (Type.GetType(arr.GetType(), false) == null)
+				throw new Exception("Invalid type of object passed as initialValue"); // This may not be possible but better safe then sorry
+			for (int i = 0; i < arr.Length; i++)
+				arr.SetValue(initialValue, i);
+			return arr;
+		}
+
 		#region STRING_METHODS
-		[FunctionAttr(Syntax.Types.String + ".OccurrencesOf", Syntax.Types.Integer, Syntax.Types.String + " counter", true)]
-		public static Any OccurrencesOf(Any[] parameters)
-		{
-			return new Any(Type.Integer, Utils.OccurrencesOf(parameters[0].Value.ToString(), parameters[1].Value.ToString()));
-		}
+		[MethodAttr(Syntax.Types.String + ".OccurrencesOf")]
+		public static int OccurrencesOf(Variable obj, string counter) => Utils.OccurrencesOf(obj.Value.ToString(), counter);
 
-		[FunctionAttr(Syntax.Types.String + ".Sub" + Syntax.Types.c_String, Syntax.Types.String, Syntax.Types.Integer + " index, " + Syntax.Types.Integer + " length", true)]
-		public static Any SubString(Any[] parameters)
-		{
-			string str = parameters[0].Value.ToString();
+		[MethodAttr(Syntax.Types.String + ".Sub" + Syntax.Types.c_String)]
+		public static string SubString(Variable obj, int index, int length) => obj.Value.ToString().Substring(index, length);
 
-			return new Any(Type.String, str.Substring((int)parameters[1].Value, (int)parameters[2].Value));
-		}
+		[MethodAttr(Syntax.Types.String + "." + Syntax.Types.c_Character + "At")]
+		public static char CharacterAt(Variable obj, int index) => obj.Value.ToString()[index];
 
-		[FunctionAttr(Syntax.Types.String + "." + Syntax.Types.c_Character + "At", Syntax.Types.Character, Syntax.Types.Integer + " index", true)]
-		public static Any CharacterAt(Any[] parameters)
-		{
-			return new Any(Type.Character, parameters[0].Value.ToString()[(int)parameters[1].Value]);
-		}
+		[MethodAttr(Syntax.Types.String + ".Length")]
+		public static int StringLength(Variable obj) => obj.Value.ToString().Length;
 
-		[FunctionAttr(Syntax.Types.String + ".Length", Syntax.Types.Integer, "", true)]
-		public static Any Length(Any[] parameters)
-		{
-			return new Any(Type.Integer, parameters[0].Value.ToString().Length);
-		}
+		[MethodAttr(Syntax.Types.String + ".Remove")]
+		public static string Remove(Variable obj, int index, int length) => obj.Value.ToString().Remove(index, length);
 
-		[FunctionAttr(Syntax.Types.String + ".Remove", Syntax.Types.String, Syntax.Types.Integer + " index, " + Syntax.Types.Integer + " length", true)]
-		public static Any Remove(Any[] parameters)
-		{
-			return new Any(Type.String, parameters[0].Value.ToString().Remove((int)parameters[1].Value, (int)parameters[2].Value));
-		}
+		[MethodAttr(Syntax.Types.String + ".Insert")]
+		public static string Insert(Variable obj, int index, string value) => obj.Value.ToString().Insert(index, value);
 
-		[FunctionAttr(Syntax.Types.String + ".Insert", Syntax.Types.String, Syntax.Types.Integer + " index, " + Syntax.Types.String + " value", true)]
-		public static Any Insert(Any[] parameters)
-		{
-			return new Any(Type.String, parameters[0].Value.ToString().Insert((int)parameters[1].Value, parameters[2].Value.ToString()));
-		}
+		[MethodAttr(Syntax.Types.String + ".IndexOf")]
+		public static int IndexOf(Variable obj, string value) => obj.Value.ToString().IndexOf(value);
 
-		[FunctionAttr(Syntax.Types.String + ".IndexOf", Syntax.Types.Integer, Syntax.Types.String + " value", true)]
-		public static Any IndexOf(Any[] parameters)
-		{
-			string toSearchFor = parameters[1].Value.ToString();
-			return new Any(Type.String, parameters[0].Value.ToString().IndexOf(toSearchFor));
-		}
+		[MethodAttr(Syntax.Types.String + ".LastIndexOf")]
+		public static int LastIndexOf(Variable obj, string value) => obj.Value.ToString().LastIndexOf(value);
 
-		[FunctionAttr(Syntax.Types.String + ".LastIndexOf", Syntax.Types.Integer, Syntax.Types.String + " value", true)]
-		public static Any LastIndexOf(Any[] parameters)
-		{
-			string toSearchFor = parameters[1].Value.ToString();
-			return new Any(Type.String, parameters[0].Value.ToString().LastIndexOf(toSearchFor));
-		}
-
-		[FunctionAttr(Syntax.Types.String + ".To" + Syntax.Types.c_Integer, Syntax.Types.Integer, "", true)]
-		public static Any ToInteger(Any[] parameters)
+		[MethodAttr(Syntax.Types.String + ".To" + Syntax.Types.c_Integer)]
+		public static int ToInteger(Variable obj)
 		{
 			int o;
-			string str = parameters[0].Value.ToString();
+			string str = obj.Value.ToString();
 
 			if (Utils.IsHexadecimal(str))
-				return new Any(Type.Integer, int.Parse(str.Substring(2), System.Globalization.NumberStyles.HexNumber));
+				return int.Parse(str.Substring(2), System.Globalization.NumberStyles.HexNumber);
 
 			if (System.Int32.TryParse(str, out o))
-				return new Any(Type.Integer, o);
+				return o;
 			else
 				throw new Exception("Could not convert " + Syntax.Types.String + " to an " + Syntax.Types.Integer);
 		}
 
-		[FunctionAttr(Syntax.Types.String + ".To" + Syntax.Types.c_Decimal, Syntax.Types.Decimal, "", true)]
-		public static Any ToDecimal(Any[] parameters)
+		[MethodAttr(Syntax.Types.String + ".To" + Syntax.Types.c_Decimal)]
+		public static double ToDecimal(Variable obj)
 		{
 			double o;
-			string str = parameters[0].Value.ToString();
+			string str = obj.Value.ToString();
 			if (System.Double.TryParse(str, out o))
-				return new Any(Type.Decimal, o);
+				return o;
 			else
 				throw new Exception("Could not convert " + Syntax.Types.String + " to an " + Syntax.Types.Decimal);
 		}
 		#endregion
 
 		#region CHARACTER_METHODS
-		[FunctionAttr(Syntax.Types.Character + ".ToUpper", Syntax.Types.Character, "", true)]
-		public static Any ToUpper(Any[] parameters)
-		{
-			return new Any(Type.Character, System.Char.ToUpper(parameters[0].Value.ToString()[0]));
-		}
-		[FunctionAttr(Syntax.Types.Character + ".ToLower", Syntax.Types.Character, "", true)]
-		public static Any ToLower(Any[] parameters)
-		{
-			return new Any(Type.Character, System.Char.ToLower(parameters[0].Value.ToString()[0]));
-		}
-		[FunctionAttr(Syntax.Types.Character + ".ToInteger", Syntax.Types.Integer, "", true)]
-		public static Any _ToInteger(Any[] parameters)
-		{
-			return new Any(Type.Integer, (int)parameters[0].Value.ToString()[0]);
-		}
+		[MethodAttr(Syntax.Types.Character + ".ToUpper")]
+		public static char ToUpper(Variable obj) => System.Char.ToUpper((char)obj.Value);
+
+		[MethodAttr(Syntax.Types.Character + ".ToLower")]
+		public static char ToLower(Variable obj) => System.Char.ToLower((char)obj.Value);
+
+		[MethodAttr(Syntax.Types.Character + ".ToInteger")]
+		public static int CharacterToInteger(Variable obj) => (int)((char)obj.Value);
 		#endregion
 
 		#region INTEGER_METHODS
-		[FunctionAttr(Syntax.Types.Integer + ".ToHexadecimal", Syntax.Types.String, "", true)]
-		public static Any ToHexadecimal(Any[] parameters)
-		{
-			return new Any(Type.String, ((int)parameters[0].Value).ToString("X"));
-		}
-		[FunctionAttr(Syntax.Types.Integer + ".ToCharacter", Syntax.Types.Character, "", true)]
-		public static Any ToCharacter(Any[] parameters)
-		{
-			return new Any(Type.Character, (char)(int)parameters[0].Value);
-		}
+		[MethodAttr(Syntax.Types.Integer + ".ToHexadecimal")]
+		public static string ToHexadecimal(Variable obj) => ((int)obj.Value).ToString("X");
+
+		[MethodAttr(Syntax.Types.Integer + ".ToCharacter")]
+		public static char ToCharacter(Variable obj) => (char)(int)obj.Value;
 		#endregion
 
 		#region INTEGER64_METHODS
-		[FunctionAttr(Syntax.Types.Integer64 + ".ToHexadecimal", Syntax.Types.String, "", true)]
-		public static Any ToHexadecimal64(Any[] parameters) => new Any(Type.String, ((long)parameters[0].Value).ToString("X"));
-		[FunctionAttr(Syntax.Types.Integer64 + ".ToCharacter", Syntax.Types.Character, "", true)]
-		public static Any ToCharacter64(Any[] parameters) => new Any(Type.Character, (char)(long)parameters[0].Value);
+		[MethodAttr(Syntax.Types.Integer64 + ".ToHexadecimal")]
+		public static string ToHexadecimal64(Variable obj) => ((long)obj.Value).ToString("X");
+
+		[MethodAttr(Syntax.Types.Integer64 + ".ToCharacter")]
+		public static char ToCharacter64(Variable obj) => (char)(long)obj.Value;
 		#endregion
 
-		[FunctionAttr("Sin", Syntax.Types.Decimal, Syntax.Types.Decimal + " a")]
-		public static Any Sin(Any[] parameters)
-		{
-			return new Any(Type.Decimal, System.Math.Sin((double)parameters[0].Value));
-		}
+		[FunctionAttr("Sin")]
+		public static double Sin(double num) => System.Math.Sin(num);
 
-		[FunctionAttr("Cos", Syntax.Types.Decimal, Syntax.Types.Decimal + " d")]
-		public static Any Cos(Any[] parameters)
-		{
-			return new Any(Type.Decimal, System.Math.Cos((double)parameters[0].Value));
-		}
+		[FunctionAttr("Cos")]
+		public static double Cos(double num) => System.Math.Cos(num);
 
-		[FunctionAttr("Tan", Syntax.Types.Decimal, Syntax.Types.Decimal + " a")]
-		public static Any Tan(Any[] parameters)
-		{
-			return new Any(Type.Decimal, System.Math.Tan((double)parameters[0].Value));
-		}
+		[FunctionAttr("Tan")]
+		public static double Tan(double num) => System.Math.Tan(num);
 
-		[FunctionAttr("Import", Syntax.Types.Void, Syntax.Types.String + " modulePath")]
-		public static Any Import(Any[] parameters)
+		[FunctionAttr("Run")]
+		public static void Run(string filePath)
 		{
 			string oldFile = string.Copy(CowSpeak.CurrentFile);
-			string modulePath = parameters[0].Value.ToString();
 
 			// make modulePath relative to CurrentFile as long as modulePath is relative
-			if (!Path.IsPathRooted(modulePath))
+			if (!Path.IsPathRooted(filePath))
 			{
 				if (CowSpeak.CurrentFile.IndexOf("/") != -1)
-					modulePath = CowSpeak.CurrentFile.Substring(0, CowSpeak.CurrentFile.IndexOf("/") + 1) + modulePath;
+					filePath = CowSpeak.CurrentFile.Substring(0, CowSpeak.CurrentFile.IndexOf("/") + 1) + filePath;
 				if (CowSpeak.CurrentFile.IndexOf("\\") != -1)
-					modulePath = CowSpeak.CurrentFile.Substring(0, CowSpeak.CurrentFile.IndexOf("\\") + 1) + modulePath;
+					filePath = CowSpeak.CurrentFile.Substring(0, CowSpeak.CurrentFile.IndexOf("\\") + 1) + filePath;
 			}
 
-			CowSpeak.Exec(modulePath);
+			CowSpeak.Exec(filePath);
 			CowSpeak.CurrentFile = oldFile;
-			return null;
 		}
 
-		[FunctionAttr("GetHtmlFromUrl", Syntax.Types.String, Syntax.Types.String + " url")]
-		public static Any GetHtmlFromUrl(Any[] parameters)
+		[FunctionAttr("GetHtmlFromUrl")]
+		public static string GetHtmlFromUrl(string url)
 		{
-			string urlAddress = parameters[0].Value.ToString();
-
-			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(urlAddress);
+			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
 			HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
 			if (response.StatusCode == HttpStatusCode.OK)
@@ -194,125 +186,70 @@ namespace CowSpeak
 
 				response.Close();
 				readStream.Close();
-				return new Any(Type.String, data);
+				return data;
 			}
 
-			throw new Exception("Cannot get a HttpWebResponse from '" + urlAddress + "'");
+			throw new Exception("Cannot get a HttpWebResponse from '" + url + "'");
 		}
 
-		[FunctionAttr("Abs", Syntax.Types.Decimal, Syntax.Types.Decimal + " value")]
-		public static Any Abs(Any[] parameters)
-		{
-			return new Any(Type.Decimal, System.Math.Abs((double)parameters[0].Value));
-		}
+		[FunctionAttr("Abs")]
+		public static double Abs(double value) => System.Math.Abs(value);
 
-		[FunctionAttr("Round", Syntax.Types.Integer, Syntax.Types.Decimal + " value")]
-		public static Any Round(Any[] parameters)
-		{
-			return new Any(Type.Integer, System.Math.Round((double)parameters[0].Value));
-		}
+		[FunctionAttr("Round")]
+		public static double Round(double value) => System.Math.Round(value);
 
-		[FunctionAttr("Sqrt", Syntax.Types.Decimal, Syntax.Types.Decimal + " value")]
-		public static Any Sqrt(Any[] parameters)
-		{
-			return new Any(Type.Integer, System.Math.Sqrt((double)parameters[0].Value));
-		}
+		[FunctionAttr("Sqrt")]
+		public static double Sqrt(double value) => System.Math.Sqrt(value);
 
-		[FunctionAttr("Pow", Syntax.Types.Decimal, Syntax.Types.Decimal + " x, " + Syntax.Types.Decimal + " y")]
-		public static Any Pow(Any[] parameters)
-		{
-			return new Any(Type.Decimal, System.Math.Pow((double)parameters[0].Value, (double)parameters[1].Value));
-		}
+		[FunctionAttr("Pow")]
+		public static double Pow(double x, double y) => System.Math.Pow(x, y);
 
-		[FunctionAttr("Sleep", Syntax.Types.Void, Syntax.Types.Integer + " ms")]
-		public static Any Sleep(Any[] parameters)
-		{
-			Thread.Sleep((int)parameters[0].Value);
-			return null;
-		}
+		[FunctionAttr("Sleep")]
+		public static void Sleep(int ms) => Thread.Sleep(ms);
 
-		[FunctionAttr("Read" + Syntax.Types.c_Character, Syntax.Types.Character, "")]
-		public static Any ReadCharacter(Any[] parameters)
-		{
-			return new Any(Type.Character, (char)System.Console.ReadKey().KeyChar);
-		}
+		[FunctionAttr("InputKey")]
+		public static char ReadCharacter() => (char)System.Console.ReadKey().KeyChar;
 
-		[FunctionAttr("ClearConsole", Syntax.Types.Void, "")]
-		public static Any ClearConsole(Any[] parameters)
-		{
-			System.Console.Clear();
-			return null;
-		}
+		[FunctionAttr("ClearConsole")]
+		public static void ClearConsole() => System.Console.Clear();
 
-		[FunctionAttr("Define", Syntax.Types.Void, Syntax.Types.String + " from, " + Syntax.Types.String + " to")]
-		public static Any Define(Any[] parameters) 
+		[FunctionAttr("Define")]
+		public static void Define(string from, string to) 
 		{
 			CowSpeak.Definitions.Add(new Definition
 			{
-				from = parameters[0].Value.ToString(),
-				to = parameters[1].Value.ToString(),
+				from = from,
+				to = to,
 				DefinitionType = DefinitionType.User
 			});
-			return null;
 		}
 
-		[FunctionAttr("Evaluate", Syntax.Types.Decimal, Syntax.Types.String + " toExec")]
-		public static Any _Evaluate(Any[] parameters) // evaluates an expression
+		[FunctionAttr("Evaluate")]
+		public static object _Evaluate(string toExec) => Evaluate.EvaluateExpression(toExec);
+
+		[FunctionAttr("Random" + Syntax.Types.c_Integer)]
+		public static int RandomInteger(int minimum, int maximum)
 		{
-			Any evaluatedValue = new Any();
-			evaluatedValue.Type = Type.Decimal;
-			evaluatedValue.Value = Evaluate.EvaluateExpression(parameters[0].Value.ToString());
-			if (((double)evaluatedValue.Value).ToString().IndexOf(".") == -1)
-				evaluatedValue.Type = Type.Integer; // decimal not found, we can convert to int
-
-			return evaluatedValue;
-		}
-
-		private static string toStr(Any toPrep)
-		{
-			return Utils.FixBoolean(toPrep.Value.ToString());
-		}
-
-		[FunctionAttr("Random" + Syntax.Types.c_Integer, Syntax.Types.Integer, Syntax.Types.Integer + " minimum, " + Syntax.Types.Integer + " maximum")]
-		public static Any RandomInteger(Any[] parameters)
-		{
-			int minimum = (int)parameters[0].Value;
-			int maximum = (int)parameters[1].Value + 1;
-
 			if (minimum > maximum)
 				throw new Exception("Minimum must be less than the maximum");
 
-			return new Any(Type.Integer, Utils.rand.Next(minimum, maximum));
+			return Utils.rand.Next(minimum, maximum);
 		}
 
-		[FunctionAttr("Print", Syntax.Types.Void, Syntax.Types.Any + " text")]
-		public static Any Print(Any[] parameters)
-		{
-			System.Console.Write(parameters[0].Value.ToString());
-			return null;
-		}
+		[FunctionAttr("Print")]
+		public static void Print(object text) => System.Console.Write(text.ToString());
 
-		[FunctionAttr("Exit", Syntax.Types.Void, Syntax.Types.Integer + " exitCode")]
-		public static Any Exit(Any[] parameters)
-		{
-			System.Environment.Exit((int)parameters[0].Value);
-			return null;
-		}
+		[FunctionAttr("Exit")]
+		public static void Exit(int exitCode) => System.Environment.Exit(exitCode);
 
-		[FunctionAttr("ThrowError", Syntax.Types.Void, Syntax.Types.String + " errorText")]
-		public static Any ThrowError(Any[] parameters)
-		{
-			throw new Exception(parameters[0].Value.ToString());
-		}
+		[FunctionAttr("ThrowError")]
+		public static void ThrowError(string errorText) => throw new Exception(errorText);
 
-		[FunctionAttr("Input" + Syntax.Types.c_String, Syntax.Types.String, "")]
-		public static Any InputString(Any[] parameters)
-		{
-			return new Any(Type.String, System.Console.ReadLine());	
-		}
+		[FunctionAttr("Input" + Syntax.Types.c_String)]
+		public static string InputString() => System.Console.ReadLine();
 
-		[FunctionAttr("Input" + Syntax.Types.c_Integer, Syntax.Types.Integer, "")]
-		public static Any InputInteger(Any[] parameters)
+		[FunctionAttr("Input" + Syntax.Types.c_Integer)]
+		public static int InputInteger()
 		{
 			string built = "";
 			System.ConsoleKeyInfo key = new System.ConsoleKeyInfo();
@@ -330,17 +267,14 @@ namespace CowSpeak
 			}
 			int _out = -1;
 			System.Int32.TryParse(built, out _out);
-			return new Any(Type.Integer, _out);
+			return _out;
 		}
 
-		[FunctionAttr("Input" + Syntax.Types.c_Character, Syntax.Types.Character, "")]
-		public static Any InputCharacter(Any[] parameters)
-		{
-			return new Any(Type.Character, System.Console.ReadKey().KeyChar);
-		}
+		[FunctionAttr("Input" + Syntax.Types.c_Character)]
+		public static char InputCharacter() => System.Console.ReadKey().KeyChar;
 
-		[FunctionAttr("Input" + Syntax.Types.c_Decimal, Syntax.Types.Decimal, "")]
-		public static Any InputDecimal(Any[] parameters)
+		[FunctionAttr("Input" + Syntax.Types.c_Decimal)]
+		public static double InputDecimal()
 		{
 			string built = "";
 			System.ConsoleKeyInfo key = new System.ConsoleKeyInfo();
@@ -358,7 +292,7 @@ namespace CowSpeak
 			}
 			float _out = -1;
 			System.Single.TryParse(built, out _out);
-			return new Any(Type.Decimal, _out);
+			return _out;
 		}
 	}
 }

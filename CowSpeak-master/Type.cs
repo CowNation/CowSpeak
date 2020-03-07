@@ -11,7 +11,7 @@ namespace CowSpeak
 			this.rep = rep;
 		}
 
-		public static Type Any = new Type(Syntax.Types.Any, typeof(void));
+		public static Type Any = new Type(Syntax.Types.Any, typeof(object));
 		public static Type Void = new Type(Syntax.Types.Void, typeof(void));
 		public static Type Integer = new Type(Syntax.Types.Integer, typeof(int));
 		public static Type Integer64 = new Type(Syntax.Types.Integer64, typeof(long));
@@ -20,12 +20,18 @@ namespace CowSpeak
 		public static Type Boolean = new Type(Syntax.Types.Boolean, typeof(bool));
 		public static Type Character = new Type(Syntax.Types.Character, typeof(char));
 
+		public static Type IntegerArray = new Type(Syntax.Types.c_Integer + "Array", typeof(int[]));
+		public static Type DecimalArray = new Type(Syntax.Types.c_Decimal + "Array", typeof(double[]));
+		public static Type StringArray = new Type(Syntax.Types.c_String + "Array", typeof(string[]));
+		public static Type BooleanArray = new Type(Syntax.Types.c_Boolean + "Array", typeof(bool[]));
+		public static Type CharacterArray = new Type(Syntax.Types.c_Character + "Array", typeof(char[]));
+
 		public static Type[] GetTypes()
 		{
-			return new Type[]{Integer, Integer64, Decimal, String, Character, Boolean, Void, Any};
+			return new Type[]{IntegerArray, DecimalArray, StringArray, BooleanArray, CharacterArray, Integer, Integer64, Decimal, String, Character, Boolean, Void, Any};
 		} // returns array of all static types
 
-		public static Type GetTypeFromRep(System.Type rep, bool _throw = true)
+		public static Type GetType(System.Type rep, bool _throw = true)
 		{
 			foreach (Type type in GetTypes())
 			{
