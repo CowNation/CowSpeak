@@ -17,8 +17,6 @@ namespace CowSpeak
 				if (token == Definition.from)
 					token = Definition.to;
 
-			//token = Utils.FixBoolean(token);
-
 			if (Utils.IsHexadecimal(token))
 				token = int.Parse(token.Substring(2), System.Globalization.NumberStyles.HexNumber).ToString(); // determine if it's a hexadecimal number
 
@@ -114,7 +112,12 @@ namespace CowSpeak
 
 				if (letter == ' ' && line.IsIndexBetween(i, '(', ')'))
 				{
-					char before = line[line.Substring(0, i).IndexOf("(") - 1]; // char before the (
+					char before;
+					if (line.Substring(0, i).IndexOf("(") - 1 >= 0)
+						before = line[line.Substring(0, i).IndexOf("(") - 1]; // char before the (
+					else
+						continue;
+
 					if ((before >= 'A' && before <= 'Z') || (before >= 'a' && before <= 'z'))
 					{
 						StringBuilder fileLine = new StringBuilder(_line);
@@ -187,7 +190,7 @@ namespace CowSpeak
 			{
 				CowSpeak.CurrentLine = i + 1 + CurrentLineOffset;
 
-				fileLines[i] = fileLines[i].Replace(@"\n", System.Environment.NewLine);//Utils.FixBoolean(fileLines[i].Replace(@"\n", System.Environment.NewLine)); // interpret \n as a newline in strings & support for setting booleans using true and false
+				fileLines[i] = fileLines[i].Replace(@"\n", System.Environment.NewLine); // interpret \n as a newline in strings
 
 				while (fileLines[i].IndexOf("	") == 0 || fileLines[i].IndexOf(" ") == 0)
 					fileLines[i] = fileLines[i].Remove(0, 1);

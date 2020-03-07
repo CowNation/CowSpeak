@@ -75,12 +75,12 @@ namespace CowSpeak
 
 				return new Any(ReturnedType, ReturnValue);
 			}
-			catch (System.Reflection.TargetInvocationException ex)
+			catch (TargetInvocationException ex)
 			{
 				System.Exception baseEx = ex.GetBaseException();
 				if (baseEx is Exception)
 					throw baseEx as Exception;
-				throw new Exception("FunctionCall '" + Name + "' returned an exception: " + baseEx.Message);
+				throw new Exception("Function '" + Name + "' returned an exception: " + baseEx.Message);
 			}
 		}
 	}

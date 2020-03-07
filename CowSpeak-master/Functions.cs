@@ -49,7 +49,6 @@ namespace CowSpeak
 		[FunctionAttr("Array")]
 		public static System.Array Array(int length, object initialValue) // creates an array based on initialValue's type
 		{
-			System.Console.WriteLine(initialValue.GetType() + " - " + initialValue);
 			var arr = System.Array.CreateInstance(initialValue.GetType(), length);
 			if (Type.GetType(arr.GetType(), false) == null)
 				throw new Exception("Invalid type of object passed as initialValue"); // This may not be possible but better safe then sorry
@@ -146,21 +145,21 @@ namespace CowSpeak
 		[FunctionAttr("Tan")]
 		public static double Tan(double num) => System.Math.Tan(num);
 
-		[FunctionAttr("Import")]
-		public static void Import(string modulePath)
+		[FunctionAttr("Run")]
+		public static void Run(string filePath)
 		{
 			string oldFile = string.Copy(CowSpeak.CurrentFile);
 
 			// make modulePath relative to CurrentFile as long as modulePath is relative
-			if (!Path.IsPathRooted(modulePath))
+			if (!Path.IsPathRooted(filePath))
 			{
 				if (CowSpeak.CurrentFile.IndexOf("/") != -1)
-					modulePath = CowSpeak.CurrentFile.Substring(0, CowSpeak.CurrentFile.IndexOf("/") + 1) + modulePath;
+					filePath = CowSpeak.CurrentFile.Substring(0, CowSpeak.CurrentFile.IndexOf("/") + 1) + filePath;
 				if (CowSpeak.CurrentFile.IndexOf("\\") != -1)
-					modulePath = CowSpeak.CurrentFile.Substring(0, CowSpeak.CurrentFile.IndexOf("\\") + 1) + modulePath;
+					filePath = CowSpeak.CurrentFile.Substring(0, CowSpeak.CurrentFile.IndexOf("\\") + 1) + filePath;
 			}
 
-			CowSpeak.Exec(modulePath);
+			CowSpeak.Exec(filePath);
 			CowSpeak.CurrentFile = oldFile;
 		}
 

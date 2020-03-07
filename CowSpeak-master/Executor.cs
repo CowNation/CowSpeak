@@ -165,7 +165,7 @@ namespace CowSpeak
 					Variable target = CowSpeak.GetVariable(Lines[i][1].identifier);
 					CowSpeak.Vars.Remove(target);
 
-					continue; // prevent execution
+					continue; // prevent further execution of line
 				} // must handle this before the other lines are evaluated to avoid wrong exceptions
 
 				bool shouldBeSet = false; // topmost variable in list should be set after exec
@@ -187,7 +187,15 @@ namespace CowSpeak
 				if (shouldBeSet)
 				{
 					CowSpeak.Vars.Last().bytes = retVal.bytes;
-					var val = CowSpeak.Vars.Last().Value; // Do this in case there was an overflow error
+
+					try
+					{
+						var val = CowSpeak.Vars.Last().Value; // Do this in case there was an overflow error
+					}
+					catch
+					{
+						System.Console.WriteLine("caught that bugger");
+					}
 				}
 				else if (Lines[i].Count >= 2 && Lines[i][0].type == TokenType.VariableIdentifier && Lines[i][1].type == TokenType.EqualOperator)
 				{

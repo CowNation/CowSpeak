@@ -2,6 +2,8 @@ using System.Reflection;
 using System.IO;
 using System.Collections.Generic;
 using CowSpeak;
+using System.Collections;
+using System.Linq;
 
 static class Extensions
 {
@@ -22,9 +24,32 @@ static class Extensions
 
 class Shell
 {
+	static string[] RetrieveFunctions()
+	{
+		var assem = typeof(CowSpeak.CowSpeak).Assembly;
+
+		var Functions = System.Activator.CreateInstance(typeof(List<>).MakeGenericType(assem.GetType("CowSpeak.FunctionBase")));
+		Functions = assem.GetType("CowSpeak.FunctionAttr").GetMethod("GetFunctions").Invoke(null, new object[]{});
+		var FunctionsList = (IList)Functions;
+		List<string> FunctionUsages = new List<string>();
+		for (int i = 0; i < FunctionsList.Count; i++)
+		{
+			object item = FunctionsList[i]; // type of this is CowSpeak.FunctionBase
+			;
+			FunctionUsages.Add((string)item.GetType().GetProperty("Usage", BindingFlags.Public | BindingFlags.Instance).GetValue(item));
+		}
+
+		return FunctionUsages.ToArray();
+	}
+
 	public static void Main(string[] args)
 	{
 		System.Console.WriteLine("Welcome to the CowSpeak(TM) shell!\nIn order to exit the shell, call the Exit() function");
+
+		var Functions = RetrieveFunctions();
+		System.Console.WriteLine("Functions (" + Functions.Length + "):");
+		foreach (var Function in Functions)
+			System.Console.WriteLine(Function);
 
 		List<string> Lines = null;
 		while (true)

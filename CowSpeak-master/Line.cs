@@ -92,13 +92,12 @@ namespace CowSpeak
 			{
 				if (base[i].type == TokenType.FunctionCall)
 				{
-					if (CowSpeak.GetFunction(base[i].identifier).isVoid()){
+					if (CowSpeak.GetFunction(base[i].identifier).type == Type.Void){
 						if (GetRange(0, Count).IsIndexValid(i - 1) && Utils.IsOperator(base[i-1].type))
 							throw new Exception("Cannot perform operation: '" + base[i-1].identifier + "' on void function");
 						if (GetRange(0, Count).IsIndexValid(i + 1) && Utils.IsOperator(base[i+1].type))
 							throw new Exception("Cannot perform operation: '" + base[i+1].identifier + "' on void function");
 					}
-				
 				}
 			}
 
@@ -136,11 +135,7 @@ namespace CowSpeak
 					FunctionBase func = CowSpeak.GetFunction(identifier);
 					Any returned = func.Execute(identifier);
 					if (toEval.Count == 1)
-					{
-						if (returned == null)
-							return null; // tocleanup
-						return new Any(func.type, returned.Value);
-					}
+						return returned;
 					if (returned != null)
 						identifier = returned.Value.ToString(); // replace function call with it's return value
 					else

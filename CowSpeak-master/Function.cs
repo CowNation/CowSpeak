@@ -42,8 +42,6 @@ namespace CowSpeak
 			}
 		}
 
-		public bool isVoid() => type == Type.Void;
-
 		public static Any[] ParseParameters(string s_parameters)
 		{
 			if (s_parameters == "()")
