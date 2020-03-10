@@ -1,0 +1,8 @@
+# we pass true so already defined exceptions are thrown
+Run("binaryTest.bcf", True)
+Run("calculator.cf", True)
+Run("convertStr.cf", True)
+Run("fizzBuzz.cf", True)
+Run("hexTest.hcf", True)
+Run("randomNumberGuessr.cf", True)
+Run("stairsMaker.cf", True)

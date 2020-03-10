@@ -188,7 +188,7 @@ namespace CowSpeak
 			{
 				CowSpeak.CurrentLine = i + 1 + CurrentLineOffset;
 
-				fileLines[i] = fileLines[i].Replace(@"\n", System.Environment.NewLine); // interpret \n as a newline in strings
+				fileLines[i] = fileLines[i].Replace(@"\n", System.Environment.NewLine).Replace(@"\b", "\b"); // interpret \n as a newline and \b as backspace in strings
 
 				while (fileLines[i].IndexOf("	") == 0 || fileLines[i].IndexOf(" ") == 0)
 					fileLines[i] = fileLines[i].Remove(0, 1);

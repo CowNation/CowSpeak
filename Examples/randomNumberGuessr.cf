@@ -27,4 +27,4 @@ while(correctGuess != guess) {
 	firstTime = False # it's not the first time through the loop
 }
 
-Print("Correct Answer!!\nYour Tries: " + tries)
+Print("Correct Answer!!\nYour Tries: " + tries + "\n")

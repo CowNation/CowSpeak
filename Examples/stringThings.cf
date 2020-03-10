@@ -1,4 +1,4 @@
-Import("stringUtils.cf")
+Run("stringUtils.cf", False)
 
 Print("String Things:\n")
 

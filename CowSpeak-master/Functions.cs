@@ -166,7 +166,7 @@ namespace CowSpeak
 		public static double Tan(double num) => System.Math.Tan(num);
 
 		[FunctionAttr("Run")]
-		public static void Run(string filePath)
+		public static void Run(string filePath, bool ClearData)
 		{
 			string oldFile = string.Copy(CowSpeak.CurrentFile);
 
@@ -179,7 +179,10 @@ namespace CowSpeak
 					filePath = CowSpeak.CurrentFile.Substring(0, CowSpeak.CurrentFile.IndexOf("\\") + 1) + filePath;
 			}
 
-			CowSpeak.Exec(filePath);
+			if (ClearData)
+				CowSpeak.Run(filePath);
+			else
+				CowSpeak.Exec(filePath);
 			CowSpeak.CurrentFile = oldFile;
 		}
 
