@@ -10,13 +10,12 @@ namespace CowSpeak
 	internal static class Functions
 	{
 		#region ALL_METHODS
-		[MethodAttr("Any.ToString")]
-		public static string ToString(Variable obj)
+		public static string _ToString(object obj)
 		{
-			if (obj.Type.rep.IsArray)
+			if (obj.GetType().IsArray)
 			{
 				string ret = "{";
-				System.Array Items = (System.Array)obj.Value;
+				System.Array Items = (System.Array)obj;
 				IEnumerator myEnumerator = Items.GetEnumerator();
 				while (( myEnumerator.MoveNext() ) && ( myEnumerator.Current != null ))
 					ret += myEnumerator.Current.ToString() + ", ";
@@ -26,7 +25,13 @@ namespace CowSpeak
 				return ret;
 			}
 
-			return obj.Value.ToString();
+			return obj.ToString();
+		}
+
+		[MethodAttr("Any.ToString")]
+		public static string ToString(Variable obj)
+		{
+			return _ToString(obj.Value);
 		}
 
 		[MethodAttr("Any.Delete")]
@@ -37,16 +42,16 @@ namespace CowSpeak
 		[MethodAttr("Array.Length")]
 		public static int ArrayLength(Variable obj) => ((System.Array)obj.Value).Length;
 		
-		[MethodAttr("Array.SetValue")]
-		public static void SetValue(Variable obj, int index, object value)
+		[MethodAttr("Array.Set")]
+		public static void Set(Variable obj, int index, object value)
 		{
 			var Value = (System.Array)obj.Value;
 			Value.SetValue(value, index);
 			obj.Value = Value;
 		}
 
-		[MethodAttr("Array.GetValue")]
-		public static object GetValue(Variable obj, int index) => ((System.Array)obj.Value).GetValue(index);
+		[MethodAttr("Array.Get")]
+		public static object Get(Variable obj, int index) => ((System.Array)obj.Value).GetValue(index);
 		#endregion
 
 		[FunctionAttr("Array")]
@@ -138,6 +143,18 @@ namespace CowSpeak
 		[MethodAttr(Syntax.Types.Integer64 + ".ToCharacter")]
 		public static char ToCharacter64(Variable obj) => (char)(long)obj.Value;
 		#endregion
+
+		[FunctionAttr("ReadFileLines")]
+		public static string[] ReadFileLines(string filePath) => File.ReadAllLines(filePath);
+
+		[FunctionAttr("WriteFileLines")]
+		public static void WriteFileLines(string filePath, string[] lines) => File.WriteAllLines(filePath, lines);
+
+		[FunctionAttr("DeleteFile")]
+		public static void DeleteFile(string filePath) => File.Delete(filePath);
+
+		[FunctionAttr("DoesFileExist")]
+		public static bool DoesFileExist(string filePath) => File.Exists(filePath);
 
 		[FunctionAttr("Sin")]
 		public static double Sin(double num) => System.Math.Sin(num);
@@ -237,7 +254,7 @@ namespace CowSpeak
 		}
 
 		[FunctionAttr("Print")]
-		public static void Print(object text) => System.Console.Write(text.ToString());
+		public static void Print(object text) => System.Console.Write(_ToString(text));
 
 		[FunctionAttr("Exit")]
 		public static void Exit(int exitCode) => System.Environment.Exit(exitCode);
