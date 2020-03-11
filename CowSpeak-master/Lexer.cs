@@ -144,7 +144,12 @@ namespace CowSpeak
 			return ret;
 		}
 
-		public Lexer(List< string > fileLines, int CurrentLineOffset = 0, bool isNestedInFunction = false, bool isNestedInConditional = false, FileType Type = FileType.Normal)
+		public Lexer()
+		{
+
+		}
+
+		public void Tokenize(List< string > fileLines, int CurrentLineOffset = 0, bool isNestedInFunction = false, bool isNestedInConditional = false, FileType Type = FileType.Normal)
 		{
 			if (Type == FileType.Binary)
 			{

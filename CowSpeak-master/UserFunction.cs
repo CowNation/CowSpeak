@@ -113,6 +113,10 @@ namespace CowSpeak
 				CowSpeak.Vars.Insert(0, new Variable(parameter.Type, parameter.Name, parameters[i].Value));
 			}
 
+			bool isBeingCalledRecursively = CowSpeak.StackTrace.Count > 0 && CowSpeak.StackTrace[CowSpeak.StackTrace.Count - 1] == Usage;
+			if (isBeingCalledRecursively)
+				throw new Exception("Recursion is not supported in this version of CowSpeak");
+
 			CowSpeak.StackTrace.Add(Usage);
 			Any returnedValue = ExecuteLines();
 			CowSpeak.StackTrace.RemoveAt(CowSpeak.StackTrace.Count - 1);

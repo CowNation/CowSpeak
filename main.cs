@@ -20,6 +20,21 @@ static class Extensions
 		ret.Add(str);
 		return ret.ToArray();
 	}
+
+	public static bool IsIndexBetween(this string str, int index, string start, string end){
+		string leftOf = str.Substring(0, index);
+		int starts = leftOf.Split(start).Length - 1;
+
+		if (start != end)
+		{
+			int lastStart = leftOf.LastIndexOf(start);
+			int lastEnd = leftOf.LastIndexOf(end);
+			int ends = leftOf.Split(end).Length - 1;
+			return lastStart != -1 && (lastStart > lastEnd || starts > ends);
+		}
+		else
+			return starts % 2 != 0;
+	}
 }
 
 class Shell
@@ -38,6 +53,8 @@ class Shell
 			;
 			FunctionUsages.Add((string)item.GetType().GetProperty("Usage", BindingFlags.Public | BindingFlags.Instance).GetValue(item));
 		}
+
+		FunctionUsages.Sort();
 
 		return FunctionUsages.ToArray();
 	}

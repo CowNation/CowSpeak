@@ -14,7 +14,7 @@ namespace CowSpeak
 					continue;
 
 				int index = token.OrdinalIndexOf(".", i);
-				if (index - 1 >= 0 && token[index - 1] == ')')
+				if (index - 1 >= 0 && !token.IsIndexBetween(index, "(", ")"))
 				{
 					atLeastOneChild = true;
 					break;
@@ -24,8 +24,8 @@ namespace CowSpeak
 			return atLeastOneChild && 
 			token.OccurrencesOf("(") > 1 &&
 			token.OccurrencesOf(")") > 1 &&
-			token.OccurrencesOf("(") == token.OccurrencesOf(")") && 
-			token.IndexOf(".") < token.IndexOf("(") && 
+			token.OccurrencesOf("(") == token.OccurrencesOf(")") &&
+			//token.IndexOf(".") < token.IndexOf("(") && 
 			token.IndexOf(".") != -1 &&
 			token.OccurrencesOf(".") > 1;
 		}

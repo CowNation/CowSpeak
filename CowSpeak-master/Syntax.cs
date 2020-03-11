@@ -18,7 +18,8 @@ namespace CowSpeak
 			public const string c_Boolean = "Boolean";
 			public const string Character = "character";
 			public const string c_Character = "Character";
-			public const string Any = "any";
+			public const string Any = "object";
+			public const string ArraySuffix = "Array";
 		}
 
 		public static class Statements

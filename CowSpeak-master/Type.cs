@@ -20,11 +20,11 @@ namespace CowSpeak
 		public static Type Boolean = new Type(Syntax.Types.Boolean, typeof(bool));
 		public static Type Character = new Type(Syntax.Types.Character, typeof(char));
 
-		public static Type IntegerArray = new Type(Syntax.Types.c_Integer + "Array", typeof(int[]));
-		public static Type DecimalArray = new Type(Syntax.Types.c_Decimal + "Array", typeof(double[]));
-		public static Type StringArray = new Type(Syntax.Types.c_String + "Array", typeof(string[]));
-		public static Type BooleanArray = new Type(Syntax.Types.c_Boolean + "Array", typeof(bool[]));
-		public static Type CharacterArray = new Type(Syntax.Types.c_Character + "Array", typeof(char[]));
+		public static Type IntegerArray = new Type(Syntax.Types.c_Integer + Syntax.Types.ArraySuffix, typeof(int[]));
+		public static Type DecimalArray = new Type(Syntax.Types.c_Decimal + Syntax.Types.ArraySuffix, typeof(double[]));
+		public static Type StringArray = new Type(Syntax.Types.c_String + Syntax.Types.ArraySuffix, typeof(string[]));
+		public static Type BooleanArray = new Type(Syntax.Types.c_Boolean + Syntax.Types.ArraySuffix, typeof(bool[]));
+		public static Type CharacterArray = new Type(Syntax.Types.c_Character + Syntax.Types.ArraySuffix, typeof(char[]));
 
 		public static Type[] GetTypes()
 		{
