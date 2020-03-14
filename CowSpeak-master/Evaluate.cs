@@ -11,7 +11,7 @@ namespace CowSpeak
 			{
 				return new DataTable().Compute(expression, null);
 			}
-			catch (System.Data.EvaluateException ex)
+			catch (InvalidExpressionException ex)
 			{
 				throw new Exception("Could not evaluate expression: " + ex.Message);
 			}

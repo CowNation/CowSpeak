@@ -7,154 +7,151 @@ namespace CowSpeak
 	{
 		public static int GetClosingBracket(List< Line > Lines, int start)
 		{
-			int nextSkips = 0; // skip bracket(s) after next Conditional (for nested conditionals)
-			for (int j = start + 1; j < Lines.Count; j++)
+			int skips = 0; // number of EndBracket(s) to skip
+			for (int j = start; j < Lines.Count; j++)
 			{
-				if (Lines[j].Count < 1)
+				if (Lines[j].Count == 0)
 					continue;
 
-				if (Lines[j][0].type.ToString().IndexOf("Conditional") != -1 || (Lines[j].Count > 2 && Lines[j][1].type == TokenType.FunctionCall && Lines[j][0].type == TokenType.TypeIdentifier && Lines[j][2].type == TokenType.StartBracket))
-					nextSkips++; // there is a nested conditional, skip the next bracket
-
-				if (Lines[j][0].type == TokenType.EndBracket)
+				foreach (var token in Lines[j])
 				{
-					if (nextSkips > 0)
-						nextSkips--;
-					else
-						return j;
+					if (token.type == TokenType.StartBracket)
+					{
+						skips++;
+						break;
+					}
+				}
+
+				foreach (var token in Lines[j])
+				{
+					if (token.type == TokenType.EndBracket)
+					{
+						skips--;
+
+						if (skips <= 0)
+							return j;
+					}
 				}
 			}
 
-			throw new Exception("Conditional or function is missing an ending curly bracket");
+			throw new Exception("StartBracket is missing an EndBracket");
 		}
 
-		public static void Execute(List< Line > Lines, int CurrentLineOffset = 0, bool isNestedInFunction = false, bool isNestedInConditional = false)
+		public static Any Execute(List< Line > Lines, int CurrentLineOffset = 0, bool isNestedInFunction = false, bool isNestedInConditional = false)
 		{
 			for (int i = 0; i < Lines.Count; i++)
 			{
 				CowSpeak.CurrentLine = i + 1 + CurrentLineOffset;
 
-				if (Lines[i].Count >= 1 && Lines[i][0].type == TokenType.ReturnStatement)
+				if (Lines[i].FirstOrDefault() != null && Lines[i].FirstOrDefault().type == TokenType.ReturnStatement)
 				{
 					if (isNestedInFunction)
-						return; // ReturnStatement to be handled by UserFunction.ExecuteLines
+					{
+						if (Lines[i].Count < 2)
+							return null;
+
+						return new Line(new List<Token>{Lines[i][1]}).Exec();
+					}
 					else
 						throw new Exception("ReturnStatement must be located inside of a FunctionDefinition");
 				}
 
-				if (Lines[i].Count > 1 && Lines[i][0].type == TokenType.TypeIdentifier && Lines[i][1].type == TokenType.FunctionCall)
+				if (Lines[i].HasFunctionDefinition || Lines[i].HasConditional)
 				{
-					if (Lines[i].Count < 3 || Lines[i][2].type != TokenType.StartBracket)
-						throw new Exception("StartBracket must immediately precede a function definition");
+					bool NextLineExists = Lines.IsIndexValid(i + 1);
+					bool HasPrecedingBracket = Lines[i].Last() != null && Lines[i].Last().type == TokenType.StartBracket;
+					bool NextLineHasBracket = NextLineExists && Lines[i + 1].FirstOrDefault() != null && Lines[i + 1].FirstOrDefault().type == TokenType.StartBracket;
+					if (!HasPrecedingBracket && !NextLineHasBracket)
+						throw new Exception("FunctionDefinition or Conditional is missing a preceding StartBracket");
 
-					if (isNestedInFunction || isNestedInConditional)
-						throw new Exception("Function cannot be defined inside of a function or conditional");
+					int StartBracketIndex = i; // index of the line that the StartBracket appears at
+					if (NextLineHasBracket)
+						StartBracketIndex++;
 
-					string usage = Lines[i][1].identifier.Replace(((char)0x1D).ToString(), " ");
+					int EndingBracket = GetClosingBracket(Lines, i);
 
-					usage = usage.Substring(0, usage.Length - 1); // remove )
-					string dName = usage.Substring(0, usage.IndexOf("(")); // text before first '('
-
-					CowSpeak.Functions.Create(new UserFunction(dName, Utils.pGetContainedLines(Lines, GetClosingBracket(Lines, i), i), UserFunction.ParseDefinitionParams(usage.Substring(usage.IndexOf("("))), Utils.GetType(Lines[i][0].identifier), Lines[i][0].identifier + " " + usage + ")", i));
-
-					i = GetClosingBracket(Lines, i); // skip to end of definition
-				}
-				else if (Lines[i].Count > 0 && Lines[i][0].type.ToString().IndexOf("Conditional") != -1)
-				{
-					if (Lines[i].Count < 2 || Lines[i][1].type != TokenType.StartBracket)
-						throw new Exception("StartBracket must immediately precede a conditional");
-
-					int endingBracket = GetClosingBracket(Lines, i);
-					List< string > ContainedLines = Utils.GetContainedLines(Lines, endingBracket, i);
-
-					if (Lines[i][0].type == TokenType.IfConditional)
+					if (Lines[i].HasFunctionDefinition)
 					{
+						if (isNestedInFunction || isNestedInConditional)
+							throw new Exception("Function cannot be defined inside of a function or conditional");
 
-						if (new Conditional(Lines[i][0].identifier).EvaluateBoolean())
-						{
-							Scope scope = new Scope();
+						string usage = Lines[i][1].identifier.Replace(((char)0x1D).ToString(), " ");
 
-							new Lexer().Tokenize(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
+						usage = usage.Substring(0, usage.Length - 1); // remove )
+						string dName = usage.Substring(0, usage.IndexOf("(")); // text before first '('
 
-							scope.End();
-						}
-
-						i = endingBracket; // IfConditional is over, skip to end of brackets to prevent continedLines to be executed again
+						var DefinitionLines = Utils.pGetContainedLines(Lines, EndingBracket, StartBracketIndex);
+						CowSpeak.Functions.Create(new UserFunction(dName, DefinitionLines, UserFunction.ParseDefinitionParams(usage.Substring(usage.IndexOf("("))), Utils.GetType(Lines[i][0].identifier), Lines[i][0].identifier + " " + usage + ")", i));
 					}
-					else if (Lines[i][0].type == TokenType.ElseConditional)
+					else if (Lines[i].HasConditional)
 					{
-						int parentIf = -1;
+						List< string > ContainedLines = Utils.GetContainedLines(Lines, EndingBracket, StartBracketIndex);
 
-						if (i == 0 || (Lines[i - 1].Count > 0 && Lines[i - 1][0].type != TokenType.EndBracket))
-							throw new Exception("ElseConditional isn't immediately preceding an EndBracket");
-
-						for (int j = 0; j < i; j++)
+						if (Lines[i][0].type == TokenType.IfConditional)
 						{
-							if (Lines[j].Count > 0 && Lines[j][0].type == TokenType.IfConditional && GetClosingBracket(Lines, j) == i - 1)
+
+							if (new Conditional(Lines[i][0].identifier).EvaluateBoolean())
 							{
-								parentIf = j;
-								break;
+								Scope scope = new Scope();
+
+								new Lexer().Tokenize(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
+
+								scope.End();
 							}
 						}
-
-						if (parentIf == -1)
-							throw new Exception("ElseConditional isn't immediately preceding an EndBracket");
-
-						if (!new Conditional(Lines[parentIf][0].identifier).EvaluateBoolean()){
-							Scope scope = new Scope();
-
-							new Lexer().Tokenize(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
-
-							scope.End();
-						}
-
-						i = endingBracket; // ElseConditional is over, skip to end of brackets to prevent continedLines to be executed again
-					}
-					else if (Lines[i][0].type == TokenType.WhileConditional)
-					{
-						Conditional whileStatement = new Conditional(Lines[i][0].identifier);
-						
-						while (whileStatement.EvaluateBoolean())
+						else if (Lines[i][0].type == TokenType.ElseConditional)
 						{
-							Scope scope = new Scope();
+							int parentIf = -1;
 
-							new Lexer().Tokenize(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
+							if (i == 0 || (Lines[i - 1].Count > 0 && Lines[i - 1][0].type != TokenType.EndBracket))
+								throw new Exception("ElseConditional must immediately precede an EndBracket");
 
-							scope.End();
+							for (int j = 0; j < i; j++)
+							{
+								if (Lines[j].Count > 0 && Lines[j][0].type == TokenType.IfConditional && GetClosingBracket(Lines, j) == i - 1)
+								{
+									parentIf = j;
+									break;
+								}
+							}
+
+							if (parentIf == -1)
+								throw new Exception("ElseConditional isn't immediately preceding an EndBracket");
+
+							if (!new Conditional(Lines[parentIf][0].identifier).EvaluateBoolean()){
+								Scope scope = new Scope();
+
+								new Lexer().Tokenize(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
+
+								scope.End();
+							}
 						}
-
-						i = endingBracket; // while loop is over, skip to end of brackets to prevent continedLines to be executed again
-					}
-					else if (Lines[i][0].type == TokenType.LoopConditional)
-					{
-						string usage = Lines[i][0].identifier;
-						Any[] loopParams = StaticFunction.ParseParameters(usage.Substring(usage.IndexOf("("), usage.LastIndexOf(")") - usage.IndexOf("(") + 1));
-
-						StaticFunction Loop = new StaticFunction("Loop", null, Type.Void, new Parameter[]{ new Parameter(Type.String, "IndexVariableName"), new Parameter(Type.Integer, "StartAt"), new Parameter(Type.Integer, "EndAt") });
-						Loop.CheckParameters(loopParams.ToList()); // throws errors if given parameters are bad
-
-						string varName = loopParams[0].Value.ToString();
-						//System.Console.WriteLine(loopParams[1].Type.Name + "," + loopParams[2].Type.Name);				
-						long start = loopParams[1].Type == Type.Integer64 ? (long)loopParams[1].Value : (int)loopParams[1].Value;
-						long end = loopParams[2].Type == Type.Integer64 ? (long)loopParams[2].Value : (int)loopParams[2].Value;
-
-						CowSpeak.Vars.Create(new Variable(Type.Integer, varName));
-
-						for (long p = start; p < end; p++)
+						else if (Lines[i][0].type == TokenType.WhileConditional)
 						{
-							Scope scope = new Scope();
+							Conditional whileStatement = new Conditional(Lines[i][0].identifier);
+							
+							while (whileStatement.EvaluateBoolean())
+							{
+								Scope scope = new Scope();
 
-							CowSpeak.Vars.Get(varName).Value = p;
+								new Lexer().Tokenize(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
 
-							new Lexer().Tokenize(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
-
-							scope.End();
+								scope.End();
+							}
 						}
+						else if (Lines[i][0].type == TokenType.LoopConditional)
+						{
+							string usage = Lines[i][0].identifier;
+							Any[] loopParams = StaticFunction.ParseParameters(usage.Substring(usage.IndexOf("("), usage.LastIndexOf(")") - usage.IndexOf("(") + 1));
 
-						CowSpeak.Vars.Remove(CowSpeak.Vars.Get(varName)); // delete the variable after loop is done
+							StaticFunction Loop = new StaticFunction("Loop", null, Type.Void, new Parameter[]{ new Parameter(Type.String, "IndexVariableName"), new Parameter(Type.Integer, "StartAt"), new Parameter(Type.Integer, "EndAt") });
+							Loop.CheckParameters(loopParams.ToList()); // throws errors if given parameters are bad
 
-						i = endingBracket; // loop is over, skip to end of brackets to prevent continedLines getting executed again
+							Functions.Loop(ContainedLines, i, CurrentLineOffset, isNestedInFunction, loopParams[0].Value.ToString(), (int)loopParams[1].Value, (int)loopParams[2].Value);
+						}
 					}
+
+					i = EndingBracket; // skip to end of definition
 				}
 
 				if (i >= Lines.Count)
@@ -179,24 +176,25 @@ namespace CowSpeak
 				if (shouldBeSet)
 				{
 					CowSpeak.Vars.Last().bytes = retVal.bytes;
-					var val = CowSpeak.Vars.Last().Value; // Do this in case there was an overflow error
+					var val = CowSpeak.Vars.Last().Value; // Do this in case there was an error when setting bytes
 				}
 				else if (Lines[i].Count >= 2 && Lines[i][0].type == TokenType.VariableIdentifier && Lines[i][1].type == TokenType.EqualOperator)
 				{
-					if (CowSpeak.Vars.Get(Lines[i][0].identifier, false) == null){
-						throw new Exception("Variable '" + Lines[i][0].identifier + "' must be defined before it can be set");
-					} // var not found
+					if (CowSpeak.Vars.Get(Lines[i][0].identifier, false) == null)
+						throw new Exception("Variable '" + Lines[i][0].identifier + "' must be defined before it can be set"); // var not found
 
 					for (int v = 0; v < CowSpeak.Vars.Count; v++)
 					{
 						if (Lines[i][0].identifier == CowSpeak.Vars[v].Name)
 						{
 							CowSpeak.Vars[v].bytes = retVal.bytes;
-							var val = CowSpeak.Vars[v].Value; // Do this in case there was an overflow error
+							var val = CowSpeak.Vars[v].Value; // Do this in case there was an error when setting bytes
 						}
 					}
 				} // type is not specified, var must already be defined
 			}
+
+			return null;
 		}
 	}
 }

@@ -84,7 +84,7 @@ namespace CowSpeak
 				return new Token(TokenType.Number, token);
 			else if (FunctionChain.IsChain(token))
 				return new Token(TokenType.FunctionChain, token);
-			else if (token.IndexOf("(") > 0 && token[token.Length - 1] == ')')
+			else if (token.IndexOf("(") > 0 && Utils.GetInitialClosingParenthesis(token) == token.Length - 1)
 				return new Token(TokenType.FunctionCall, token);
 			else if (Utils.IsLettersOnly(token))
 				return new Token(TokenType.VariableIdentifier, token);

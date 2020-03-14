@@ -1,17 +1,26 @@
 # Shout out to Pinecone by William W Wold
-void fizzBuzz(integer start, integer end) {
-	loop("index", start, end + 1) {
+void fizzBuzz(integer start, integer end)
+{
+	loop("index", start, end + 1)
+	{
 		integer threeDivisible = index % 3
 		integer fiveDivisible = index % 5
-		if(threeDivisible == 0) {
+
+		if(threeDivisible == 0)
+		{
 			Print("Fizz")
 		}
-		if(fiveDivisible == 0) {
+
+		if(fiveDivisible == 0)
+		{
 			Print("Buzz")
 		}
-		if(threeDivisible != 0 && fiveDivisible != 0) {
+
+		if(threeDivisible != 0 && fiveDivisible != 0) 
+		{
 			Print(index)
 		}
+		
 		Print("\n")
 	}
 }

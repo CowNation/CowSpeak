@@ -36,6 +36,24 @@ namespace CowSpeak
 			return Encoding.Unicode.GetString(bytes);
 		}
 
+		public static int GetInitialClosingParenthesis(string str)
+		{
+			int skips = 0;
+			for (int i = 0; i < str.Length; i++)
+			{
+				if (str[i] == '(')
+					skips++;
+
+				if (str[i] == ')')
+				{
+					skips--;
+					if (skips <= 0)
+						return i;
+				}
+			}
+			return -1;
+		}
+
 		public static bool IsHexadecimal(string str) => Utils.OccurrencesOf(str, "0x") == 1 && str.IndexOf("0x") == 0;
 
 		public static int OccurrencesOf(this string str, string splitter) => str.Split(splitter).Length - 1;

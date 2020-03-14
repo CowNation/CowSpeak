@@ -10,9 +10,6 @@ namespace CowSpeak
 			bool atLeastOneChild = false;
 			for (int i = 0; i < token.OccurrencesOf("."); i++)
 			{
-				if (i == 0)
-					continue;
-
 				int index = token.OrdinalIndexOf(".", i);
 				if (index - 1 >= 0 && !token.IsIndexBetween(index, "(", ")"))
 				{
@@ -25,9 +22,7 @@ namespace CowSpeak
 			token.OccurrencesOf("(") > 1 &&
 			token.OccurrencesOf(")") > 1 &&
 			token.OccurrencesOf("(") == token.OccurrencesOf(")") &&
-			//token.IndexOf(".") < token.IndexOf("(") && 
-			token.IndexOf(".") != -1 &&
-			token.OccurrencesOf(".") > 1;
+			token.IndexOf(".") != -1;
 		}
 
 		public static Any Evaluate(string identifier)

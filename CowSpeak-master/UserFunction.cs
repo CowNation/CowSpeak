@@ -29,35 +29,25 @@ namespace CowSpeak
 			string CurrentFile = CowSpeak.CurrentFile;
 			CowSpeak.CurrentFile = DefinedIn;
 
-			Executor.Execute(Definition, DefinitionOffset + 1, true);
-
-			Line ReturnedLine = Definition[CowSpeak.CurrentLine - DefinitionOffset - 2]; // relative line where Lexer returned
-
-			bool HasReturnStatement = ReturnedLine.Count > 0 && ReturnedLine[0].type == TokenType.ReturnStatement; // starts with a ReturnStatement
-			bool IsReturnStatement = ReturnedLine.Count == 1 && HasReturnStatement; // is only one token, a ReturnStatement
+			var ReturnedValue = Executor.Execute(Definition, DefinitionOffset + 1, true);
 
 			if (type == Type.Void)
 			{
-				if (HasReturnStatement && !IsReturnStatement)
+				if (ReturnedValue != null)
 					throw new Exception("Cannot return a value from a void function");
 
-				return new Any(Type.Integer, 0);
+				return null; // TODO: Return null
 			}
 
-			if (!HasReturnStatement)
-				throw new Exception(Name + " - Function is missing a ReturnStatement");
+			if (ReturnedValue == null)
+				throw new Exception("Non-void function '" + Name + "' did not return any valid value");
 
-			if (ReturnedLine.Count == 0)
-				throw new Exception("ReturnStatement requires a value when the function type is not void");
-
-			Any returnedValue = new Line(ReturnedLine.GetRange(1, ReturnedLine.Count - 1)).Exec();
-
-			if (!Conversion.IsCompatible(returnedValue.Type, type))
-				throw new Exception("Incompatible return type ('" + returnedValue.Type.Name + "' is incompatible with '" + type.Name + "')");
+			if (!Conversion.IsCompatible(ReturnedValue.Type, type))
+				throw new Exception("Incompatible return type, ('" + ReturnedValue.Type.Name + "' is incompatible with '" + type.Name + "')");
 
 			CowSpeak.CurrentFile = CurrentFile;
 
-			return returnedValue;
+			return ReturnedValue;
 		}
 
 		public static Parameter[] ParseDefinitionParams(string s_params)

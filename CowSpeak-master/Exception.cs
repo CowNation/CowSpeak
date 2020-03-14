@@ -15,6 +15,8 @@ namespace CowSpeak
 			{
 				StackTrace += CowSpeak.StackTrace[i] + (i < CowSpeak.StackTrace.Count - 1 ? "->" : "");
 			}
+
+			CowSpeak.StackTrace.Clear(); // prevent recursion exception false positives
 		}
 	}
 }

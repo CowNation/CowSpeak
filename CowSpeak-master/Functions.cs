@@ -144,6 +144,24 @@ namespace CowSpeak
 		public static char ToCharacter64(Variable obj) => (char)(long)obj.Value;
 		#endregion
 
+		public static void Loop(List<string> ContainedLines, int i, int CurrentLineOffset, bool isNestedInFunction, string IndexVarName, int StartIndex, int EndIndex)
+		{
+			CowSpeak.Vars.Create(new Variable(Type.Integer, IndexVarName));
+
+			for (long p = StartIndex; p < EndIndex; p++)
+			{
+				Scope scope = new Scope();
+
+				CowSpeak.Vars.Get(IndexVarName).Value = p;
+
+				new Lexer().Tokenize(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
+
+				scope.End();
+			}
+
+			CowSpeak.Vars.Remove(CowSpeak.Vars.Get(IndexVarName)); // delete the variable after loop is done
+		}
+
 		[FunctionAttr("ReadFileLines")]
 		public static string[] ReadFileLines(string filePath) => File.ReadAllLines(filePath);
 

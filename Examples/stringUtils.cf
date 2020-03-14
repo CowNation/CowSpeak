@@ -1,17 +1,21 @@
-string GetTextBetween(string str, string leftOf, string rightOf) {
+string GetTextBetween(string str, string leftOf, string rightOf)
+{
 	integer TextStart = str.IndexOf(leftOf) + leftOf.Length()
 	return str.SubString(TextStart, str.IndexOf(rightOf) - TextStart)
 }
 
-string ReplaceFirstOf(string str, string lookFor, string replaceWith) {
+string ReplaceFirstOf(string str, string lookFor, string replaceWith)
+{
 	integer index = str.IndexOf(lookFor)
 	str = str.Remove(index, lookFor.Length())
 	str = str.Insert(index, replaceWith)
 	return str
 }
 
-string ReplaceAllOf(string str, string lookFor, string replaceWith) {
-	loop("", 0, str.OccurrencesOf(lookFor)) {
+string ReplaceAllOf(string str, string lookFor, string replaceWith)
+{
+	loop("", 0, str.OccurrencesOf(lookFor))
+	{
 		str = ReplaceFirstOf(str, lookFor, replaceWith)
 	}
 	return str

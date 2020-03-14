@@ -9,6 +9,22 @@ namespace CowSpeak
 
 		}
 
+		public bool HasFunctionDefinition
+		{
+			get
+			{
+				return Count > 1 && base[0].type == TokenType.TypeIdentifier && base[1].type == TokenType.FunctionCall;
+			}
+		}
+
+		public bool HasConditional
+		{
+			get
+			{
+				return Count > 0 && base[0].type.ToString().IndexOf("Conditional") != -1;
+			}
+		}
+
 		private static Any FixCharChain(List< Token > toEval, int i, string identifier)
 		{
 			if ((toEval[i].type == TokenType.Character || Utils.IsCharable(toEval[i])) && i == toEval.Count - 1)
@@ -177,6 +193,16 @@ namespace CowSpeak
 			}
 
 			return new Any(Evaluate.EvaluateExpression(Expression));
+		}
+
+		public override string ToString()
+		{
+			string ret = "";
+			for (int i = 0; i < Count; i++)
+			{
+				ret += base[i].identifier + (i < Count - 1 ? " " : "");
+			}
+			return ret;
 		}
 	}
 }
