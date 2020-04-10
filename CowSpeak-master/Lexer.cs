@@ -7,9 +7,9 @@ using System.Globalization;
 
 namespace CowSpeak
 {
-	internal class Lexer
+	public class Lexer
 	{
-		public List< Line > Lines = new List< Line >();
+		internal List< Line > Lines = new List< Line >();
 
 		public static Token ParseToken(string token, bool _throw = true)
 		{
@@ -144,12 +144,12 @@ namespace CowSpeak
 			return ret;
 		}
 
-		public Lexer()
+		internal Lexer()
 		{
 
 		}
 
-		public void Tokenize(List< string > fileLines, int CurrentLineOffset = 0, bool isNestedInFunction = false, bool isNestedInConditional = false, FileType Type = FileType.Normal)
+		internal void Tokenize(List< string > fileLines, int CurrentLineOffset = 0, bool isNestedInFunction = false, bool isNestedInConditional = false, FileType Type = FileType.Normal)
 		{
 			if (Type == FileType.Binary)
 			{

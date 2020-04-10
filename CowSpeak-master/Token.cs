@@ -1,6 +1,6 @@
 namespace CowSpeak
 {
-	internal enum TokenType
+	public enum TokenType
 	{
 		AddOperator,
 		SubtractOperator,
@@ -40,7 +40,7 @@ namespace CowSpeak
 		ReturnStatement
 	}
 
-	internal class Token
+	public class Token
 	{
 		public TokenType type;
 		public string identifier;
