@@ -42,6 +42,19 @@ namespace CowSpeak
 			}
 		}
 
+		public static bool IsFunctionCall(string token)
+		{
+			if (token.IndexOf("(") <= 0 || Utils.GetInitialClosingParenthesis(token) != token.Length - 1)
+				return false;
+
+			string LeftUsage = token.Substring(0, token.IndexOf("("));
+
+			if (LeftUsage.OccurrencesOf(".") > 1) // ex
+				return false;
+
+			return Utils.IsValidFunctionName(LeftUsage.Replace(".", "_"));
+		}
+
 		public static Any[] ParseParameters(string s_parameters)
 		{
 			if (s_parameters == "()")

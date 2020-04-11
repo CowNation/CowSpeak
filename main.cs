@@ -61,6 +61,8 @@ class Shell
 
 	public static void Main(string[] args)
 	{
+		CowSpeak.CowSpeak.Run("Examples/calculator.cf");
+
 		System.Console.WriteLine("Welcome to the CowSpeak(TM) shell!\nIn order to exit the shell, call the Exit() function");
 
 		var Functions = RetrieveFunctions();

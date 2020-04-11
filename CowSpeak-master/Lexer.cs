@@ -4,6 +4,7 @@ using System.Text;
 using System.IO;
 using System.Diagnostics;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace CowSpeak
 {
@@ -84,9 +85,9 @@ namespace CowSpeak
 				return new Token(TokenType.Number, token);
 			else if (FunctionChain.IsChain(token))
 				return new Token(TokenType.FunctionChain, token);
-			else if (token.IndexOf("(") > 0 && Utils.GetInitialClosingParenthesis(token) == token.Length - 1)
+			else if (FunctionBase.IsFunctionCall(token))
 				return new Token(TokenType.FunctionCall, token);
-			else if (Utils.IsLettersOnly(token))
+			else if (Utils.IsValidObjectName(token))
 				return new Token(TokenType.VariableIdentifier, token);
 
 			if (_throw)
@@ -101,6 +102,10 @@ namespace CowSpeak
 				return new List< Token >(); // don't parse empty line
 
 			line = Utils.ReplaceBetween(line, ' ', '\"', '\"', (char)0x1f);
+
+			// surrounded in Parenthesis (?<=[(])(.*)(?=[)])
+			// surrounded in quotes (?<=")(.*)(?=")
+			// function regex: \w+[(][^)]*[)]
 
 			string _line = line;
 			for (int Occurrence = 0; Occurrence < Utils.OccurrencesOf(line, " "); Occurrence++)

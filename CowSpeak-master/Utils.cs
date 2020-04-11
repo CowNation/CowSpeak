@@ -4,6 +4,7 @@ using System.Linq;
 using System.ComponentModel;
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace CowSpeak
 {
@@ -195,31 +196,22 @@ namespace CowSpeak
 			return index >= 0 && index < container.Count && container.Count > 0;
 		}
 
-		public static bool IsLettersOnly(string s)
+		public static bool IsValidObjectName(string s)
 		{
-			if (s == "")
-				return false;
-			foreach (char c in s)
-				if (!System.Char.IsLetter(c) && c != '_')
-					return false;
-			return true;
+			// A word char is A-z, 0-9, or a _ ([a-zA-Z0-9_] in Regex)
+			// This function returns whether the entire string is only made of one or more word chars
+			return Regex.Match(s, "\\w+").Value == s;
+		}
+
+		public static bool IsValidFunctionName(string s)
+		{
+			return Regex.Match(s, "(\\w+\\.\\w+|\\w+)").Value == s;
 		}
 
 		public static bool IsNumber(string str)
 		{
-			if (str == "-" || str.OccurrencesOf(".") > 1 || str.OccurrencesOf("-") > 1)
-				return false;
-
-			for (int i = 0; i < str.Length; i++)
-			{
-				if (str[i] == '-' && i == 0)
-					continue;
-
-				if ((str[i] < '0' || str[i] > '9') && str[i] != '.')
-					return false;
-			}
-
-			return true;
+			// regex is really confusing to me but basically this returns if the string is a number (including negatives and decimals)
+			return Regex.Match(str, "(-|\\d*?)\\d+(\\.\\d+|\\d*?)").Value == str;
 		}
 
 		public static bool IsCharable(Token token)
