@@ -148,7 +148,7 @@ namespace CowSpeak
 
 		}
 
-		private string EncodeLiterals(string str)
+		private static string EncodeLiterals(string str)
 		{
 			// Encode the contents in between "s or 's to base64 so they don't interfere with anything
 			MatchCollection LiteralMatches = Regex.Matches(str, "([\"\'])(?:(?:\\\\\\1|.)*?)\\1"); // matches for text surrounded in "s or 's (non-empty) (keep in mind the matches include the "s or 's)

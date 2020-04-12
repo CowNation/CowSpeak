@@ -36,7 +36,6 @@ namespace CowSpeak
 		StartBracket,
 		EndBracket,
 
-		DeleteStatement,
 		ReturnStatement
 	}
 
