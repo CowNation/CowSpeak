@@ -21,7 +21,7 @@ If you experience an issue where new printed lines are being written over previo
 * Scopes & manual variable deletion
 * Easily modifiable syntax
 * Full support for hexadecimal numbers
-## Previous Versions
+## Previous Significant Versions
 [v1 (Initial release on May 17, 2019)](https://github.com/CowNation/CowSpeak/tree/295d57e0a54622b5fc0483c6d1f163408d728aaf)
 
 [v2 (Recode of line evaluations on September 5, 2019)](https://github.com/CowNation/CowSpeak/tree/75c0002235ae917f6d7070cbc35dbfa2c4bb56a8)
