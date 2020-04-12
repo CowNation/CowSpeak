@@ -220,11 +220,11 @@ namespace CowSpeak
 		{
 			try
 			{
-				return (char)(int)obj.Value;
+				return (char)(long)obj.Value;
 			}
 			catch (System.InvalidCastException)
 			{
-				throw new Exception("Could not convert " + ((int)obj.Value) + " to a " + Syntax.Types.Character);
+				throw new Exception("Could not convert " + ((long)obj.Value) + " to a " + Syntax.Types.Character);
 			}
 		}
 		#endregion
