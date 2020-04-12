@@ -71,10 +71,10 @@ namespace CowSpeak
 					return new Token(TokenType.ElseConditional, token);
 			}
 
-			if (token[0] == '\"' && token[token.Length - 1] == '\"')
-				return new Token(TokenType.String, token.Replace(((char)0x1f).ToString(), " ").Substring(1, token.Replace(((char)0x1f).ToString(), " ").Length - 2));	
-			else if (token[0] == '\'' && token[token.Length - 1] == '\'' && token.Length == 3)
-				return new Token(TokenType.Character, token[token.Length - 2].ToString());
+			if (token[0] == '\"' && token[token.Length - 1] == '\"' && token.OccurrencesOf("\"") == 2)
+				return new Token(TokenType.String, token.Substring(1, token.Length - 2).FromBase64());	
+			else if (token[0] == '\'' && token[token.Length - 1] == '\'') // we can't ensure the length here because the contents are encoded
+				return new Token(TokenType.Character, token.Substring(1, token.Length - 2).FromBase64());
 			else if (token.IndexOf(Syntax.Conditionals.If + "(") == 0 && token[token.Length - 1] == ')')
 				return new Token(TokenType.IfConditional, token);
 			else if (token.IndexOf(Syntax.Conditionals.While + "(") == 0 && token[token.Length - 1] == ')')
@@ -91,7 +91,7 @@ namespace CowSpeak
 				return new Token(TokenType.VariableIdentifier, token);
 
 			if (_throw)
-				throw new Exception("Unknown token: " + token.Replace(((char)0x1f).ToString(), " "));
+				throw new Exception("Unknown token: " + token);
 
 			return null;
 		}
@@ -100,12 +100,6 @@ namespace CowSpeak
 		{
 			if (string.IsNullOrWhiteSpace(line))
 				return new List< Token >(); // don't parse empty line
-
-			line = Utils.ReplaceBetween(line, ' ', '\"', '\"', (char)0x1f);
-
-			// surrounded in Parenthesis (?<=[(])(.*)(?=[)])
-			// surrounded in quotes (?<=")(.*)(?=")
-			// function regex: \w+[(][^)]*[)]
 
 			string _line = line;
 			for (int Occurrence = 0; Occurrence < Utils.OccurrencesOf(line, " "); Occurrence++)
@@ -121,7 +115,7 @@ namespace CowSpeak
 					else
 						continue;
 
-					if ((before >= 'A' && before <= 'Z') || (before >= 'a' && before <= 'z'))
+					if (Regex.IsMatch(before.ToString(), "\\w"))
 					{
 						StringBuilder fileLine = new StringBuilder(_line);
 						fileLine[i] = (char)0x1D;
@@ -152,6 +146,27 @@ namespace CowSpeak
 		internal Lexer()
 		{
 
+		}
+
+		private string EncodeLiterals(string str)
+		{
+			// Encode the contents in between "s or 's to base64 so they don't interfere with anything
+			MatchCollection LiteralMatches = Regex.Matches(str, "([\"\'])(?:(?:\\\\\\1|.)*?)\\1"); // matches for text surrounded in "s or 's (non-empty) (keep in mind the matches include the "s or 's)
+			int IndexOffset = 0;
+			foreach (Match match in LiteralMatches)
+			{
+				if (match.Value[0] == '\'' && match.Length > 3)
+					throw new Exception("Character literal must have no more than one character");
+
+				if (match.Length > 2) // not just "s or 's
+				{
+					string Base64 = match.Value.Substring(1, match.Value.Length - 2).ToBase64();
+					str = str.Remove(IndexOffset + match.Index + 1, match.Length - 2); // remove contents of string
+					str = str.Insert(IndexOffset + match.Index + 1, Base64); // fill contents of string to base64 of old contents
+					IndexOffset += Base64.Length - (match.Length - 2);
+				}
+			}
+			return str;
 		}
 
 		internal void Tokenize(List< string > fileLines, int CurrentLineOffset = 0, bool isNestedInFunction = false, bool isNestedInConditional = false, FileType Type = FileType.Normal)
@@ -198,45 +213,36 @@ namespace CowSpeak
 			{
 				CowSpeak.CurrentLine = i + 1 + CurrentLineOffset;
 
-				fileLines[i] = fileLines[i].Replace(@"\n", System.Environment.NewLine).Replace(@"\b", "\b"); // interpret \n as a newline and \b as backspace in strings
-
 				while (fileLines[i].IndexOf("	") == 0 || fileLines[i].IndexOf(" ") == 0)
 					fileLines[i] = fileLines[i].Remove(0, 1);
 
-				while (fileLines[i].IndexOf(Syntax.Identifiers.Comment) != -1)
-				{
-					int pos = fileLines[i].IndexOf(Syntax.Identifiers.Comment);
-					if (fileLines[i].IsIndexBetween(pos, '"', '"') || fileLines[i].IsIndexBetween(pos, '\'', '\''))
-					{
-						StringBuilder fileLine = new StringBuilder(fileLines[i]);
-						fileLine[pos] = (char)0x1f;
-						fileLines[i] = fileLine.ToString(); 
-						continue;
-						// replace with placeholder temporarily to prevent while loop forever
-					}
+				string SafeLine = fileLines[i];
+				if (!isNestedInConditional && !isNestedInFunction) // literals are already encoded
+					SafeLine = EncodeLiterals(SafeLine);
 
-					fileLines[i] = fileLines[i].Remove(pos, fileLines[i].Length - pos);
+				while (SafeLine.IndexOf(Syntax.Identifiers.Comment) != -1)
+				{
+					int pos = SafeLine.IndexOf(Syntax.Identifiers.Comment);
+					SafeLine = SafeLine.Remove(pos, SafeLine.Length - pos);
 				} // get rid of all Comments and anything after it (but it cannot be enclosed in quotes or apostrophes)
 
-				fileLines[i] = fileLines[i].Replace(((char)0x1f).ToString(), Syntax.Identifiers.Comment); // replace placeholders back with comment token
-
-				if (string.IsNullOrWhiteSpace(fileLines[i]))
+				if (string.IsNullOrWhiteSpace(SafeLine))
 				{
 					Lines.Add(new Line(new List<Token>()));
 					continue;
 				} // no need to parse or evaluate empty line
 
-				Lines.Add(new Line(ParseLine(fileLines[i])));
+				Lines.Add(new Line(ParseLine(SafeLine)));
 				Line RecentLine = Lines[Lines.Count - 1];
 
 				if (RecentLine.Count >= 2 && RecentLine[0].type == TokenType.VariableIdentifier && RecentLine[1].type == TokenType.VariableIdentifier)
-					throw new Exception("Unknown token: " + RecentLine[0].identifier.Replace(((char)0x1f).ToString(), " "));
+					throw new Exception("Unknown token: " + RecentLine[0].identifier);
 
 				if (!isNestedInFunction && CowSpeak.Debug && RecentLine.Count > 0)
 				{
 					System.Console.WriteLine("\n(" + CowSpeak.CurrentFile + ") Line " + (i + 1) + ": ");
 					foreach (var token in RecentLine)
-						System.Console.WriteLine(token.type.ToString() + " - " + token.identifier.Replace(System.Environment.NewLine, @"\n").Replace(((char)0x1f).ToString(), " ").Replace(((char)0x1D).ToString(), " "));
+						System.Console.WriteLine(token.type.ToString() + " - " + token.identifier.Replace(System.Environment.NewLine, @"\n").Replace(((char)0x1D).ToString(), " "));
 				}
 
 				if (RecentLine.Count > 0 && RecentLine[0].type == TokenType.FunctionCall && RecentLine[0].identifier.IndexOf("Define(") == 0)

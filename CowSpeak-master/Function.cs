@@ -63,7 +63,7 @@ namespace CowSpeak
 			List< Any > parameters = new List< Any >();
 			s_parameters = s_parameters.Substring(1, s_parameters.Length - 2); // remove parentheses
 			
-			s_parameters = Utils.ReplaceBetween(Utils.ReplaceBetween(s_parameters, ',', '\"', '\"', (char)0x1a), ',', '(', ')', (char)0x1a).Replace(((char)0x1D).ToString(), " "); // prevent splitting of commas in nested functions & strings
+			s_parameters = Utils.ReplaceBetween(s_parameters, ',', '(', ')', (char)0x1a).Replace(((char)0x1D).ToString(), " "); // prevent splitting of commas in nested parentheses
 
 			string[] splitParams = s_parameters.Split(','); // split by each comma (each item is a parameter)
 
@@ -79,11 +79,11 @@ namespace CowSpeak
 			{
 				string cleanedUp = "";
 				if (parameter != "\"\"" && (parameter[0] == '\"' || parameter[0] == '\'') && (parameter[parameter.Length - 1] == '\"' || parameter[parameter.Length - 1] == '\''))
-					cleanedUp = parameter.Substring(1, parameter.Length - 2);
+					cleanedUp = parameter.Substring(1, parameter.Length - 2); // remove quotes/apostrophes
 				else
 					cleanedUp = parameter;
 
-				cleanedUp = cleanedUp.Replace(((char)0x1f).ToString(), " ").Replace(((char)0x1E).ToString(), ","); // remove quotes/apostrophes & remove string space placeholders
+				cleanedUp = cleanedUp.Replace(((char)0x1E).ToString(), ",");
 				Token token = null;
 
 				if (parameter.Split('\"').Length - 1 <= 2 && parameter.IndexOf(" ") == -1)
@@ -120,10 +120,21 @@ namespace CowSpeak
 					parameters.Add(FunctionChain.Evaluate(token.identifier));
 					continue;
 				}
-				else if (token.type == TokenType.String)
-					vtype = Type.String;
-				else if (token.type == TokenType.Character)
-					vtype = Type.Character;
+				else if (token.type == TokenType.String || token.type == TokenType.Character)
+				{
+					switch (token.type)
+					{
+					case TokenType.String:
+						vtype = Type.String;
+						break;
+					case TokenType.Character:
+						vtype = Type.Character;
+						break;
+					}
+
+					if (cleanedUp.Length > 2)
+						cleanedUp = cleanedUp.FromBase64(); // convert encoded base64 text given it's not an empty literal
+				}
 				else if (token.type == TokenType.Number)
 				{
 					if (token.identifier.IndexOf(".") != -1)
@@ -144,7 +155,7 @@ namespace CowSpeak
 		public void CheckParameters(List< Any > usedParams)
 		{
 			if (Parameters.Length != usedParams.Count)
-				throw new Exception("Invalid number of parameters passed in FunctionCall: '" + Name + "'");
+				throw new Exception("Invalid number of parameters passed in FunctionCall (" + Parameters.Length + " expected, " + usedParams.Count + " given)");
 
 			for (int i = 0; i < Parameters.Length; i++)
 			{

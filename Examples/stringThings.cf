@@ -3,7 +3,7 @@ Run("stringUtils.cf", False)
 Print("String Things:\n")
 
 string html = GetHtmlFromUrl("http://example.org/")
-Print(GetTextBetween(html, "<h1>", "</h1>") + "\n")
+#Print(GetTextBetween(html, "<h1>", "</h1>") + "\n")
 Print(ReplaceAllOf(ReplaceAllOf(GetTextBetween(html, "<p>", "</p>"), "\n", ""), "   ", "") + "\n") # get text between paragraph, remove newline & extra spaces in text
 
 string hello = "hey ho hi he he ho hi heah ho ho ho\n"
@@ -11,7 +11,7 @@ Print(ReplaceAllOf(hello, "ho", "ha"))
 
 string myn = "67.56"
 Print("" + myn.ToDecimal() + "\n")
-delete myn # we don't need this var anymore
+myn.Delete() # we don't need this var anymore and we must delete it manually since CowSpeak lacks any intelligent optimization features
 
 string cs = "CowSpeak is literally the best language in the world!" # just kidding
 Print(cs.SubString(0, 8) + "\n")
@@ -20,13 +20,13 @@ Print(cs.SubString(0, 8) + "\n")
 # make a word out of a string
 character w = cs.CharacterAt(2)
 Print(w.ToUpper() + cs.CharacterAt(1) + w + "ie\n")
-delete w
+w.Delete()
 
 # split string in two
 integer halfLen = cs.Length() / 2 # decimal to integer for use with some string methods
 Print("First Half: " + cs.SubString(0, halfLen) + "\n")
 Print("Second Half: " + cs.SubString(halfLen, cs.Length() - halfLen) + "\n")
-delete halfLen
+halfLen.Delete()
 
 # replace "world" with "universe"
 cs = ReplaceFirstOf(cs, "world", "universe")

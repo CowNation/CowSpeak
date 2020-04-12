@@ -80,7 +80,8 @@ namespace CowSpeak
 				System.Exception baseEx = ex.GetBaseException();
 				if (baseEx is Exception)
 					throw baseEx as Exception;
-				throw new Exception("Function '" + Name + "' returned an exception: " + baseEx.Message);
+					
+				throw baseEx;
 			}
 		}
 	}

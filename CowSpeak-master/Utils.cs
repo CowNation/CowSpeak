@@ -160,6 +160,16 @@ namespace CowSpeak
 			return pos;
 		}
 
+		public static string ToBase64(this string str)
+		{
+			return System.Convert.ToBase64String(Encoding.ASCII.GetBytes(str.Replace(System.Environment.NewLine, @"\n")));
+		}
+
+		public static string FromBase64(this string str)
+		{
+			return Encoding.UTF8.GetString(System.Convert.FromBase64String(str)).Replace(@"\n", System.Environment.NewLine);
+		}
+
 		public static string ReplaceBetween(string str, char toReplace, char start, char end, char substitution = (char)0x1a){
 			string _str = str;
 			for (int Occurrence = 0; Occurrence < OccurrencesOf(str, toReplace.ToString()); Occurrence++)

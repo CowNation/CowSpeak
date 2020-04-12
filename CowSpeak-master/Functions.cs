@@ -46,17 +46,32 @@ namespace CowSpeak
 		public static void Set(Variable obj, int index, object value)
 		{
 			var Value = (System.Array)obj.Value;
+
+			if (index < 0 || index >= Value.Length)
+				throw new Exception("Index is out of array bounds");
+
 			Value.SetValue(value, index);
 			obj.Value = Value;
 		}
 
 		[MethodAttr("Array.Get")]
-		public static object Get(Variable obj, int index) => ((System.Array)obj.Value).GetValue(index);
+		public static object Get(Variable obj, int index)
+		{
+			var Value = ((System.Array)obj.Value);
+
+			if (index < 0 || index >= Value.Length)
+				throw new Exception("Index is out of array bounds");
+
+			return Value.GetValue(index);
+		}
 		#endregion
 
 		[FunctionAttr("Array")]
 		public static System.Array Array(int length, object initialValue) // creates an array based on initialValue's type
 		{
+			if (length < 0)
+				throw new Exception("Array length must be greater than or equal to zero");
+
 			var arr = System.Array.CreateInstance(initialValue.GetType(), length);
 			if (Type.GetType(arr.GetType(), false) == null)
 				throw new Exception("Invalid type of object passed as initialValue"); // This may not be possible but better safe then sorry
@@ -66,23 +81,73 @@ namespace CowSpeak
 		}
 
 		#region STRING_METHODS
+		static void VerifyParams(int index, int length = 0)
+		{
+			if (index < 0)
+				throw new Exception("Index cannot be less than zero");
+
+			if (length < 0)
+				throw new Exception("Length cannot be less than zero");
+		}
+
 		[MethodAttr(Syntax.Types.String + ".OccurrencesOf")]
 		public static int OccurrencesOf(Variable obj, string counter) => Utils.OccurrencesOf(obj.Value.ToString(), counter);
 
 		[MethodAttr(Syntax.Types.String + ".Sub" + Syntax.Types.c_String)]
-		public static string SubString(Variable obj, int index, int length) => obj.Value.ToString().Substring(index, length);
+		public static string SubString(Variable obj, int index, int length)
+		{
+			VerifyParams(index, length);
+
+			string str = obj.Value.ToString();
+
+			if (index + length >= str.Length)
+				throw new Exception("Index and length must refer to a location within the string");
+
+			return str.Substring(index, length);
+		}
 
 		[MethodAttr(Syntax.Types.String + "." + Syntax.Types.c_Character + "At")]
-		public static char CharacterAt(Variable obj, int index) => obj.Value.ToString()[index];
+		public static char CharacterAt(Variable obj, int index)
+		{
+			string str = obj.Value.ToString();
+
+			if (index < 0 || index >= str.Length)
+				throw new Exception("Index must refer to a location within the string");
+
+			return str[index];
+		}
 
 		[MethodAttr(Syntax.Types.String + ".Length")]
 		public static int StringLength(Variable obj) => obj.Value.ToString().Length;
 
 		[MethodAttr(Syntax.Types.String + ".Remove")]
-		public static string Remove(Variable obj, int index, int length) => obj.Value.ToString().Remove(index, length);
+		public static string Remove(Variable obj, int index, int length)
+		{
+			string str = obj.Value.ToString();
+
+			VerifyParams(index, length);
+
+			if (index >= str.Length)
+				throw new Exception("Index must refer to a location within the string");
+
+			if (index + length >= str.Length)
+				throw new Exception("Index and length must refer to a location within the string");
+
+			return str.Remove(index, length);
+		}
 
 		[MethodAttr(Syntax.Types.String + ".Insert")]
-		public static string Insert(Variable obj, int index, string value) => obj.Value.ToString().Insert(index, value);
+		public static string Insert(Variable obj, int index, string value)
+		{
+			VerifyParams(index);
+
+			string str = obj.Value.ToString();
+
+			if (index >= str.Length)
+				throw new Exception("Index must refer to a location within the string");
+
+			return str.Insert(index, value);
+		}
 
 		[MethodAttr(Syntax.Types.String + ".IndexOf")]
 		public static int IndexOf(Variable obj, string value) => obj.Value.ToString().IndexOf(value);
@@ -102,7 +167,7 @@ namespace CowSpeak
 			if (System.Int32.TryParse(str, out o))
 				return o;
 			else
-				throw new Exception("Could not convert " + Syntax.Types.String + " to an " + Syntax.Types.Integer);
+				throw new Exception("Could not convert " + str + " to an " + Syntax.Types.Integer);
 		}
 
 		[MethodAttr(Syntax.Types.String + ".To" + Syntax.Types.c_Decimal)]
@@ -113,7 +178,7 @@ namespace CowSpeak
 			if (System.Double.TryParse(str, out o))
 				return o;
 			else
-				throw new Exception("Could not convert " + Syntax.Types.String + " to an " + Syntax.Types.Decimal);
+				throw new Exception("Could not convert " + str + " to a " + Syntax.Types.Decimal);
 		}
 		#endregion
 
@@ -133,7 +198,17 @@ namespace CowSpeak
 		public static string ToHexadecimal(Variable obj) => ((int)obj.Value).ToString("X");
 
 		[MethodAttr(Syntax.Types.Integer + ".ToCharacter")]
-		public static char ToCharacter(Variable obj) => (char)(int)obj.Value;
+		public static char ToCharacter(Variable obj)
+		{
+			try
+			{
+				return (char)(int)obj.Value;
+			}
+			catch (System.InvalidCastException)
+			{
+				throw new Exception("Could not convert " + ((int)obj.Value) + " to a " + Syntax.Types.Character);
+			}
+		}
 		#endregion
 
 		#region INTEGER64_METHODS
@@ -141,7 +216,17 @@ namespace CowSpeak
 		public static string ToHexadecimal64(Variable obj) => ((long)obj.Value).ToString("X");
 
 		[MethodAttr(Syntax.Types.Integer64 + ".ToCharacter")]
-		public static char ToCharacter64(Variable obj) => (char)(long)obj.Value;
+		public static char ToCharacter64(Variable obj)
+		{
+			try
+			{
+				return (char)(int)obj.Value;
+			}
+			catch (System.InvalidCastException)
+			{
+				throw new Exception("Could not convert " + ((int)obj.Value) + " to a " + Syntax.Types.Character);
+			}
+		}
 		#endregion
 
 		public static void Loop(List<string> ContainedLines, int i, int CurrentLineOffset, bool isNestedInFunction, string IndexVarName, int StartIndex, int EndIndex)

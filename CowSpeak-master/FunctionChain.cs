@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace CowSpeak
 {
@@ -7,22 +8,7 @@ namespace CowSpeak
 	{
 		public static bool IsChain(string token)
 		{
-			bool atLeastOneChild = false;
-			for (int i = 0; i < token.OccurrencesOf("."); i++)
-			{
-				int index = token.OrdinalIndexOf(".", i);
-				if (index - 1 >= 0 && !token.IsIndexBetween(index, "(", ")"))
-				{
-					atLeastOneChild = true;
-					break;
-				}
-			}
-
-			return atLeastOneChild && 
-			token.OccurrencesOf("(") > 1 &&
-			token.OccurrencesOf(")") > 1 &&
-			token.OccurrencesOf("(") == token.OccurrencesOf(")") &&
-			token.IndexOf(".") != -1;
+			return Regex.IsMatch(token, "(\\w+(\\(.*\\)\\.|\\.\\w+(\\(.*\\)\\.)))+(\\w+\\(.*\\))") && Utils.GetInitialClosingParenthesis(token) != token.Length - 1;
 		}
 
 		public static Any Evaluate(string identifier)
@@ -55,7 +41,7 @@ namespace CowSpeak
 			while (identifier != "")
 			{
 				int DotIndex = identifier.IndexOf(".");
-				int End = identifier.IndexOf(")");
+				int End = Utils.GetInitialClosingParenthesis(identifier);
 
 				string Object = identifier.Substring(0, DotIndex);
 				string FuncIdentifier = identifier.Substring(DotIndex, End - DotIndex + 1);
@@ -70,21 +56,23 @@ namespace CowSpeak
 				var _var = CowSpeak.Vars.Get(Object, false);
 				if (_var != null)
 				{
-					FuncIdentifier = _var.Type.Name + FuncIdentifier;
-					LastType = CowSpeak.Functions.Get(FuncIdentifier, false).type;
+					//FuncIdentifier = _var.Type.Name + FuncIdentifier;
+					System.Console.WriteLine(CowSpeak.Functions.Get(Object + FuncIdentifier, false) == null);
+
+					LastType = CowSpeak.Functions.Get(Object + FuncIdentifier, false).type;
 				}
 
 				var func = CowSpeak.Functions.Get(Object + FuncIdentifier, false);
 				if (func != null)
 					LastType = func.type;
 
-				if (End + 1 >= identifier.Length)
+				if (End + 1 >= identifier.Length || LastType == null)
 					break;
 
 				identifier = LastType.Name + identifier.Substring(End + 1);
 				continue;
 			}
-
+System.Console.WriteLine(LastType.Name);
 			return LastType;
 		}
 	}
