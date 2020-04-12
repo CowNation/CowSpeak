@@ -4,4 +4,4 @@ using System.Reflection;
 [assembly: AssemblyDescription("An open source interpreted programming language made in C# with a C style syntax")]
 [assembly: AssemblyCompany("CowCorp")]
 
-[assembly: AssemblyVersion("7.2.0.1")]
+[assembly: AssemblyVersion("7.2.0.2")]

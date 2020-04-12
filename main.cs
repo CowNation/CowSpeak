@@ -7,9 +7,7 @@ using System.Linq;
 
 static class Extensions
 {
-	public static int OccurrencesOf(this string str, string splitter) => str.Split(splitter).Length - 1;
-
-	public static string[] Split(this string str, string splitter)
+	public static string[] Split(string str, string splitter)
 	{
 		List<string> ret = new List<string>();
 		while (str.IndexOf(splitter) != -1)
@@ -21,15 +19,17 @@ static class Extensions
 		return ret.ToArray();
 	}
 
+	public static int OccurrencesOf(this string str, string splitter) => Split(str, splitter).Length - 1;
+
 	public static bool IsIndexBetween(this string str, int index, string start, string end){
 		string leftOf = str.Substring(0, index);
-		int starts = leftOf.Split(start).Length - 1;
+		int starts = Split(leftOf, start).Length - 1;
 
 		if (start != end)
 		{
 			int lastStart = leftOf.LastIndexOf(start);
 			int lastEnd = leftOf.LastIndexOf(end);
-			int ends = leftOf.Split(end).Length - 1;
+			int ends = Split(leftOf, end).Length - 1;
 			return lastStart != -1 && (lastStart > lastEnd || starts > ends);
 		}
 		else

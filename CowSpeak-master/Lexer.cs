@@ -125,7 +125,7 @@ namespace CowSpeak
 			}
 			line = _line;
 
-			List< string > splitLine = line.Split(' ').ToList();
+			List< string > splitLine = Utils.Split(line, " ").ToList();
 			List< Token > ret = new List< Token >();
 			List< int > skipList = new List< int >(); // lines to be skipped
 			for (int i = 0; i < splitLine.Count; i++)
@@ -180,7 +180,7 @@ namespace CowSpeak
 
 					try
 					{
-						fileLines[i].Split(' ').ToList().ForEach(x => Built += Encoding.ASCII.GetString(Utils.GetBytesFromBinaryString(x)));
+						Utils.Split(fileLines[i], ' ').ToList().ForEach(x => Built += Encoding.ASCII.GetString(Utils.GetBytesFromBinaryString(x)));
 					}
 					catch
 					{
@@ -198,7 +198,7 @@ namespace CowSpeak
 
 					try
 					{
-						fileLines[i].Split(' ').Where(x => x != "").ToList().ForEach(x => Built += (char)int.Parse(x, NumberStyles.HexNumber));
+						Utils.Split(fileLines[i], ' ').Where(x => x != "").ToList().ForEach(x => Built += (char)int.Parse(x, NumberStyles.HexNumber));
 					}
 					catch (System.FormatException)
 					{
