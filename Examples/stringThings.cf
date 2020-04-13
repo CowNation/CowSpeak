@@ -1,9 +1,9 @@
-Run("stringUtils.cf", False)
+Exec("stringUtils.cf")
 
 Print("String Things:\n")
 
 string html = GetHtmlFromUrl("http://example.org/")
-#Print(GetTextBetween(html, "<h1>", "</h1>") + "\n")
+Print(GetTextBetween(html, "<h1>", "</h1>") + "\n")
 Print(ReplaceAllOf(ReplaceAllOf(GetTextBetween(html, "<p>", "</p>"), "\n", ""), "   ", "") + "\n") # get text between paragraph, remove newline & extra spaces in text
 
 string hello = "hey ho hi he he ho hi heah ho ho ho\n"

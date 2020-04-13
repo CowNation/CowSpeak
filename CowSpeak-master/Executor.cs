@@ -90,7 +90,7 @@ namespace CowSpeak
 						if (Lines[i][0].type == TokenType.IfConditional)
 						{
 
-							if (new Conditional(Lines[i][0].identifier).EvaluateBoolean())
+							if (new Conditional(Lines[i][0].identifier).EvaluateExpression())
 							{
 								Scope scope = new Scope();
 
@@ -118,7 +118,8 @@ namespace CowSpeak
 							if (parentIf == -1)
 								throw new Exception("ElseConditional isn't immediately preceding an EndBracket");
 
-							if (!new Conditional(Lines[parentIf][0].identifier).EvaluateBoolean()){
+							if (!new Conditional(Lines[parentIf][0].identifier).EvaluateExpression())
+							{
 								Scope scope = new Scope();
 
 								new Lexer().Tokenize(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
@@ -130,7 +131,7 @@ namespace CowSpeak
 						{
 							Conditional whileStatement = new Conditional(Lines[i][0].identifier);
 							
-							while (whileStatement.EvaluateBoolean())
+							while (whileStatement.EvaluateExpression())
 							{
 								Scope scope = new Scope();
 

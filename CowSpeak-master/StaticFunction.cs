@@ -33,7 +33,7 @@ namespace CowSpeak
 		public override Any Execute(string usage)
 		{
 			if (usage.IndexOf("(") == -1 || usage.IndexOf(")") == -1)
-				throw new Exception("Invalid usage of function: '" + usage);
+				throw new Exception("Invalid usage of function: " + usage);
 
 			string usage_temp = usage;
 			usage = usage.Substring(usage.IndexOf("(")); // reduce it to parentheses and params inside of them

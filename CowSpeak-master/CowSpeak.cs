@@ -32,13 +32,12 @@ namespace CowSpeak
 
 		internal static VariableList Vars = new VariableList();
 
-		public static void Exec(string fileName, bool _Debug = false)
+		public static void Exec(string fileName)
 		{
 			if (Functions == null)
 				Functions = FunctionAttr.GetFunctions();
 
 			CurrentFile = fileName;
-			Debug = _Debug;
 			FileType Type;
 
 			if (!File.Exists(fileName))
@@ -56,28 +55,27 @@ namespace CowSpeak
 			new Lexer().Tokenize(new CowConfig.ReadConfig(fileName).GetLines(), 0, false, false, Type);
 		}
 
-		public static void Exec(string[] lines, bool _Debug = false)
+		public static void Exec(string[] lines)
 		{
 			if (Functions == null)
 				Functions = FunctionAttr.GetFunctions();
 
 			CurrentFile = "";
-			Debug = _Debug;
 
 			new Lexer().Tokenize(lines.ToList());
 		}
 
-		public static void Run(string fileName, bool _Debug = false)
+		public static void Run(string fileName)
 		{
-			Exec(fileName, _Debug);
+			Exec(fileName);
 			Vars.Clear();
 			ClearUserDefinitions();
 			Functions.ClearUserDefined();
 		}
 
-		public static void Run(string[] lines, bool _Debug = false)
+		public static void Run(string[] lines)
 		{
-			Exec(lines, _Debug);
+			Exec(lines);
 			Vars.Clear();
 			ClearUserDefinitions();
 			Functions.ClearUserDefined();

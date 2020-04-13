@@ -5,11 +5,92 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
+using DynamicExpresso;
+using DynamicExpresso.Exceptions;
 
 namespace CowSpeak
 {
 	internal static class Utils
 	{
+		static Interpreter interpreter = new Interpreter();
+
+		public static object Eval(string Expression)
+		{
+			try
+			{
+				return interpreter.Eval(Expression);
+			}
+			catch (DynamicExpressoException ex)
+			{
+				throw new Exception(ex.Message);
+			}
+		}
+
+		public static string GetTokensExpression(List<Token> tokens, ref Any AlreadyEvaluatedValue)
+		{
+			string Expression = "";
+			for (int i = 0; i < tokens.Count; i++)
+			{
+				string identifier = tokens[i].identifier;
+
+				Type ObjectType = null;
+				if (tokens[i].type == TokenType.VariableIdentifier)
+				{
+					Variable var = CowSpeak.Vars.Get(identifier);
+					identifier = var.Value.ToString(); // replace variable name with it's value
+					ObjectType = var.Type;
+				}
+
+				switch (tokens[i].type)
+				{
+				case TokenType.WhileConditional:
+				case TokenType.IfConditional:
+				case TokenType.EndBracket:
+					continue;
+				}
+
+				if (tokens[i].type == TokenType.FunctionCall)
+				{
+					FunctionBase func = CowSpeak.Functions.Get(identifier);
+					Any returned = func.Execute(identifier);
+					ObjectType = func.type;
+
+					if (tokens.Count == 1)
+					{
+						AlreadyEvaluatedValue = returned;
+						return "";
+					}
+
+					if (returned != null)
+						identifier = returned.Value.ToString(); // replace function call with it's return value
+					else
+						identifier = "";
+				}
+				else if (tokens[i].type == TokenType.FunctionChain)
+				{
+					Any EvaluatedChain = FunctionChain.Evaluate(identifier);
+
+					if (tokens.Count == 1)
+					{
+						AlreadyEvaluatedValue = EvaluatedChain;
+						return "";
+					}
+
+					identifier = EvaluatedChain.Value.ToString();
+					ObjectType = FunctionChain.GetType(tokens[i].identifier);
+				}
+
+				if (tokens[i].type == TokenType.String || ObjectType == Type.String)
+					identifier = "\"" + identifier + "\"";
+				else if (tokens[i].type == TokenType.Character || ObjectType == Type.Character)
+					identifier = "\'" + identifier + "\'";
+				
+				Expression += identifier;
+			}
+			//System.Console.WriteLine(Expression);
+			return Expression;
+		}
+
 		public static System.Random rand = new System.Random();
 
 		public static byte[] GetBytesFromBinaryString(string binary)
@@ -56,6 +137,20 @@ namespace CowSpeak
 		}
 
 		public static bool IsHexadecimal(string str) => Utils.OccurrencesOf(str, "0x") == 1 && str.IndexOf("0x") == 0;
+
+		public static System.Tuple<int, string>[] SplitWithIndicies(string str, string splitter)
+		{
+			List<System.Tuple<int, string>> ret = new List<System.Tuple<int, string>>();
+			int Offset = 0;
+			while (str.IndexOf(splitter) != -1)
+			{
+				ret.Add(new System.Tuple<int, string>(Offset, str.Substring(0, str.IndexOf(splitter))));
+				Offset += splitter.Length + str.Substring(0, str.IndexOf(splitter)).Length;
+				str = str.Remove(0, str.IndexOf(splitter) + splitter.Length);
+			}
+			ret.Add(new System.Tuple<int, string>(Offset, str));
+			return ret.ToArray();
+		}
 
 		public static string[] Split(string str, string splitter)
 		{
@@ -224,42 +319,6 @@ namespace CowSpeak
 		{
 			// regex is really confusing to me but basically this returns if the string is a number (including negatives and decimals)
 			return Regex.Match(str, "(-|\\d*?)\\d+(\\.\\d+|\\d*?)").Value == str;
-		}
-
-		public static bool IsCharable(Token token)
-		{
-			if (token.type == TokenType.FunctionCall)
-			{
-				FunctionBase func = CowSpeak.Functions.Get(token.identifier, false);
-				return func != null && func.type == Type.Character;	
-			}
-			else if (token.type == TokenType.VariableIdentifier)
-			{
-				Variable _var = CowSpeak.Vars.Get(token.identifier, false);
-				return _var != null && _var.Type == Type.Character;
-			}
-			else if (token.type == TokenType.FunctionChain)
-				return FunctionChain.GetType(token.identifier) == Type.Character;
-			else
-				return false;
-		}
-
-		public static bool IsStringable(Token token)
-		{
-			if (token.type == TokenType.FunctionCall)
-			{
-				FunctionBase func = CowSpeak.Functions.Get(token.identifier, false);
-				return func != null && func.type == Type.String;	
-			}
-			else if (token.type == TokenType.VariableIdentifier)
-			{
-				Variable _var = CowSpeak.Vars.Get(token.identifier, false);
-				return _var != null && _var.Type == Type.String;
-			}
-			else if (token.type == TokenType.FunctionChain)
-				return FunctionChain.GetType(token.identifier) == Type.String;
-			else
-				return false;
 		}
 	}
 }

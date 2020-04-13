@@ -9,33 +9,36 @@ namespace CowSpeak
 
 		}
 
-		internal FunctionBase Get(string functionName, bool _throw = true)
+		internal FunctionBase Get(string functionName, bool _throw = true, bool AcceptStaticMethods = false)
 		{
 			bool isValidMethodCall = false;
-			if (functionName.IndexOf(".") != -1)
+			string Name = functionName.IndexOf("(") != -1 ? functionName.Substring(0, functionName.IndexOf("(")) : functionName;
+			if (Name.IndexOf(".") != -1)
 			{
-				Variable obj = CowSpeak.Vars.Get(functionName.Substring(0, functionName.IndexOf(".")), false); // interpret variable name to the left of the period as a variable
+				Variable obj = CowSpeak.Vars.Get(Name.Substring(0, Name.IndexOf(".")), false); // interpret variable name to the left of the period as a variable
 
 				if (obj != null)
 				{
 					isValidMethodCall = true;
 					if (obj.Type.rep.IsArray)
-						functionName = "Array" + functionName.Substring(functionName.IndexOf("."));
+						Name = "Array" + Name.Substring(Name.IndexOf("."));
 					else
-						functionName = obj.Type.Name + functionName.Substring(functionName.IndexOf("."));
+						Name = obj.Type.Name + Name.Substring(Name.IndexOf("."));
 				}
+				else if (AcceptStaticMethods && Type.GetType(Name.Substring(0, Name.IndexOf(".")), false) != null) // ex: string.IndexOf
+					isValidMethodCall = true;
 			} // if it has a period, it's probably a method
 
-			if (isValidMethodCall || functionName.IndexOf(".") == -1 || Type.GetType(functionName.Substring(0, functionName.IndexOf(".")), false) == null)
+			if (isValidMethodCall || Name.IndexOf(".") == -1)
 			{
 				for (int i = 0; i < Count; i++)
-					if (functionName.IndexOf(base[i].Name) == 0)
+					if (Name.IndexOf(base[i].Name) == 0)
 						return base[i];
 			}
 
-			if (functionName.IndexOf(".") != -1)
+			if (Name.IndexOf(".") != -1)
 			{
-				string anyMethod = "Any" + functionName.Substring(functionName.IndexOf("."));
+				string anyMethod = "Any" + Name.Substring(Name.IndexOf("."));
 
 				for (int i = 0; i < Count; i++)
 					if (anyMethod.IndexOf(base[i].Name) == 0)

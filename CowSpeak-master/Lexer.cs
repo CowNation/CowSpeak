@@ -12,7 +12,7 @@ namespace CowSpeak
 	{
 		internal List< Line > Lines = new List< Line >();
 
-		public static Token ParseToken(string token, bool _throw = true)
+		public static Token ParseToken(string token, bool _throw = true, int Index = -1)
 		{
 			foreach (Definition Definition in CowSpeak.Definitions)
 				if (token == Definition.from)
@@ -23,72 +23,72 @@ namespace CowSpeak
 
 			Type type = Utils.GetType(token, false);
 			if (type != null)
-				return new Token(TokenType.TypeIdentifier, token);
+				return new Token(TokenType.TypeIdentifier, token, Index);
 
 			switch (token)
 			{
-				case "True":
-				case "False":
-					return new Token(TokenType.Boolean, token);
+				case "true":
+				case "false":
+					return new Token(TokenType.Boolean, token, Index);
 				case Syntax.Statements.Return:
-					return new Token(TokenType.ReturnStatement, token);
+					return new Token(TokenType.ReturnStatement, token, Index);
 				case Syntax.Comparators.IsEqual:
-					return new Token(TokenType.IsEqualOperator, token);
+					return new Token(TokenType.IsEqualOperator, token, Index);
 				case Syntax.Comparators.IsNotEqual:
-					return new Token(TokenType.IsNotEqualOperator, token);
+					return new Token(TokenType.IsNotEqualOperator, token, Index);
 				case Syntax.Comparators.IsGreaterThan:
-					return new Token(TokenType.IsGreaterThanOperator, token);
+					return new Token(TokenType.IsGreaterThanOperator, token, Index);
 				case Syntax.Comparators.IsLessThan:
-					return new Token(TokenType.IsLessThanOperator, token);
+					return new Token(TokenType.IsLessThanOperator, token, Index);
 				case Syntax.Comparators.IsGreaterThanOrEqual:
-					return new Token(TokenType.IsGreaterThanOrEqualOperator, token);
+					return new Token(TokenType.IsGreaterThanOrEqualOperator, token, Index);
 				case Syntax.Comparators.IsLessThanOrEqual:
-					return new Token(TokenType.IsLessThanOrEqualOperator, token);
+					return new Token(TokenType.IsLessThanOrEqualOperator, token, Index);
 				case Syntax.Operators.Add:
-					return new Token(TokenType.AddOperator, token);
+					return new Token(TokenType.AddOperator, token, Index);
 				case Syntax.Operators.And:
-					return new Token(TokenType.AndOperator, token);
+					return new Token(TokenType.AndOperator, token, Index);
 				case Syntax.Operators.Subtract:
-					return new Token(TokenType.SubtractOperator, token);
+					return new Token(TokenType.SubtractOperator, token, Index);
 				case Syntax.Operators.Multiply:
-					return new Token(TokenType.MultiplyOperator, token);
+					return new Token(TokenType.MultiplyOperator, token, Index);
 				case Syntax.Operators.Divide:
-					return new Token(TokenType.DivideOperator, token);
+					return new Token(TokenType.DivideOperator, token, Index);
 				case Syntax.Operators.Modulo:
-					return new Token(TokenType.ModuloOperator, token);
+					return new Token(TokenType.ModuloOperator, token, Index);
 				case Syntax.Operators.Equal:
-					return new Token(TokenType.EqualOperator, token);
+					return new Token(TokenType.EqualOperator, token, Index);
 				case "''":
-					return new Token(TokenType.Character, ""); // support empty Characters ('')
+					return new Token(TokenType.Character, "", Index); // support empty Characters ('')
 				case "{":
-					return new Token(TokenType.StartBracket, token);
+					return new Token(TokenType.StartBracket, token, Index);
 				case "}":
-					return new Token(TokenType.EndBracket, token);
+					return new Token(TokenType.EndBracket, token, Index);
 				case "(":
 				case ")":
-					return new Token(TokenType.Parenthesis, token);
+					return new Token(TokenType.Parenthesis, token, Index);
 				case Syntax.Conditionals.Else:
-					return new Token(TokenType.ElseConditional, token);
+					return new Token(TokenType.ElseConditional, token, Index);
 			}
 
 			if (token[0] == '\"' && token[token.Length - 1] == '\"' && token.OccurrencesOf("\"") == 2)
-				return new Token(TokenType.String, token.Substring(1, token.Length - 2).FromBase64());	
+				return new Token(TokenType.String, token.Substring(1, token.Length - 2).FromBase64(), Index);	
 			else if (token[0] == '\'' && token[token.Length - 1] == '\'') // we can't ensure the length here because the contents are encoded
-				return new Token(TokenType.Character, token.Substring(1, token.Length - 2).FromBase64());
+				return new Token(TokenType.Character, token.Substring(1, token.Length - 2).FromBase64(), Index);
 			else if (token.IndexOf(Syntax.Conditionals.If + "(") == 0 && token[token.Length - 1] == ')')
-				return new Token(TokenType.IfConditional, token);
+				return new Token(TokenType.IfConditional, token, Index);
 			else if (token.IndexOf(Syntax.Conditionals.While + "(") == 0 && token[token.Length - 1] == ')')
-				return new Token(TokenType.WhileConditional, token);
+				return new Token(TokenType.WhileConditional, token, Index);
 			else if (token.IndexOf(Syntax.Conditionals.Loop + "(") == 0 && token[token.Length - 1] == ')')
-				return new Token(TokenType.LoopConditional, token);
+				return new Token(TokenType.LoopConditional, token, Index);
 			else if (Utils.IsNumber(token))
-				return new Token(TokenType.Number, token);
+				return new Token(TokenType.Number, token, Index);
 			else if (FunctionChain.IsChain(token))
-				return new Token(TokenType.FunctionChain, token);
+				return new Token(TokenType.FunctionChain, token, Index);
 			else if (FunctionBase.IsFunctionCall(token))
-				return new Token(TokenType.FunctionCall, token);
+				return new Token(TokenType.FunctionCall, token, Index);
 			else if (Utils.IsValidObjectName(token))
-				return new Token(TokenType.VariableIdentifier, token);
+				return new Token(TokenType.VariableIdentifier, token, Index);
 
 			if (_throw)
 				throw new Exception("Unknown token: " + token);
@@ -125,19 +125,14 @@ namespace CowSpeak
 			}
 			line = _line;
 
-			List< string > splitLine = Utils.Split(line, " ").ToList();
+			System.Tuple<int, string>[] splitLine = Utils.SplitWithIndicies(line, " ");
 			List< Token > ret = new List< Token >();
-			List< int > skipList = new List< int >(); // lines to be skipped
-			for (int i = 0; i < splitLine.Count; i++)
+			for (int i = 0; i < splitLine.Length; i++)
 			{
-				if (string.IsNullOrWhiteSpace(splitLine[i]))
+				if (string.IsNullOrWhiteSpace(splitLine[i].Item2))
 					continue;
 
-				foreach (int skip in skipList)
-					if (skip == i)
-						continue;
-
-				ret.Add(ParseToken(splitLine[i], _throw));
+				ret.Add(ParseToken(splitLine[i].Item2, _throw, splitLine[i].Item1));
 			}
 
 			return ret;

@@ -43,11 +43,13 @@ namespace CowSpeak
 	{
 		public TokenType type;
 		public string identifier;
+		public int Index;
 		
-		public Token(TokenType tt, string id)
+		public Token(TokenType type, string identifier, int Index = -1)
 		{
-			type = tt;
-			identifier = id;
+			this.type = type;
+			this.identifier = identifier;
+			this.Index = Index;
 		}
 	}
 }

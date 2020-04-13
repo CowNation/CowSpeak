@@ -24,31 +24,7 @@ string ToLower(string str)
 	return result
 }
 
-string RandomCaps(string str)
-{
-	string result = ""
-
-	loop("index", 0, str.Length())
-	{
-		character char = str.CharacterAt(index)
-
-		if(RandomInteger(0, 1) == 1)
-		{
-			char = char.ToUpper()
-		}
-		else
-		{
-			char = char.ToLower()
-		}
-		result = result + char
-	}
-
-	return result
-}
-
 Print("Enter the target string: ")
 string target = InputString()
-
 Print("ToUpper: " + ToUpper(target) + "\n")
 Print("ToLower: " + ToLower(target) + "\n")
-Print("RandomCaps: " + RandomCaps(target) + "\n")

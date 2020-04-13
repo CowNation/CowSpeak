@@ -269,7 +269,7 @@ namespace CowSpeak
 		public static double Tan(double num) => System.Math.Tan(num);
 
 		[FunctionAttr("Run")]
-		public static void Run(string filePath, bool ClearData)
+		public static void Run(string filePath)
 		{
 			string oldFile = string.Copy(CowSpeak.CurrentFile);
 
@@ -282,10 +282,25 @@ namespace CowSpeak
 					filePath = CowSpeak.CurrentFile.Substring(0, CowSpeak.CurrentFile.IndexOf("\\") + 1) + filePath;
 			}
 
-			if (ClearData)
-				CowSpeak.Run(filePath);
-			else
-				CowSpeak.Exec(filePath);
+			CowSpeak.Run(filePath);
+			CowSpeak.CurrentFile = oldFile;
+		}
+
+		[FunctionAttr("Exec")]
+		public static void Exec(string filePath)
+		{
+			string oldFile = string.Copy(CowSpeak.CurrentFile);
+
+			// make modulePath relative to CurrentFile as long as modulePath is relative
+			if (!Path.IsPathRooted(filePath))
+			{
+				if (CowSpeak.CurrentFile.IndexOf("/") != -1)
+					filePath = CowSpeak.CurrentFile.Substring(0, CowSpeak.CurrentFile.IndexOf("/") + 1) + filePath;
+				if (CowSpeak.CurrentFile.IndexOf("\\") != -1)
+					filePath = CowSpeak.CurrentFile.Substring(0, CowSpeak.CurrentFile.IndexOf("\\") + 1) + filePath;
+			}
+
+			CowSpeak.Exec(filePath);
 			CowSpeak.CurrentFile = oldFile;
 		}
 
@@ -348,7 +363,7 @@ namespace CowSpeak
 		}
 
 		[FunctionAttr("Evaluate")]
-		public static object _Evaluate(string toExec) => Evaluate.EvaluateExpression(toExec);
+		public static object _Evaluate(string Expression) => Utils.Eval(Expression);
 
 		[FunctionAttr("Random" + Syntax.Types.c_Integer)]
 		public static int RandomInteger(int minimum, int maximum)

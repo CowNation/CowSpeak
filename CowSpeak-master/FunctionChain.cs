@@ -40,39 +40,21 @@ namespace CowSpeak
 			Type LastType = null;
 			while (identifier != "")
 			{
-				int DotIndex = identifier.IndexOf(".");
-				int End = Utils.GetInitialClosingParenthesis(identifier);
+				int ClosingParenthesis = Utils.GetInitialClosingParenthesis(identifier);
 
-				string Object = identifier.Substring(0, DotIndex);
-				string FuncIdentifier = identifier.Substring(DotIndex, End - DotIndex + 1);
+				string FuncIdentifier = identifier.Substring(0, ClosingParenthesis + 1);
 
-				var type = Type.GetType(Object, false);
-				if (type != null)
-				{
-					FuncIdentifier = type.Name + FuncIdentifier;
-					LastType = CowSpeak.Functions.Get(FuncIdentifier, false).type;
-				}
-
-				var _var = CowSpeak.Vars.Get(Object, false);
-				if (_var != null)
-				{
-					//FuncIdentifier = _var.Type.Name + FuncIdentifier;
-					System.Console.WriteLine(CowSpeak.Functions.Get(Object + FuncIdentifier, false) == null);
-
-					LastType = CowSpeak.Functions.Get(Object + FuncIdentifier, false).type;
-				}
-
-				var func = CowSpeak.Functions.Get(Object + FuncIdentifier, false);
+				var func = CowSpeak.Functions.Get(FuncIdentifier, false);
 				if (func != null)
 					LastType = func.type;
 
-				if (End + 1 >= identifier.Length || LastType == null)
+				if (ClosingParenthesis + 1 >= identifier.Length || LastType == null)
 					break;
 
-				identifier = LastType.Name + identifier.Substring(End + 1);
+				identifier = LastType.Name + identifier.Substring(ClosingParenthesis + 1);
 				continue;
 			}
-System.Console.WriteLine(LastType.Name);
+
 			return LastType;
 		}
 	}

@@ -65,7 +65,7 @@ namespace CowSpeak
 			
 			s_parameters = Utils.ReplaceBetween(s_parameters, ',', '(', ')', (char)0x1a).Replace(((char)0x1D).ToString(), " "); // prevent splitting of commas in nested parentheses
 
-			string[] splitParams = s_parameters.Split(','); // split by each comma (each item is a parameter)
+			string[] splitParams = Utils.Split(s_parameters, ","); // split by each comma (each item is a parameter)
 
 			for (int i = 0; i < splitParams.Length; i++)
 			{
@@ -86,7 +86,7 @@ namespace CowSpeak
 				cleanedUp = cleanedUp.Replace(((char)0x1E).ToString(), ",");
 				Token token = null;
 
-				if (parameter.Split('\"').Length - 1 <= 2 && parameter.IndexOf(" ") == -1)
+				if (Utils.Split(parameter, "\"").Length - 1 <= 2 && parameter.IndexOf(" ") == -1)
 				{
 					token = Lexer.ParseToken(parameter, false); // a flaw in the parsing function for strings would take a string chain if it starts and ends with a string as 1 string (this is a janky workaround)
 				}

@@ -1,47 +1,27 @@
 using System.Collections.Generic;
 using System.Linq;
+using DynamicExpresso;
 
 namespace CowSpeak
 {
 	internal class Conditional
 	{
-		public string text = "";
+		public List<Token> ExpressionTokens = new List<Token>();
 		
 		public Conditional(string text)
 		{
-			this.text = text.Substring(text.IndexOf("(") + 1, text.LastIndexOf(")") - text.IndexOf("(") - 1); // Reduce it to the text in between parenthesis
+			ExpressionTokens = Lexer.ParseLine(text.Substring(text.IndexOf("(") + 1, text.LastIndexOf(")") - text.IndexOf("(") - 1).Replace(((char)0x1D).ToString(), " ")); // Reduce it to the text in between parenthesis and parse
 		}
 
-		public bool EvaluateBoolean()
+		public bool EvaluateExpression()
 		{
-			List< string > Expressions = Utils.Split(text, Syntax.Operators.And).ToList();
-			bool Evaluated = true;
+			Any AlreadyEvaluatedValue = null;
+			string Expression = Utils.GetTokensExpression(ExpressionTokens, ref AlreadyEvaluatedValue);
+			if (AlreadyEvaluatedValue != null)
+				return AlreadyEvaluatedValue.ToString() == "true" || AlreadyEvaluatedValue.ToString() == "1";
 
-			foreach (string Expression in Expressions)
-			{
-				bool _Evaluated = false;
-				Token token = Lexer.ParseToken(text, false);
-				if (token == null)
-					_Evaluated = Evaluate.EvaluateBoolean(Lexer.ParseLine(Expression.Replace(((char)0x1D).ToString(), " ")));
-				else
-				{
-					string simplified = "";
-					if (token.type == TokenType.VariableIdentifier)
-						simplified = CowSpeak.Vars.Get(token.identifier).Value.ToString();
-					else if (token.type == TokenType.FunctionCall)
-						simplified = CowSpeak.Functions.Get(token.identifier).Execute(token.identifier).Value.ToString();
-					else
-						simplified = token.identifier;
-					_Evaluated = simplified == "True" || simplified == "1";
-				}
-				if (!_Evaluated)
-				{
-					Evaluated = false;
-					break;
-				}
-			}
-
-			return Evaluated;
+			object Interpreted = Utils.Eval(Expression);
+			return Interpreted.ToString() == "true" || Interpreted.ToString() == "1";
 		}
 	}
 }
