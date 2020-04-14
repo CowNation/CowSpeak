@@ -18,10 +18,10 @@ namespace CowSpeak
 			Any AlreadyEvaluatedValue = null;
 			string Expression = Utils.GetTokensExpression(ExpressionTokens, ref AlreadyEvaluatedValue);
 			if (AlreadyEvaluatedValue != null)
-				return AlreadyEvaluatedValue.ToString() == "true" || AlreadyEvaluatedValue.ToString() == "1";
+				return AlreadyEvaluatedValue.ToString() == "True" || AlreadyEvaluatedValue.ToString() == "1";
 
 			object Interpreted = Utils.Eval(Expression);
-			return Interpreted.ToString() == "true" || Interpreted.ToString() == "1";
+			return Interpreted.ToString() == "True" || Interpreted.ToString() == "1";
 		}
 	}
 }

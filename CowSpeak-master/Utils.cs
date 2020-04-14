@@ -37,7 +37,7 @@ namespace CowSpeak
 				if (tokens[i].type == TokenType.VariableIdentifier)
 				{
 					Variable var = CowSpeak.Vars.Get(identifier);
-					identifier = var.Value.ToString(); // replace variable name with it's value
+					identifier = Functions._ToString(var.Value); // replace variable name with it's value
 					ObjectType = var.Type;
 				}
 
@@ -62,7 +62,7 @@ namespace CowSpeak
 					}
 
 					if (returned != null)
-						identifier = returned.Value.ToString(); // replace function call with it's return value
+						identifier = Functions._ToString(returned.Value); // replace function call with it's return value
 					else
 						identifier = "";
 				}
@@ -76,7 +76,7 @@ namespace CowSpeak
 						return "";
 					}
 
-					identifier = EvaluatedChain.Value.ToString();
+					identifier = Functions._ToString(EvaluatedChain.Value);
 					ObjectType = FunctionChain.GetType(tokens[i].identifier);
 				}
 
@@ -120,7 +120,12 @@ namespace CowSpeak
 
 		public static int GetInitialClosingParenthesis(string str)
 		{
-			int skips = 0;
+			Match match = Regex.Match(str, @"\([^()]*\)|\(.*(\(.*?\))*");
+			if (match == null)
+				return -1;
+
+			return match.Index + match.Length - 1;
+			/*int skips = 0;
 			for (int i = 0; i < str.Length; i++)
 			{
 				if (str[i] == '(')
@@ -133,7 +138,7 @@ namespace CowSpeak
 						return i;
 				}
 			}
-			return -1;
+			return -1;*/
 		}
 
 		public static bool IsHexadecimal(string str) => Utils.OccurrencesOf(str, "0x") == 1 && str.IndexOf("0x") == 0;

@@ -15,6 +15,10 @@ namespace CowSpeak
 		IsGreaterThanOrEqualOperator,
 		IsLessThanOrEqualOperator,
 		AndOperator,
+		OrOperator,
+		
+		BitwiseANDOperator,
+		BitwiseOROperator,
 
 		FunctionCall,
 		FunctionChain,

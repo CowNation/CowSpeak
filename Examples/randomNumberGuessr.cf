@@ -9,7 +9,7 @@ while(correctGuess != guess)
 {
 	tries = tries + 1
 
-	if(firstTime == False)
+	if(firstTime == false)
 	{
 		Print("Wrong Answer - ")
 
@@ -28,7 +28,7 @@ while(correctGuess != guess)
 	
 	Print("Input Your Guess: ")
 	guess = InputInteger()
-	firstTime = False # it's not the first time through the loop
+	firstTime = false # it's not the first time through the loop
 }
 
 Print("Correct Answer!!\nYour Tries: " + tries + "\n")

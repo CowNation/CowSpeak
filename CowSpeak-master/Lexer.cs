@@ -32,6 +32,12 @@ namespace CowSpeak
 					return new Token(TokenType.Boolean, token, Index);
 				case Syntax.Statements.Return:
 					return new Token(TokenType.ReturnStatement, token, Index);
+				case Syntax.Operators.Or:
+					return new Token(TokenType.OrOperator, token, Index);
+				case Syntax.Operators.BitwiseOR:
+					return new Token(TokenType.BitwiseOROperator, token, Index);
+				case Syntax.Operators.BitwiseAND:
+					return new Token(TokenType.BitwiseANDOperator, token, Index);
 				case Syntax.Comparators.IsEqual:
 					return new Token(TokenType.IsEqualOperator, token, Index);
 				case Syntax.Comparators.IsNotEqual:

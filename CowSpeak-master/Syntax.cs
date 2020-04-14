@@ -59,6 +59,9 @@ namespace CowSpeak
 			public const string Modulo = "%";
 			public const string Equal = "=";
 			public const string And = "&&";
+			public const string Or = "||";
+			public const string BitwiseAND = "&";
+			public const string BitwiseOR = "|";
 		}
 	}
 }

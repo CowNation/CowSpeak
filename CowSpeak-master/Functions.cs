@@ -12,6 +12,9 @@ namespace CowSpeak
 		#region ALL_METHODS
 		public static string _ToString(object obj)
 		{
+			if (obj is bool)
+				return (bool)obj ? "true" : "false";
+
 			if (obj.GetType().IsArray)
 			{
 				string ret = "{";
