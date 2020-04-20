@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 
 namespace CowSpeak
 {
@@ -59,7 +58,7 @@ namespace CowSpeak
 			List< Parameter > parameters = new List< Parameter >();
 			s_params = s_params.Substring(1, s_params.Length - 1); // remove parentheses
 
-			string[] splitParams = Regex.Split(s_params, ","); // split by each comma (each item is a parameter)
+			string[] splitParams = Utils.Split(s_params, ','); // split by each comma (each item is a parameter)
 
 			foreach (string parameter in splitParams)
 			{
@@ -74,6 +73,15 @@ namespace CowSpeak
 			}
 
 			return parameters.ToArray();
+		}
+
+		public static UserFunction ParseDefinition(List<Line> Lines, int definitionLine, Token returnType, string usage)
+		{
+			usage = usage.Substring(0, usage.Length - 2); // remove StartBracket
+
+			string dName = usage.Substring(0, usage.IndexOf("(")); // text before first '('
+
+			return new UserFunction(dName, Utils.GetContainedLines(Lines, Executor.GetClosingBracket(Lines, definitionLine), definitionLine), ParseDefinitionParams(usage.Substring(usage.IndexOf("("))), Utils.GetType(returnType.identifier), returnType.identifier + " " + usage, definitionLine);
 		}
 
 		public override Any Execute(string usage)

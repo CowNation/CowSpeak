@@ -5,34 +5,26 @@ namespace CowSpeak
 {
 	public static class Executor
 	{
-		public struct TokenLocation
-		{
-			public int LineIndex, TokenIndex;
-
-			public TokenLocation(int LineIndex, int TokenIndex)
-			{
-				this.LineIndex = LineIndex;
-				this.TokenIndex = TokenIndex;
-			}
-		}
-
-		public static TokenLocation GetClosingBracket(List< Line > Lines, int start)
+		public static int GetClosingBracket(List< Line > Lines, int start)
 		{
 			int skips = 0; // number of EndBracket(s) to skip
 			for (int j = start; j < Lines.Count; j++)
 			{
-				for (int i = 0; i < Lines[j].Count; i++)
+				if (Lines[j].Count == 0)
+					continue;
+
+				foreach (var token in Lines[j])
 				{
-					Token token = Lines[j][i];
-		
 					if (token.type == TokenType.StartBracket)
+					{
 						skips++;
+					}
 					else if (token.type == TokenType.EndBracket)
 					{
 						skips--;
 
 						if (skips <= 0)
-							return new TokenLocation(j, i);
+							return j;
 					}
 				}
 			}
@@ -73,11 +65,11 @@ namespace CowSpeak
 					if (!HasPrecedingBracket && !NextLineHasBracket)
 						throw new Exception("FunctionDefinition or Conditional is missing a preceding StartBracket");
 
-					TokenLocation StartBracket = new TokenLocation(i, ItemIndex + 1); // index of the line that the StartBracket appears at
+					int StartBracketIndex = i; // index of the line that the StartBracket appears at
 					if (NextLineHasBracket)
-						StartBracket = new TokenLocation(i + 1, 0);
+						StartBracketIndex++;
 
-					TokenLocation EndingBracket = GetClosingBracket(Lines, i);
+					int EndingBracket = GetClosingBracket(Lines, i);
 
 					if (Lines[i].HasFunctionDefinition)
 					{
@@ -89,12 +81,12 @@ namespace CowSpeak
 						usage = usage.Substring(0, usage.Length - 1); // remove )
 						string dName = usage.Substring(0, usage.IndexOf("(")); // text before first '('
 
-						var DefinitionLines = Utils.GetContainedLines(Lines, EndingBracket, StartBracket);
+						var DefinitionLines = Utils.GetContainedLines(Lines, EndingBracket, StartBracketIndex);
 						CowSpeak.Functions.Create(new UserFunction(dName, DefinitionLines, UserFunction.ParseDefinitionParams(usage.Substring(usage.IndexOf("("))), Utils.GetType(Lines[i][0].identifier), Lines[i][0].identifier + " " + usage + ")", i));
 					}
 					else if (Lines[i].HasConditional)
 					{
-						List< Line > ContainedLines = Utils.GetContainedLines(Lines, EndingBracket, StartBracket);
+						List< Line > ContainedLines = Utils.GetContainedLines(Lines, EndingBracket, StartBracketIndex);
 
 						if (Lines[i][0].type == TokenType.IfConditional)
 						{
@@ -118,7 +110,7 @@ namespace CowSpeak
 
 							for (int j = 0; j < i; j++)
 							{
-								if (Lines[j].Count > 0 && Lines[j][0].type == TokenType.IfConditional && GetClosingBracket(Lines, j).LineIndex == i - 1)
+								if (Lines[j].Count > 0 && Lines[j][0].type == TokenType.IfConditional && GetClosingBracket(Lines, j) == i - 1)
 								{
 									parentIf = j;
 									break;
@@ -162,9 +154,7 @@ namespace CowSpeak
 						}
 					}
 
-					// skip to after the end of definition
-					i = EndingBracket.LineIndex;
-					continue;
+					i = EndingBracket; // skip to end of definition
 				}
 
 				if (i >= Lines.Count)

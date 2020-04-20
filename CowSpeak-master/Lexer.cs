@@ -163,11 +163,8 @@ namespace CowSpeak
 			return str;
 		}
 
-		public static List<Line> Parse(List< string > CodeLines, int CurrentLineOffset = 0, bool isNestedInFunction = false, bool isNestedInConditional = false, FileType Type = FileType.Normal)
+		public static List< Line > Parse(List< string > CodeLines, int CurrentLineOffset = 0, bool isNestedInFunction = false, bool isNestedInConditional = false, FileType Type = FileType.Normal)
 		{
-			Stopwatch sw = new Stopwatch();
-			sw.Start();
-
 			if (Type == FileType.Binary)
 			{
 				for (int i = 0; i < CodeLines.Count; i++)
@@ -177,7 +174,7 @@ namespace CowSpeak
 
 					try
 					{
-						Regex.Split(CodeLines[i], " ").ToList().ForEach(x => Built += Encoding.ASCII.GetString(Utils.GetBytesFromBinaryString(x)));
+						Utils.Split(CodeLines[i], ' ').ToList().ForEach(x => Built += Encoding.ASCII.GetString(Utils.GetBytesFromBinaryString(x)));
 					}
 					catch
 					{
@@ -195,7 +192,7 @@ namespace CowSpeak
 
 					try
 					{
-						Regex.Split(CodeLines[i], " ").Where(x => x != "").ToList().ForEach(x => Built += (char)int.Parse(x, NumberStyles.HexNumber));
+						Utils.Split(CodeLines[i], ' ').Where(x => x != "").ToList().ForEach(x => Built += (char)int.Parse(x, NumberStyles.HexNumber));
 					}
 					catch (System.FormatException)
 					{
@@ -215,7 +212,7 @@ namespace CowSpeak
 					CodeLines[i] = CodeLines[i].Remove(0, 1);
 
 				string SafeLine = CodeLines[i];
-				if (!isNestedInConditional && !isNestedInFunction) // literals are already encoded
+				if (!isNestedInConditional && !isNestedInFunction) // literals are already enCodeLinesd
 					SafeLine = EncodeLiterals(SafeLine);
 
 				while (SafeLine.IndexOf(Syntax.Identifiers.Comment) != -1)
@@ -233,6 +230,9 @@ namespace CowSpeak
 				Lines.Add(new Line(ParseLine(SafeLine)));
 				Line RecentLine = Lines[Lines.Count - 1];
 
+				if (RecentLine.Count >= 2 && RecentLine[0].type == TokenType.VariableIdentifier && RecentLine[1].type == TokenType.VariableIdentifier)
+					throw new Exception("Unknown token: " + RecentLine[0].identifier);
+
 				if (!isNestedInFunction && CowSpeak.Debug && RecentLine.Count > 0)
 				{
 					System.Console.WriteLine("\n(" + CowSpeak.CurrentFile + ") Line " + (i + 1) + ": ");
@@ -247,11 +247,7 @@ namespace CowSpeak
 				} // must handle this function before the other lines are compiled to avoid errors
 			}
 
-			sw.Stop();
-			if (CowSpeak.Debug)
-				System.Console.WriteLine("Parsing " + (CowSpeak.CurrentFile != "" ? "'" + CowSpeak.CurrentFile + "'" : CodeLines.Count + " lines") + " took " + sw.ElapsedMilliseconds + " ms");
-
-			//CowSpeak.Debug = false; // only debug tokens on compilation, needed because many things recurse back to Lexer
+			CowSpeak.Debug = false; // only debug tokens on compilation, needed because many things recurse back to Lexer
 
 			return Lines;
 		}

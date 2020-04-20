@@ -95,11 +95,11 @@ class Shell
 
 			try
 			{
-				CowSpeak.CowSpeak.Execute(Lines.ToArray());
+				CowSpeak.CowSpeak.Exec(Lines.ToArray());
 			}
 			catch (CowSpeak.Exception ex)
 			{
-				System.Console.WriteLine(ex.Message);
+				System.Console.WriteLine("(" + (ex.ErrorFile != "" ? ex.ErrorFile + ", " : "") + ex.ErrorLine + ") " + ex.Message + (ex.StackTrace != "" ? "\n" + ex.StackTrace : ""));
 			}
 			catch (System.Reflection.TargetInvocationException ex)
 			{
