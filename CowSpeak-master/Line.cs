@@ -3,7 +3,7 @@ using DynamicExpresso;
 
 namespace CowSpeak
 {
-	internal class Line : List< Token >
+	public class Line : List< Token >
 	{
 		public Line(List< Token > tokens) : base(tokens)
 		{

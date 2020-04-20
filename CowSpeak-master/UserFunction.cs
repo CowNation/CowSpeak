@@ -75,13 +75,13 @@ namespace CowSpeak
 			return parameters.ToArray();
 		}
 
-		public static UserFunction ParseDefinition(Lexer owner, int definitionLine, Token returnType, string usage)
+		public static UserFunction ParseDefinition(List<Line> Lines, int definitionLine, Token returnType, string usage)
 		{
 			usage = usage.Substring(0, usage.Length - 2); // remove StartBracket
 
 			string dName = usage.Substring(0, usage.IndexOf("(")); // text before first '('
 
-			return new UserFunction(dName, Utils.pGetContainedLines(owner.Lines, Executor.GetClosingBracket(owner.Lines, definitionLine), definitionLine), ParseDefinitionParams(usage.Substring(usage.IndexOf("("))), Utils.GetType(returnType.identifier), returnType.identifier + " " + usage, definitionLine);
+			return new UserFunction(dName, Utils.GetContainedLines(Lines, Executor.GetClosingBracket(Lines, definitionLine), definitionLine), ParseDefinitionParams(usage.Substring(usage.IndexOf("("))), Utils.GetType(returnType.identifier), returnType.identifier + " " + usage, definitionLine);
 		}
 
 		public override Any Execute(string usage)

@@ -1,6 +1,6 @@
 namespace CowSpeak
 {
-	internal class Type
+	public class Type
 	{
 		public string Name; // how the type is referenced in the code
 		public System.Type rep; // C# representation of type
