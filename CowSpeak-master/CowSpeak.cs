@@ -52,7 +52,7 @@ namespace CowSpeak
 			else
 				throw new Exception("Cannot execute COWFILE '" + fileName + "', it doesn't have the .bcf file extension");
 
-			Executor.Execute(Lexer.Parse(new CowConfig.ReadConfig(fileName).GetLines(), 0, false, false, Type));
+			new Lexer().Tokenize(new CowConfig.ReadConfig(fileName).GetLines(), 0, false, false, Type);
 		}
 
 		public static void Exec(string[] lines)
@@ -62,7 +62,7 @@ namespace CowSpeak
 
 			CurrentFile = "";
 
-			Executor.Execute(Lexer.Parse(lines.ToList()));
+			new Lexer().Tokenize(lines.ToList());
 		}
 
 		public static void Run(string fileName)

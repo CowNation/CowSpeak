@@ -7,7 +7,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using DynamicExpresso;
 using DynamicExpresso.Exceptions;
-using System.Diagnostics;
 
 namespace CowSpeak
 {
@@ -19,11 +18,7 @@ namespace CowSpeak
 		{
 			try
 			{
-				//Stopwatch sw = new Stopwatch();
-				//sw.Start();
 				return interpreter.Eval(Expression);
-				//sw.Stop();
-				//System.Console.WriteLine(Expression + " - " + sw.ElapsedMilliseconds);
 			}
 			catch (DynamicExpressoException ex)
 			{
@@ -198,14 +193,33 @@ namespace CowSpeak
 			return null;
 		}
 
-		public static List< string > GetContainedLines(List< string > Lines, int EndLine, int StartLine)
-		{
-			return Lines.GetRange(StartLine + 1, EndLine - (StartLine + 1));
-		}
+		public static List< string > GetContainedLines(List< string > Lines, int endingBracket, int i) => Lines.GetRange(i + 1, endingBracket - (i + 1));
 
-		public static List< Line > GetContainedLines(List< Line > Lines, int EndLine, int StartLine)
+		public static List< Line > pGetContainedLines(List< Line > Lines, int endingBracket, int i) => Lines.GetRange(i + 1, endingBracket - (i + 1));
+
+		public static List< string > GetContainedLines(List< Line > Lines, int endingBracket, int i)
 		{
-			return Lines.GetRange(StartLine + 1, EndLine - (StartLine + 1));
+			List< Line > _containedLines = new List< Line >();
+			_containedLines = Lines.GetRange(i + 1, endingBracket - (i + 1));
+			List< string > containedLines = new List< string >();
+
+			foreach (Line line in _containedLines)
+			{
+				string built = "";
+				foreach (Token pToken in line)
+				{
+					if (pToken.type == TokenType.String)
+						built += "\"";
+
+					built += pToken.identifier.Replace(System.Environment.NewLine, @"\n").Replace(((char)0x1f).ToString(), " ").Replace(((char)0x1D).ToString(), " ") + " ";
+
+					if (pToken.type == TokenType.String)
+						built += "\"";
+				}
+				containedLines.Add(built);
+			}
+
+			return containedLines;
 		}
 
 		public static bool IsIndexBetween(this string str, int index, string start, string end){

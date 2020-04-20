@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace CowSpeak
 {
-	public static class Executor
+	internal static class Executor
 	{
 		public static int GetClosingBracket(List< Line > Lines, int start)
 		{
@@ -18,8 +18,13 @@ namespace CowSpeak
 					if (token.type == TokenType.StartBracket)
 					{
 						skips++;
+						break;
 					}
-					else if (token.type == TokenType.EndBracket)
+				}
+
+				foreach (var token in Lines[j])
+				{
+					if (token.type == TokenType.EndBracket)
 					{
 						skips--;
 
@@ -53,14 +58,8 @@ namespace CowSpeak
 
 				if (Lines[i].HasFunctionDefinition || Lines[i].HasConditional)
 				{
-					int ItemIndex = -1; // index of the token that the definition/conditional appears at
-					if (Lines[i].HasFunctionDefinition)
-						ItemIndex = 1;
-					else
-						ItemIndex = 0;
-
 					bool NextLineExists = Lines.IsIndexValid(i + 1);
-					bool HasPrecedingBracket = Lines[i].IsIndexValid(ItemIndex + 1) && Lines[i][ItemIndex + 1].type == TokenType.StartBracket;
+					bool HasPrecedingBracket = Lines[i].Last() != null && Lines[i].Last().type == TokenType.StartBracket;
 					bool NextLineHasBracket = NextLineExists && Lines[i + 1].FirstOrDefault() != null && Lines[i + 1].FirstOrDefault().type == TokenType.StartBracket;
 					if (!HasPrecedingBracket && !NextLineHasBracket)
 						throw new Exception("FunctionDefinition or Conditional is missing a preceding StartBracket");
@@ -81,12 +80,12 @@ namespace CowSpeak
 						usage = usage.Substring(0, usage.Length - 1); // remove )
 						string dName = usage.Substring(0, usage.IndexOf("(")); // text before first '('
 
-						var DefinitionLines = Utils.GetContainedLines(Lines, EndingBracket, StartBracketIndex);
+						var DefinitionLines = Utils.pGetContainedLines(Lines, EndingBracket, StartBracketIndex);
 						CowSpeak.Functions.Create(new UserFunction(dName, DefinitionLines, UserFunction.ParseDefinitionParams(usage.Substring(usage.IndexOf("("))), Utils.GetType(Lines[i][0].identifier), Lines[i][0].identifier + " " + usage + ")", i));
 					}
 					else if (Lines[i].HasConditional)
 					{
-						List< Line > ContainedLines = Utils.GetContainedLines(Lines, EndingBracket, StartBracketIndex);
+						List< string > ContainedLines = Utils.GetContainedLines(Lines, EndingBracket, StartBracketIndex);
 
 						if (Lines[i][0].type == TokenType.IfConditional)
 						{
@@ -95,8 +94,7 @@ namespace CowSpeak
 							{
 								Scope scope = new Scope();
 
-								Execute(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
-								//new Lexer().Tokenize(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
+								new Lexer().Tokenize(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
 
 								scope.End();
 							}
@@ -124,7 +122,7 @@ namespace CowSpeak
 							{
 								Scope scope = new Scope();
 
-								Execute(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
+								new Lexer().Tokenize(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
 
 								scope.End();
 							}
@@ -137,7 +135,7 @@ namespace CowSpeak
 							{
 								Scope scope = new Scope();
 
-								Execute(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
+								new Lexer().Tokenize(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
 
 								scope.End();
 							}

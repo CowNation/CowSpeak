@@ -8,8 +8,10 @@ using System.Text.RegularExpressions;
 
 namespace CowSpeak
 {
-	public static class Lexer
+	public class Lexer
 	{
+		internal List< Line > Lines = new List< Line >();
+
 		public static Token ParseToken(string token, bool _throw = true, int Index = -1)
 		{
 			foreach (Definition Definition in CowSpeak.Definitions)
@@ -77,7 +79,7 @@ namespace CowSpeak
 
 			if (token[0] == '\"' && token[token.Length - 1] == '\"' && token.OccurrencesOf("\"") == 2)
 				return new Token(TokenType.String, token.Substring(1, token.Length - 2).FromBase64(), Index);	
-			else if (token[0] == '\'' && token[token.Length - 1] == '\'') // we can't ensure the length here because the contents are enCodeLinesd
+			else if (token[0] == '\'' && token[token.Length - 1] == '\'') // we can't ensure the length here because the contents are encoded
 				return new Token(TokenType.Character, token.Substring(1, token.Length - 2).FromBase64(), Index);
 			else if (token.IndexOf(Syntax.Conditionals.If + "(") == 0 && token[token.Length - 1] == ')')
 				return new Token(TokenType.IfConditional, token, Index);
@@ -142,9 +144,14 @@ namespace CowSpeak
 			return ret;
 		}
 
+		internal Lexer()
+		{
+
+		}
+
 		public static string EncodeLiterals(string str)
 		{
-			// EnCodeLines the contents in between "s or 's to base64 so they don't interfere with anything
+			// Encode the contents in between "s or 's to base64 so they don't interfere with anything
 			MatchCollection LiteralMatches = Regex.Matches(str, "([\"\'])(?:(?:\\\\\\1|.)*?)\\1"); // matches for text surrounded in "s or 's (non-empty) (keep in mind the matches include the "s or 's)
 			int IndexOffset = 0;
 			foreach (Match match in LiteralMatches)
@@ -163,56 +170,55 @@ namespace CowSpeak
 			return str;
 		}
 
-		public static List< Line > Parse(List< string > CodeLines, int CurrentLineOffset = 0, bool isNestedInFunction = false, bool isNestedInConditional = false, FileType Type = FileType.Normal)
+		internal void Tokenize(List< string > fileLines, int CurrentLineOffset = 0, bool isNestedInFunction = false, bool isNestedInConditional = false, FileType Type = FileType.Normal)
 		{
 			if (Type == FileType.Binary)
 			{
-				for (int i = 0; i < CodeLines.Count; i++)
+				for (int i = 0; i < fileLines.Count; i++)
 				{
 					CowSpeak.CurrentLine = i + 1 + CurrentLineOffset;
 					string Built = "";
 
 					try
 					{
-						Utils.Split(CodeLines[i], ' ').ToList().ForEach(x => Built += Encoding.ASCII.GetString(Utils.GetBytesFromBinaryString(x)));
+						Utils.Split(fileLines[i], ' ').ToList().ForEach(x => Built += Encoding.ASCII.GetString(Utils.GetBytesFromBinaryString(x)));
 					}
 					catch
 					{
 						throw new Exception("Invalid binary token in bcf");
 					}
-					CodeLines[i] = Built;
+					fileLines[i] = Built;
 				}
 			}
 			else if (Type == FileType.Hex)
 			{
-				for (int i = 0; i < CodeLines.Count; i++)
+				for (int i = 0; i < fileLines.Count; i++)
 				{
 					CowSpeak.CurrentLine = i + 1 + CurrentLineOffset;
 					string Built = "";
 
 					try
 					{
-						Utils.Split(CodeLines[i], ' ').Where(x => x != "").ToList().ForEach(x => Built += (char)int.Parse(x, NumberStyles.HexNumber));
+						Utils.Split(fileLines[i], ' ').Where(x => x != "").ToList().ForEach(x => Built += (char)int.Parse(x, NumberStyles.HexNumber));
 					}
 					catch (System.FormatException)
 					{
 						throw new Exception("Invalid hexadecimal token in hcf");
 					}
 
-					CodeLines[i] = Built;
+					fileLines[i] = Built;
 				}
 			}
 
-			List<Line> Lines = new List<Line>();
-			for (int i = 0; i < CodeLines.Count; i++)
+			for (int i = 0; i < fileLines.Count; i++)
 			{
 				CowSpeak.CurrentLine = i + 1 + CurrentLineOffset;
 
-				while (CodeLines[i].IndexOf("	") == 0 || CodeLines[i].IndexOf(" ") == 0)
-					CodeLines[i] = CodeLines[i].Remove(0, 1);
+				while (fileLines[i].IndexOf("	") == 0 || fileLines[i].IndexOf(" ") == 0)
+					fileLines[i] = fileLines[i].Remove(0, 1);
 
-				string SafeLine = CodeLines[i];
-				if (!isNestedInConditional && !isNestedInFunction) // literals are already enCodeLinesd
+				string SafeLine = fileLines[i];
+				if (!isNestedInConditional && !isNestedInFunction) // literals are already encoded
 					SafeLine = EncodeLiterals(SafeLine);
 
 				while (SafeLine.IndexOf(Syntax.Identifiers.Comment) != -1)
@@ -249,7 +255,7 @@ namespace CowSpeak
 
 			CowSpeak.Debug = false; // only debug tokens on compilation, needed because many things recurse back to Lexer
 
-			return Lines;
+			Executor.Execute(Lines, CurrentLineOffset, isNestedInFunction, isNestedInConditional);
 		}
 	}
 }
