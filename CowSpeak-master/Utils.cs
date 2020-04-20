@@ -19,11 +19,7 @@ namespace CowSpeak
 		{
 			try
 			{
-				//Stopwatch sw = new Stopwatch();
-				//sw.Start();
 				return interpreter.Eval(Expression);
-				//sw.Stop();
-				//System.Console.WriteLine(Expression + " - " + sw.ElapsedMilliseconds);
 			}
 			catch (DynamicExpressoException ex)
 			{
@@ -130,20 +126,6 @@ namespace CowSpeak
 				return -1;
 
 			return match.Index + match.Length - 1;
-			/*int skips = 0;
-			for (int i = 0; i < str.Length; i++)
-			{
-				if (str[i] == '(')
-					skips++;
-
-				if (str[i] == ')')
-				{
-					skips--;
-					if (skips <= 0)
-						return i;
-				}
-			}
-			return -1;*/
 		}
 
 		public static bool IsHexadecimal(string str) => Utils.OccurrencesOf(str, "0x") == 1 && str.IndexOf("0x") == 0;
@@ -203,9 +185,20 @@ namespace CowSpeak
 			return Lines.GetRange(StartLine + 1, EndLine - (StartLine + 1));
 		}
 
-		public static List< Line > GetContainedLines(List< Line > Lines, int EndLine, int StartLine)
+		public static List<Line> GetContainedLines(List< Line > Lines, Executor.TokenLocation EndLine, Executor.TokenLocation StartLine)
 		{
-			return Lines.GetRange(StartLine + 1, EndLine - (StartLine + 1));
+			if (StartLine.LineIndex == EndLine.LineIndex) // same line
+			{
+				if (StartLine.TokenIndex + 1 == EndLine.TokenIndex) // empty brackets
+					return new List<Line>();
+
+				return new List<Line>()
+				{
+					new Line(Lines[StartLine.LineIndex].GetRange(StartLine.TokenIndex + 1, EndLine.TokenIndex - (StartLine.TokenIndex + 1))) // tokens between StartLine.TokenIndex & EndLine.TokenIndex
+				};
+			}
+
+			return Lines.GetRange(StartLine.LineIndex + 1, EndLine.LineIndex - (StartLine.LineIndex + 1));
 		}
 
 		public static bool IsIndexBetween(this string str, int index, string start, string end){

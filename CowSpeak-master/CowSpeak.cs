@@ -32,7 +32,7 @@ namespace CowSpeak
 
 		internal static VariableList Vars = new VariableList();
 
-		public static void Exec(string fileName)
+		public static void Execute(string fileName)
 		{
 			if (Functions == null)
 				Functions = FunctionAttr.GetFunctions();
@@ -50,12 +50,12 @@ namespace CowSpeak
 			else if (fileName.IndexOf(".hcf") != -1)
 				Type = FileType.Hex;
 			else
-				throw new Exception("Cannot execute COWFILE '" + fileName + "', it doesn't have the .bcf file extension");
+				throw new Exception("Cannot execute file '" + fileName + "', it doesn't have a compatible file extension (.cf/.bcf/.hcf)");
 
 			Executor.Execute(Lexer.Parse(new CowConfig.ReadConfig(fileName).GetLines(), 0, false, false, Type));
 		}
 
-		public static void Exec(string[] lines)
+		public static void Execute(string[] lines)
 		{
 			if (Functions == null)
 				Functions = FunctionAttr.GetFunctions();
@@ -67,7 +67,7 @@ namespace CowSpeak
 
 		public static void Run(string fileName)
 		{
-			Exec(fileName);
+			Execute(fileName);
 			Vars.Clear();
 			ClearUserDefinitions();
 			Functions.ClearUserDefined();
@@ -75,7 +75,7 @@ namespace CowSpeak
 
 		public static void Run(string[] lines)
 		{
-			Exec(lines);
+			Execute(lines);
 			Vars.Clear();
 			ClearUserDefinitions();
 			Functions.ClearUserDefined();
