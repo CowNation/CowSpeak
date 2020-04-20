@@ -4,6 +4,7 @@ using System.Text;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace CowSpeak
 {
@@ -57,6 +58,8 @@ namespace CowSpeak
 
 		public static Any[] ParseParameters(string s_parameters)
 		{
+			string p = s_parameters.Replace(((char)0x1D).ToString(), " ");
+
 			if (s_parameters == "()")
 				return new Any[0]; // no parameters
 
@@ -65,7 +68,7 @@ namespace CowSpeak
 			
 			s_parameters = Utils.ReplaceBetween(s_parameters, ',', '(', ')', (char)0x1a).Replace(((char)0x1D).ToString(), " "); // prevent splitting of commas in nested parentheses
 
-			string[] splitParams = Utils.Split(s_parameters, ","); // split by each comma (each item is a parameter)
+			string[] splitParams = Regex.Split(s_parameters, ","); // split by each comma/space (each item is a parameter)
 
 			for (int i = 0; i < splitParams.Length; i++)
 			{
@@ -86,7 +89,7 @@ namespace CowSpeak
 				cleanedUp = cleanedUp.Replace(((char)0x1E).ToString(), ",");
 				Token token = null;
 
-				if (Utils.Split(parameter, "\"").Length - 1 <= 2 && parameter.IndexOf(" ") == -1)
+				if (parameter.OccurrencesOf("\"") <= 2 && parameter.IndexOf(" ") == -1)
 				{
 					token = Lexer.ParseToken(parameter, false); // a flaw in the parsing function for strings would take a string chain if it starts and ends with a string as 1 string (this is a janky workaround)
 				}

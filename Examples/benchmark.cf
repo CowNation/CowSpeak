@@ -18,9 +18,7 @@ decimal EndBenchmark() {
 decimal BenchmarkLoops() {
 	StartBenchmark()
 
-	loop("", 0, LoopsNum) { 
-		integer p = 69
-	}
+	loop("", 0, LoopsNum) { }
 
 	return EndBenchmark()
 }

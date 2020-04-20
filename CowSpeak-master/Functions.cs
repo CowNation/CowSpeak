@@ -295,8 +295,8 @@ namespace CowSpeak
 			CowSpeak.CurrentFile = oldFile;
 		}
 
-		[FunctionAttr("Exec")]
-		public static void Exec(string filePath)
+		[FunctionAttr("ExecuteFile")]
+		public static void ExecuteFile(string filePath)
 		{
 			string oldFile = string.Copy(CowSpeak.CurrentFile);
 
@@ -309,7 +309,7 @@ namespace CowSpeak
 					filePath = CowSpeak.CurrentFile.Substring(0, CowSpeak.CurrentFile.IndexOf("\\") + 1) + filePath;
 			}
 
-			CowSpeak.Exec(filePath);
+			CowSpeak.Execute(filePath);
 			CowSpeak.CurrentFile = oldFile;
 		}
 
