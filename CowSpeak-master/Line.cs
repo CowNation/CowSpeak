@@ -34,7 +34,8 @@ namespace CowSpeak
 			{
 				if (base[i].type == TokenType.FunctionCall)
 				{
-					if (CowSpeak.Functions.Get(base[i].identifier).type == Type.Void){
+					if (CowSpeak.Functions[base[i].identifier].type == Type.Void)
+					{
 						if (GetRange(0, Count).IsIndexValid(i - 1) && Utils.IsOperator(base[i-1].type))
 							throw new Exception("Cannot perform operation: '" + base[i-1].identifier + "' on void function");
 						if (GetRange(0, Count).IsIndexValid(i + 1) && Utils.IsOperator(base[i+1].type))
@@ -50,39 +51,20 @@ namespace CowSpeak
 					toEval = GetRange(i + 1, Count - (i + 1));
 					break;
 				}
-			} // remove the equal sign and everything to the left
+			} // remove the equal sign and everything to the left from the equation
 
 			if (Count == 2 && base[0].type == TokenType.TypeIdentifier && base[1].type == TokenType.VariableIdentifier)
 				return null; // support for uninitialized vars
 
-			Any AlreadyEvaluatedValue = null;
-			string Expression = Utils.GetTokensExpression(toEval, ref AlreadyEvaluatedValue);
-			if (AlreadyEvaluatedValue != null)
-				return AlreadyEvaluatedValue;
+			Any alreadyEvaluatedValue = null;
+			string expression = Utils.GetTokensExpression(toEval, ref alreadyEvaluatedValue);
+			if (alreadyEvaluatedValue != null)
+				return alreadyEvaluatedValue; // expression was already evaluated previously
 
-			if (Expression.Length == 0)
-				return new Any(Type.Integer, 0);
+			if (expression.Length == 0)
+				return null;
 
-			if (Expression.OccurrencesOf(" ") == 0 && Utils.IsNumber(Expression))
-			{
-				Any val = new Any();
-				if (Expression.IndexOf(".") != -1)
-				{
-					val.Type = Type.Decimal;
-					val.Value = double.Parse(Expression);
-				}
-				else
-				{
-					val.Type = Type.Integer64;
-					val.Value = long.Parse(Expression);
-					if ((long)val.Value < int.MaxValue)
-						val.Type = Type.Integer;
-				}
-				
-				return val;
-			}
-
-			return new Any(Utils.Eval(Expression));
+			return new Any(Utils.Eval(expression));
 		}
 
 		public override string ToString()

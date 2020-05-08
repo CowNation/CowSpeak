@@ -24,7 +24,6 @@ namespace CowSpeak
 	{
 		public string Name;
 		public Type type;
-		public string ProperUsage;
 		public bool isMethod = false;
 		public Parameter[] Parameters; // defined parameters
 		public DefinitionType DefinitionType;
@@ -58,8 +57,6 @@ namespace CowSpeak
 
 		public static Any[] ParseParameters(string s_parameters)
 		{
-			string p = s_parameters.Replace(((char)0x1D).ToString(), " ");
-
 			if (s_parameters == "()")
 				return new Any[0]; // no parameters
 
@@ -87,12 +84,11 @@ namespace CowSpeak
 					cleanedUp = parameter;
 
 				cleanedUp = cleanedUp.Replace(((char)0x1E).ToString(), ",");
+
 				Token token = null;
 
-				if (parameter.OccurrencesOf("\"") <= 2 && parameter.IndexOf(" ") == -1)
-				{
+				if (parameter.OccurrencesOf("\"") <= 2)
 					token = Lexer.ParseToken(parameter, false); // a flaw in the parsing function for strings would take a string chain if it starts and ends with a string as 1 string (this is a janky workaround)
-				}
 
 				Type vtype = null;
 
@@ -104,7 +100,7 @@ namespace CowSpeak
 				} // unknown identifier, could be an equation waiting to be solved
 				else if (token.type == TokenType.VariableIdentifier)
 				{
-					Variable _var = CowSpeak.Vars.Get(token.identifier);
+					Variable _var = CowSpeak.Vars[token.identifier];
 					parameters.Add(new Any(_var.Type, _var.Value));
 					continue;
 				}
@@ -112,7 +108,7 @@ namespace CowSpeak
 				{
 					while ((int)token.identifier[0] < 'A' || (int)token.identifier[0] > 'z')
 						token.identifier = token.identifier.Remove(0, 1); // i don't remember why this is here tbh
-					FunctionBase func = CowSpeak.Functions.Get(token.identifier);
+					FunctionBase func = CowSpeak.Functions[token.identifier];
 					if (func.type == Type.Void)
 						throw new Exception("Cannot pass void function as a parameter");
 					parameters.Add(new Any(func.type, func.Execute(token.identifier).Value));

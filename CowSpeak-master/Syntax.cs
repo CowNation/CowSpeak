@@ -19,6 +19,7 @@ namespace CowSpeak
 			public const string Character = "character";
 			public const string c_Character = "Character";
 			public const string Any = "object";
+			public const string c_Any = "Object";
 			public const string ArraySuffix = "Array";
 		}
 

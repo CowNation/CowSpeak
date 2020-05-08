@@ -4,16 +4,9 @@ using System.Linq;
 
 namespace CowSpeak
 {
-	public enum FileType
-	{
-		Normal,
-		Binary,
-		Hex
-	}
-
 	public class CowSpeak
 	{
-		internal static FunctionList Functions = null;
+		internal static Functions Functions = null;
 
 		internal static List< Definition > Definitions = new List< Definition >();
 
@@ -30,35 +23,28 @@ namespace CowSpeak
 		public static string CurrentFile = "";
 		public static List< string > StackTrace = new List< string >();
 
-		internal static VariableList Vars = new VariableList();
+		internal static Variables Vars = new Variables();
 
 		public static void Execute(string fileName)
 		{
 			if (Functions == null)
-				Functions = FunctionAttr.GetFunctions();
+				Functions = FunctionAttribute.GetFunctions();
 
 			CurrentFile = fileName;
-			FileType Type;
 
 			if (!File.Exists(fileName))
 				throw new Exception("Cannot execute COWFILE '" + fileName + "', it doesn't exist");
 
-			if (fileName.IndexOf(".cf") != -1)
-				Type = FileType.Normal;
-			else if (fileName.IndexOf(".bcf") != -1)
-				Type = FileType.Binary;
-			else if (fileName.IndexOf(".hcf") != -1)
-				Type = FileType.Hex;
-			else
-				throw new Exception("Cannot execute file '" + fileName + "', it doesn't have a compatible file extension (.cf/.bcf/.hcf)");
+			if (fileName.IndexOf(".cf") == -1)
+				throw new Exception("Cannot execute file '" + fileName + "', it doesn't the cowfile extension (.cf)");
 
-			Executor.Execute(Lexer.Parse(new CowConfig.ReadConfig(fileName).GetLines(), 0, false, false, Type));
+			Executor.Execute(Lexer.Parse(new CowConfig.ReadConfig(fileName).GetLines(), 0, false, false));
 		}
 
 		public static void Execute(string[] lines)
 		{
 			if (Functions == null)
-				Functions = FunctionAttr.GetFunctions();
+				Functions = FunctionAttribute.GetFunctions();
 
 			CurrentFile = "";
 

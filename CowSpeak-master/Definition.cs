@@ -1,7 +1,7 @@
 namespace CowSpeak{
 	internal enum DefinitionType
 	{
-		Language,
+		Static,
 		User
 	}
 

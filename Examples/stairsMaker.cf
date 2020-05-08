@@ -1,7 +1,7 @@
 Print("Stairs Maker:\n")
 
 Print("Enter the number of stairs: ")
-integer steps = InputInteger()
+integer steps = InputString().ToInteger()
 
 Print("Enter the symbol: ")
 character symbol = InputCharacter()

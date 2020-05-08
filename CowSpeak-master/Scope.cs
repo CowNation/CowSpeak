@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CowSpeak
 {
@@ -7,34 +8,22 @@ namespace CowSpeak
 		public Scope()
 		{
 			// get a copy so it's not a reference
-			oldVars = new List< Variable >(CowSpeak.Vars);
+			oldVars = new List<string>(CowSpeak.Vars.Keys);
 		} // any vars created in this scope will be destroyed at the end of the scope
 
-		public List< Variable > oldVars = null;
+		public List<string> oldVars = null;
 
 		public void End()
 		{
-			for (int i = 0; i < CowSpeak.Vars.Count; i++)
+			List<string> keysToRemove = new List<string>(); // a list of variable names to remove after checking for new vars
+			foreach (var entry in CowSpeak.Vars)
 			{
-				bool matchFound = false;
-				foreach (Variable oldVar in oldVars)
+				if (oldVars.Where(x => x == entry.Key).FirstOrDefault() == null)
 				{
-					if (oldVar.Name == CowSpeak.Vars[i].Name)
-					{
-						matchFound = true;
-						break;
-					}
+					keysToRemove.Add(entry.Key);
 				}
-				if (!matchFound)
-				{
-					CowSpeak.Vars.RemoveAt(i); // was created in restricted scope because it didn't exist before the restricted scope began
-					
-					i--;
-				}
-
-				if (!CowSpeak.Vars.IsIndexValid(i) && i >= 0)
-					break;
-			} // destroy any new vars created during the restricted scope
+			}
+			keysToRemove.ForEach(key => CowSpeak.Vars.Remove(key));
 		}
 	}
 }

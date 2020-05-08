@@ -29,17 +29,17 @@ namespace CowSpeak
 
 		public static string GetTokensExpression(List<Token> tokens, ref Any AlreadyEvaluatedValue)
 		{
-			string Expression = "";
+			string expression = "";
 			for (int i = 0; i < tokens.Count; i++)
 			{
 				string identifier = tokens[i].identifier;
 
-				Type ObjectType = null;
+				Type objectType = null;
 				if (tokens[i].type == TokenType.VariableIdentifier)
 				{
-					Variable var = CowSpeak.Vars.Get(identifier);
-					identifier = Functions._ToString(var.Value); // replace variable name with it's value
-					ObjectType = var.Type;
+					Variable var = CowSpeak.Vars[identifier];
+					identifier = StaticFunction.Functions._ToString(var.Value); // replace variable name with it's value
+					objectType = var.Type;
 				}
 
 				switch (tokens[i].type)
@@ -52,9 +52,9 @@ namespace CowSpeak
 
 				if (tokens[i].type == TokenType.FunctionCall)
 				{
-					FunctionBase func = CowSpeak.Functions.Get(identifier);
+					FunctionBase func = CowSpeak.Functions[identifier];
 					Any returned = func.Execute(identifier);
-					ObjectType = func.type;
+					objectType = func.type;
 
 					if (tokens.Count == 1)
 					{
@@ -63,7 +63,7 @@ namespace CowSpeak
 					}
 
 					if (returned != null)
-						identifier = Functions._ToString(returned.Value); // replace function call with it's return value
+						identifier = StaticFunction.Functions._ToString(returned.Value); // replace function call with it's return value
 					else
 						identifier = "";
 				}
@@ -77,19 +77,19 @@ namespace CowSpeak
 						return "";
 					}
 
-					identifier = Functions._ToString(EvaluatedChain.Value);
-					ObjectType = FunctionChain.GetType(tokens[i].identifier);
+					identifier = StaticFunction.Functions._ToString(EvaluatedChain.Value);
+					objectType = FunctionChain.GetType(tokens[i].identifier);
 				}
 
-				if (tokens[i].type == TokenType.String || ObjectType == Type.String)
+				if (tokens[i].type == TokenType.String || objectType == Type.String)
 					identifier = "\"" + identifier + "\"";
-				else if (tokens[i].type == TokenType.Character || ObjectType == Type.Character)
+				else if (tokens[i].type == TokenType.Character || objectType == Type.Character)
 					identifier = "\'" + identifier + "\'";
 				
-				Expression += identifier;
+				expression += identifier;
 			}
 			//System.Console.WriteLine(Expression);
-			return Expression;
+			return expression;
 		}
 
 		public static System.Random rand = new System.Random();

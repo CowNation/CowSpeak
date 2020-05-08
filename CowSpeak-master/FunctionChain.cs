@@ -20,17 +20,18 @@ namespace CowSpeak
 				int End = identifier.IndexOf(")", i);
 				string FuncIdentifier = identifier.Substring(0, End + 1);
 
-				FunctionBase ChainFunc = CowSpeak.Functions.Get(FuncIdentifier);
+				FunctionBase ChainFunc = CowSpeak.Functions[FuncIdentifier];
 				EvaluatedValues.Add(ChainFunc.Execute(FuncIdentifier));
 
 				CowSpeak.Vars.Create(new Variable(EvaluatedValues.Last().Type, "temp_" + i, EvaluatedValues.Last().Value));
 				identifier = ("temp_" + i) + identifier.Substring(End + 1);
 
-				var LastTempVar = CowSpeak.Vars.Get("temp_" + (i - 1), false);
-				if (LastTempVar != null)
-					CowSpeak.Vars.Remove(LastTempVar); // remove last temp var
+				if (CowSpeak.Vars.ContainsKey("temp_" + (i - 1)))
+					CowSpeak.Vars.Remove("temp_" + (i - 1)); // remove last temp var
 			}
-			CowSpeak.Vars.Remove(CowSpeak.Vars.Get("temp_" + (Funcs - 1), false));
+
+			if (CowSpeak.Vars.ContainsKey("temp_" + (Funcs - 1)))
+				CowSpeak.Vars.Remove("temp_" + (Funcs - 1));
 				
 			return EvaluatedValues.Last();
 		}
@@ -44,9 +45,8 @@ namespace CowSpeak
 
 				string FuncIdentifier = identifier.Substring(0, ClosingParenthesis + 1);
 
-				var func = CowSpeak.Functions.Get(FuncIdentifier, false);
-				if (func != null)
-					LastType = func.type;
+				if (CowSpeak.Functions.FunctionExists(FuncIdentifier))
+					LastType = CowSpeak.Functions[FuncIdentifier].type;
 
 				if (ClosingParenthesis + 1 >= identifier.Length || LastType == null)
 					break;

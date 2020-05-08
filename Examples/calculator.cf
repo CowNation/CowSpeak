@@ -1,13 +1,13 @@
 Print("Calculator:\n")
 
 Print("Enter number left of symbol: ")
-decimal left = InputDecimal()
+decimal left = InputString().ToDecimal()
 
 Print("Enter symbol: ")
 character symbol = InputCharacter()
 
 Print("\nEnter number right of symbol: ")
-decimal right = InputDecimal()
+decimal right = InputString().ToDecimal()
 
 string expression = "" + left + " " + symbol + " " + right
 Print("" + expression + " = " + Evaluate(expression) + "\n")

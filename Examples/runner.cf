@@ -1,8 +1,6 @@
 # we pass true so already defined exceptions are thrown
-Run("binaryTest.bcf")
 Run("calculator.cf")
 Run("convertStr.cf")
 Run("fizzBuzz.cf")
-Run("hexTest.hcf")
 Run("randomNumberGuessr.cf")
 Run("stairsMaker.cf")

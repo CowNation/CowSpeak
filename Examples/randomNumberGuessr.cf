@@ -27,7 +27,7 @@ while(correctGuess != guess)
 	}
 	
 	Print("Input Your Guess: ")
-	guess = InputInteger()
+	guess = InputString().ToInteger()
 	firstTime = false # it's not the first time through the loop
 }
 

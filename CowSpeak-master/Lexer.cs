@@ -12,87 +12,93 @@ namespace CowSpeak
 	{
 		public static Token ParseToken(string token, bool _throw = true, int Index = -1)
 		{
-			foreach (Definition Definition in CowSpeak.Definitions)
-				if (token == Definition.from)
-					token = Definition.to;
+			while (token.Length > 0 && token[0] == ' ')
+				token = token.Remove(0);
 
-			if (Utils.IsHexadecimal(token))
-				token = int.Parse(token.Substring(2), System.Globalization.NumberStyles.HexNumber).ToString(); // determine if it's a hexadecimal number
-
-			Type type = Utils.GetType(token, false);
-			if (type != null)
-				return new Token(TokenType.TypeIdentifier, token, Index);
-
-			switch (token)
+			if (token.Length > 0)
 			{
-				case "true":
-				case "false":
-					return new Token(TokenType.Boolean, token, Index);
-				case Syntax.Statements.Return:
-					return new Token(TokenType.ReturnStatement, token, Index);
-				case Syntax.Operators.Or:
-					return new Token(TokenType.OrOperator, token, Index);
-				case Syntax.Operators.BitwiseOR:
-					return new Token(TokenType.BitwiseOROperator, token, Index);
-				case Syntax.Operators.BitwiseAND:
-					return new Token(TokenType.BitwiseANDOperator, token, Index);
-				case Syntax.Comparators.IsEqual:
-					return new Token(TokenType.IsEqualOperator, token, Index);
-				case Syntax.Comparators.IsNotEqual:
-					return new Token(TokenType.IsNotEqualOperator, token, Index);
-				case Syntax.Comparators.IsGreaterThan:
-					return new Token(TokenType.IsGreaterThanOperator, token, Index);
-				case Syntax.Comparators.IsLessThan:
-					return new Token(TokenType.IsLessThanOperator, token, Index);
-				case Syntax.Comparators.IsGreaterThanOrEqual:
-					return new Token(TokenType.IsGreaterThanOrEqualOperator, token, Index);
-				case Syntax.Comparators.IsLessThanOrEqual:
-					return new Token(TokenType.IsLessThanOrEqualOperator, token, Index);
-				case Syntax.Operators.Add:
-					return new Token(TokenType.AddOperator, token, Index);
-				case Syntax.Operators.And:
-					return new Token(TokenType.AndOperator, token, Index);
-				case Syntax.Operators.Subtract:
-					return new Token(TokenType.SubtractOperator, token, Index);
-				case Syntax.Operators.Multiply:
-					return new Token(TokenType.MultiplyOperator, token, Index);
-				case Syntax.Operators.Divide:
-					return new Token(TokenType.DivideOperator, token, Index);
-				case Syntax.Operators.Modulo:
-					return new Token(TokenType.ModuloOperator, token, Index);
-				case Syntax.Operators.Equal:
-					return new Token(TokenType.EqualOperator, token, Index);
-				case "''":
-					return new Token(TokenType.Character, "", Index); // support empty Characters ('')
-				case "{":
-					return new Token(TokenType.StartBracket, token, Index);
-				case "}":
-					return new Token(TokenType.EndBracket, token, Index);
-				case "(":
-				case ")":
-					return new Token(TokenType.Parenthesis, token, Index);
-				case Syntax.Conditionals.Else:
-					return new Token(TokenType.ElseConditional, token, Index);
-			}
+				foreach (Definition Definition in CowSpeak.Definitions)
+					if (token == Definition.from)
+						token = Definition.to;
 
-			if (token[0] == '\"' && token[token.Length - 1] == '\"' && token.OccurrencesOf("\"") == 2)
-				return new Token(TokenType.String, token.Substring(1, token.Length - 2).FromBase64(), Index);	
-			else if (token[0] == '\'' && token[token.Length - 1] == '\'') // we can't ensure the length here because the contents are enCodeLinesd
-				return new Token(TokenType.Character, token.Substring(1, token.Length - 2).FromBase64(), Index);
-			else if (token.IndexOf(Syntax.Conditionals.If + "(") == 0 && token[token.Length - 1] == ')')
-				return new Token(TokenType.IfConditional, token, Index);
-			else if (token.IndexOf(Syntax.Conditionals.While + "(") == 0 && token[token.Length - 1] == ')')
-				return new Token(TokenType.WhileConditional, token, Index);
-			else if (token.IndexOf(Syntax.Conditionals.Loop + "(") == 0 && token[token.Length - 1] == ')')
-				return new Token(TokenType.LoopConditional, token, Index);
-			else if (Utils.IsNumber(token))
-				return new Token(TokenType.Number, token, Index);
-			else if (FunctionChain.IsChain(token))
-				return new Token(TokenType.FunctionChain, token, Index);
-			else if (FunctionBase.IsFunctionCall(token))
-				return new Token(TokenType.FunctionCall, token, Index);
-			else if (Utils.IsValidObjectName(token))
-				return new Token(TokenType.VariableIdentifier, token, Index);
+				if (Utils.IsHexadecimal(token))
+					token = int.Parse(token.Substring(2), System.Globalization.NumberStyles.HexNumber).ToString(); // determine if it's a hexadecimal number
+
+				Type type = Utils.GetType(token, false);
+				if (type != null)
+					return new Token(TokenType.TypeIdentifier, token, Index);
+
+				switch (token)
+				{
+					case "true":
+					case "false":
+						return new Token(TokenType.Boolean, token, Index);
+					case Syntax.Statements.Return:
+						return new Token(TokenType.ReturnStatement, token, Index);
+					case Syntax.Operators.Or:
+						return new Token(TokenType.OrOperator, token, Index);
+					case Syntax.Operators.BitwiseOR:
+						return new Token(TokenType.BitwiseOROperator, token, Index);
+					case Syntax.Operators.BitwiseAND:
+						return new Token(TokenType.BitwiseANDOperator, token, Index);
+					case Syntax.Comparators.IsEqual:
+						return new Token(TokenType.IsEqualOperator, token, Index);
+					case Syntax.Comparators.IsNotEqual:
+						return new Token(TokenType.IsNotEqualOperator, token, Index);
+					case Syntax.Comparators.IsGreaterThan:
+						return new Token(TokenType.IsGreaterThanOperator, token, Index);
+					case Syntax.Comparators.IsLessThan:
+						return new Token(TokenType.IsLessThanOperator, token, Index);
+					case Syntax.Comparators.IsGreaterThanOrEqual:
+						return new Token(TokenType.IsGreaterThanOrEqualOperator, token, Index);
+					case Syntax.Comparators.IsLessThanOrEqual:
+						return new Token(TokenType.IsLessThanOrEqualOperator, token, Index);
+					case Syntax.Operators.Add:
+						return new Token(TokenType.AddOperator, token, Index);
+					case Syntax.Operators.And:
+						return new Token(TokenType.AndOperator, token, Index);
+					case Syntax.Operators.Subtract:
+						return new Token(TokenType.SubtractOperator, token, Index);
+					case Syntax.Operators.Multiply:
+						return new Token(TokenType.MultiplyOperator, token, Index);
+					case Syntax.Operators.Divide:
+						return new Token(TokenType.DivideOperator, token, Index);
+					case Syntax.Operators.Modulo:
+						return new Token(TokenType.ModuloOperator, token, Index);
+					case Syntax.Operators.Equal:
+						return new Token(TokenType.EqualOperator, token, Index);
+					case "''":
+						return new Token(TokenType.Character, "", Index); // support empty Characters ('')
+					case "{":
+						return new Token(TokenType.StartBracket, token, Index);
+					case "}":
+						return new Token(TokenType.EndBracket, token, Index);
+					case "(":
+					case ")":
+						return new Token(TokenType.Parenthesis, token, Index);
+					case Syntax.Conditionals.Else:
+						return new Token(TokenType.ElseConditional, token, Index);
+				}
+
+				if (token[0] == '\"' && token[token.Length - 1] == '\"' && token.OccurrencesOf("\"") == 2)
+					return new Token(TokenType.String, token.Substring(1, token.Length - 2).FromBase64(), Index);	
+				else if (token[0] == '\'' && token[token.Length - 1] == '\'') // we can't ensure the length here because the contents are encoded
+					return new Token(TokenType.Character, token.Substring(1, token.Length - 2).FromBase64(), Index);
+				else if (token.IndexOf(Syntax.Conditionals.If + "(") == 0 && token[token.Length - 1] == ')')
+					return new Token(TokenType.IfConditional, token, Index);
+				else if (token.IndexOf(Syntax.Conditionals.While + "(") == 0 && token[token.Length - 1] == ')')
+					return new Token(TokenType.WhileConditional, token, Index);
+				else if (token.IndexOf(Syntax.Conditionals.Loop + "(") == 0 && token[token.Length - 1] == ')')
+					return new Token(TokenType.LoopConditional, token, Index);
+				else if (Utils.IsNumber(token))
+					return new Token(TokenType.Number, token, Index);
+				else if (FunctionChain.IsChain(token))
+					return new Token(TokenType.FunctionChain, token, Index);
+				else if (FunctionBase.IsFunctionCall(token))
+					return new Token(TokenType.FunctionCall, token, Index);
+				else if (Utils.IsValidObjectName(token))
+					return new Token(TokenType.VariableIdentifier, token, Index);
+			}
 
 			if (_throw)
 				throw new Exception("Unknown token: " + token);
@@ -130,21 +136,24 @@ namespace CowSpeak
 			line = _line;
 
 			System.Tuple<int, string>[] splitLine = Utils.SplitWithIndicies(line, " ");
-			List< Token > ret = new List< Token >();
+			List< Token > tokens = new List< Token >();
 			for (int i = 0; i < splitLine.Length; i++)
 			{
 				if (string.IsNullOrWhiteSpace(splitLine[i].Item2))
 					continue;
 
-				ret.Add(ParseToken(splitLine[i].Item2, _throw, splitLine[i].Item1));
+				tokens.Add(ParseToken(splitLine[i].Item2, _throw, splitLine[i].Item1));
 			}
 
-			return ret;
+			if (tokens.Count > 1 && tokens[0].type == TokenType.VariableIdentifier && tokens[1].type == TokenType.VariableIdentifier)
+				throw new Exception("Unknown type: " + tokens[0].identifier);
+
+			return tokens;
 		}
 
 		public static string EncodeLiterals(string str)
 		{
-			// EnCodeLines the contents in between "s or 's to base64 so they don't interfere with anything
+			// Encode the contents in between "s or 's to base64 so they don't interfere with anything
 			MatchCollection LiteralMatches = Regex.Matches(str, "([\"\'])(?:(?:\\\\\\1|.)*?)\\1"); // matches for text surrounded in "s or 's (non-empty) (keep in mind the matches include the "s or 's)
 			int IndexOffset = 0;
 			foreach (Match match in LiteralMatches)
@@ -163,50 +172,12 @@ namespace CowSpeak
 			return str;
 		}
 
-		public static List<Line> Parse(List< string > CodeLines, int CurrentLineOffset = 0, bool isNestedInFunction = false, bool isNestedInConditional = false, FileType Type = FileType.Normal)
+		public static List<Line> Parse(List< string > CodeLines, int CurrentLineOffset = 0, bool isNestedInFunction = false, bool isNestedInConditional = false)
 		{
 			Stopwatch sw = new Stopwatch();
 			sw.Start();
 
-			if (Type == FileType.Binary)
-			{
-				for (int i = 0; i < CodeLines.Count; i++)
-				{
-					CowSpeak.CurrentLine = i + 1 + CurrentLineOffset;
-					string Built = "";
-
-					try
-					{
-						Regex.Split(CodeLines[i], " ").ToList().ForEach(x => Built += Encoding.ASCII.GetString(Utils.GetBytesFromBinaryString(x)));
-					}
-					catch
-					{
-						throw new Exception("Invalid binary token in bcf");
-					}
-					CodeLines[i] = Built;
-				}
-			}
-			else if (Type == FileType.Hex)
-			{
-				for (int i = 0; i < CodeLines.Count; i++)
-				{
-					CowSpeak.CurrentLine = i + 1 + CurrentLineOffset;
-					string Built = "";
-
-					try
-					{
-						Regex.Split(CodeLines[i], " ").Where(x => x != "").ToList().ForEach(x => Built += (char)int.Parse(x, NumberStyles.HexNumber));
-					}
-					catch (System.FormatException)
-					{
-						throw new Exception("Invalid hexadecimal token in hcf");
-					}
-
-					CodeLines[i] = Built;
-				}
-			}
-
-			List<Line> Lines = new List<Line>();
+			List<Line> lines = new List<Line>();
 			for (int i = 0; i < CodeLines.Count; i++)
 			{
 				CowSpeak.CurrentLine = i + 1 + CurrentLineOffset;
@@ -226,12 +197,12 @@ namespace CowSpeak
 
 				if (string.IsNullOrWhiteSpace(SafeLine))
 				{
-					Lines.Add(new Line(new List<Token>()));
+					lines.Add(new Line(new List<Token>()));
 					continue;
 				} // no need to parse or evaluate empty line
 
-				Lines.Add(new Line(ParseLine(SafeLine)));
-				Line RecentLine = Lines[Lines.Count - 1];
+				lines.Add(new Line(ParseLine(SafeLine)));
+				Line RecentLine = lines[lines.Count - 1];
 
 				if (!isNestedInFunction && CowSpeak.Debug && RecentLine.Count > 0)
 				{
@@ -242,8 +213,8 @@ namespace CowSpeak
 
 				if (RecentLine.Count > 0 && RecentLine[0].type == TokenType.FunctionCall && RecentLine[0].identifier.IndexOf("Define(") == 0)
 				{
-					CowSpeak.Functions.Get("Define(").Execute(RecentLine[0].identifier);
-					Lines[Lines.Count - 1] = new Line(new List<Token>()); // line was already handled, clear line
+					CowSpeak.Functions["Define("].Execute(RecentLine[0].identifier);
+					lines[lines.Count - 1] = new Line(new List<Token>()); // line was already handled, clear line
 				} // must handle this function before the other lines are compiled to avoid errors
 			}
 
@@ -251,9 +222,7 @@ namespace CowSpeak
 			if (CowSpeak.Debug)
 				System.Console.WriteLine("Parsing " + (CowSpeak.CurrentFile != "" ? "'" + CowSpeak.CurrentFile + "'" : CodeLines.Count + " lines") + " took " + sw.ElapsedMilliseconds + " ms");
 
-			//CowSpeak.Debug = false; // only debug tokens on compilation, needed because many things recurse back to Lexer
-
-			return Lines;
+			return lines;
 		}
 	}
 }

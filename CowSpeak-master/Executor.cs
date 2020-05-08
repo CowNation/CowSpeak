@@ -104,7 +104,6 @@ namespace CowSpeak
 								Scope scope = new Scope();
 
 								Execute(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
-								//new Lexer().Tokenize(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
 
 								scope.End();
 							}
@@ -158,7 +157,7 @@ namespace CowSpeak
 							StaticFunction Loop = new StaticFunction("Loop", null, Type.Void, new Parameter[]{ new Parameter(Type.String, "IndexVariableName"), new Parameter(Type.Integer, "StartAt"), new Parameter(Type.Integer, "EndAt") });
 							Loop.CheckParameters(loopParams.ToList()); // throws errors if given parameters are bad
 
-							Functions.Loop(ContainedLines, i, CurrentLineOffset, isNestedInFunction, loopParams[0].Value.ToString(), (int)loopParams[1].Value, (int)loopParams[2].Value);
+							StaticFunction.Functions.Loop(ContainedLines, i, CurrentLineOffset, isNestedInFunction, loopParams[0].Value.ToString(), (int)loopParams[1].Value, (int)loopParams[2].Value);
 						}
 					}
 
@@ -181,29 +180,23 @@ namespace CowSpeak
 
 				Any retVal = Lines[i].Exec(); // Execute line
 
-				if (Lines[i].Count >= 3 && Lines[i][1].type == TokenType.VariableIdentifier && Lines[i][2].type == TokenType.EqualOperator && !Conversion.IsCompatible(CowSpeak.Vars.Get(Lines[i][1].identifier).Type, retVal.Type))
-					throw new Exception("Cannot set '" + Lines[i][1].identifier + "', type '" + CowSpeak.Vars.Get(Lines[i][1].identifier).Type.Name + "' is incompatible with '" + retVal.Type.Name + "'"); // check if types are compatible
-				else if (Lines[i].Count >= 2 && Lines[i][0].type == TokenType.VariableIdentifier && Lines[i][1].type == TokenType.EqualOperator && !Conversion.IsCompatible(CowSpeak.Vars.Get(Lines[i][0].identifier).Type, retVal.Type))
-					throw new Exception("Cannot set '" + Lines[i][0].identifier + "', type '" + CowSpeak.Vars.Get(Lines[i][0].identifier).Type.Name + "' is incompatible with '" + retVal.Type.Name + "'"); // check if types are compatible
+				if (Lines[i].Count >= 3 && Lines[i][1].type == TokenType.VariableIdentifier && Lines[i][2].type == TokenType.EqualOperator && !Conversion.IsCompatible(CowSpeak.Vars[Lines[i][1].identifier].Type, retVal.Type))
+					throw new Exception("Cannot set '" + Lines[i][1].identifier + "', type '" + CowSpeak.Vars[Lines[i][1].identifier].Type.Name + "' is incompatible with '" + retVal.Type.Name + "'"); // check if types are compatible
+				else if (Lines[i].Count >= 2 && Lines[i][0].type == TokenType.VariableIdentifier && Lines[i][1].type == TokenType.EqualOperator && !Conversion.IsCompatible(CowSpeak.Vars[Lines[i][0].identifier].Type, retVal.Type))
+					throw new Exception("Cannot set '" + Lines[i][0].identifier + "', type '" + CowSpeak.Vars[Lines[i][0].identifier].Type.Name + "' is incompatible with '" + retVal.Type.Name + "'"); // check if types are compatible
 
 				if (shouldBeSet)
 				{
-					CowSpeak.Vars.Last().bytes = retVal.bytes;
-					var val = CowSpeak.Vars.Last().Value; // Do this in case there was an error when setting bytes
+					CowSpeak.Vars[Lines[i][1].identifier].bytes = retVal.bytes;
+					var val = CowSpeak.Vars[Lines[i][1].identifier].Value; // Do this in case there was an error when setting bytes
 				}
 				else if (Lines[i].Count >= 2 && Lines[i][0].type == TokenType.VariableIdentifier && Lines[i][1].type == TokenType.EqualOperator)
 				{
-					if (CowSpeak.Vars.Get(Lines[i][0].identifier, false) == null)
+					if (!CowSpeak.Vars.ContainsKey(Lines[i][0].identifier))
 						throw new Exception("Variable '" + Lines[i][0].identifier + "' must be defined before it can be set"); // var not found
 
-					for (int v = 0; v < CowSpeak.Vars.Count; v++)
-					{
-						if (Lines[i][0].identifier == CowSpeak.Vars[v].Name)
-						{
-							CowSpeak.Vars[v].bytes = retVal.bytes;
-							var val = CowSpeak.Vars[v].Value; // Do this in case there was an error when setting bytes
-						}
-					}
+					CowSpeak.Vars[Lines[i][0].identifier].bytes = retVal.bytes;
+					var val = CowSpeak.Vars[Lines[i][0].identifier].Value; // In case there was an error when setting bytes
 				} // type is not specified, var must already be defined
 			}
 

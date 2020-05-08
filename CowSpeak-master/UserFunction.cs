@@ -15,14 +15,13 @@ namespace CowSpeak
 
 		public UserFunction(string Name, List< Line > Definition, Parameter[] Parameters, Type type, string ProperUsage, int DefinitionOffset)
 		{
-			this.DefinitionType = DefinitionType.User;
+			DefinitionType = DefinitionType.User;
 			this.type = type;
 			this.Definition = Definition;
-   			this.ProperUsage = ProperUsage;
 			this.Name = Name;
 			this.Parameters = Parameters;
 			this.DefinitionOffset = DefinitionOffset;
-			this.DefinedIn = CowSpeak.CurrentFile;
+			DefinedIn = CowSpeak.CurrentFile;
 		}
 
 		private Any ExecuteLines()
@@ -92,11 +91,11 @@ namespace CowSpeak
 			for (int i = 0; i < Parameters.Length; i++)
 			{
 				Parameter parameter = Parameters[i];
-				CowSpeak.Vars.Insert(0, new Variable(parameter.Type, parameter.Name, parameters[i].Value));
+				CowSpeak.Vars.Add(parameter.Name, new Variable(parameter.Type, parameter.Name, parameters[i].Value));
 			}
 
-			bool isBeingCalledRecursively = CowSpeak.StackTrace.Count > 0 && CowSpeak.StackTrace[CowSpeak.StackTrace.Count - 1] == Usage;
-			if (isBeingCalledRecursively)
+			bool calledRecursively = CowSpeak.StackTrace.Count > 0 && CowSpeak.StackTrace[CowSpeak.StackTrace.Count - 1] == Usage;
+			if (calledRecursively)
 				throw new Exception("Recursion is not supported in this version of CowSpeak");
 
 			CowSpeak.StackTrace.Add(Usage);

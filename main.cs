@@ -43,24 +43,23 @@ class Shell
 	{
 		var assem = typeof(CowSpeak.CowSpeak).Assembly;
 
-		var Functions = System.Activator.CreateInstance(typeof(List<>).MakeGenericType(assem.GetType("CowSpeak.FunctionBase")));
-		Functions = assem.GetType("CowSpeak.FunctionAttr").GetMethod("GetFunctions").Invoke(null, new object[]{});
-		var FunctionsList = (IList)Functions;
+		var Functions = ((IDictionary)assem.GetType("CowSpeak.FunctionAttribute").GetMethod("GetFunctions").Invoke(null, new object[]{})).Values;
 		List<string> FunctionUsages = new List<string>();
-		for (int i = 0; i < FunctionsList.Count; i++)
-		{
-			object item = FunctionsList[i]; // type of this is CowSpeak.FunctionBase
-			;
-			FunctionUsages.Add((string)item.GetType().GetProperty("Usage", BindingFlags.Public | BindingFlags.Instance).GetValue(item));
-		}
 
-		FunctionUsages.Sort();
+		foreach (var item in Functions)
+			FunctionUsages.Add((string)item.GetType().GetProperty("Usage", BindingFlags.Public | BindingFlags.Instance).GetValue(item));
+
+		FunctionUsages.Sort(); // sort alphabetically
 
 		return FunctionUsages.ToArray();
 	}
 
 	public static void Main(string[] args)
 	{
+		//CowSpeak.CowSpeak.Execute(new string[]{
+		//	"Run(\"Examples/runner.cf\")"
+		//});
+
 		System.Console.WriteLine("Welcome to the CowSpeak(TM) shell!\nIn order to exit the shell, call the Exit() function");
 
 		var Functions = RetrieveFunctions();
