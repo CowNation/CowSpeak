@@ -42,3 +42,5 @@ If you experience an issue where new printed lines are being written over previo
 [v7.2 (Major bug fixes, improvements, and changed some literals to be stored as Base64 April 12, 2020)](https://github.com/CowNation/CowSpeak/tree/a44ebfbb8b1a31a5ead65aec6e162512a1b7cf72)
 
 [v7.4 (Major bug fixes, improvements, and changed evaluate method for all types of expessions to DynamicExpresso.Eval April 13, 2020)](https://github.com/CowNation/CowSpeak/tree/71d8f40caf78fdbf9bfe6d41cf28a2781297504a)
+
+[v7.8 (Bug fixes, major optimizations, API changes May 8, 2020)](https://github.com/CowNation/CowSpeak/tree/e5c7222d50f190ef07f464169d6971d17bcc4d10)
