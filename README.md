@@ -40,7 +40,7 @@ This project's sole developer is a high school student and this is simply a hobb
 * Function names will still refer to the types as their defualt CowSpeak type names (Ex: myInt.ToCharacter())
 * Exceptions will still also refer to the standard CowSpeak type names
 * This will probably cause several bugs whenever using this module's short type names
-## Previous Significant Versions
+## Significant Versions
 [v1 (Initial release on May 17, 2019)](https://github.com/CowNation/CowSpeak/tree/295d57e0a54622b5fc0483c6d1f163408d728aaf)
 
 [v2 (Recode of line evaluations on September 5, 2019)](https://github.com/CowNation/CowSpeak/tree/75c0002235ae917f6d7070cbc35dbfa2c4bb56a8)
@@ -63,4 +63,5 @@ This project's sole developer is a high school student and this is simply a hobb
 
 [v7.8 (Bug fixes, major optimizations, API changes May 8, 2020)](https://github.com/CowNation/CowSpeak/tree/e5c7222d50f190ef07f464169d6971d17bcc4d10)
 
-[v8 (Current Version) (Added new module system, added byte and ByteArray types, major bug fixes, optimizations, and improvements June 5, 2020)](https://github.com/CowNation/CowSpeak)
+Current Version:
+[v8 (Added new module system, added byte and ByteArray types, major bug fixes, optimizations, and improvements June 5, 2020)](https://github.com/CowNation/CowSpeak)
