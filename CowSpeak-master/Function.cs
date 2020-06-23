@@ -5,10 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Globalization;
+using CowSpeak.Exceptions;
+using System;
 
 namespace CowSpeak
 {
-	internal class Parameter
+	public class Parameter
 	{
 		public string Name;
 		public Type Type;
@@ -20,18 +23,19 @@ namespace CowSpeak
 		}
 	}
 
-	internal abstract class FunctionBase
+	public abstract class FunctionBase
 	{
 		public string Name;
-		public Type type;
-		public bool isMethod = false;
-		public Parameter[] Parameters; // defined parameters
-		public DefinitionType DefinitionType;
+		public Type ReturnType;
+		public bool IsMethod = false;
+		public Parameter[] Parameters;
+		internal DefinitionType DefinitionType;
+
 		public string Usage
 		{
 			get
 			{
-				string def = Name + "(";
+				string def = ReturnType.Name + " " + Name + "(";
 				for (int i = 0; i < Parameters.Length; i++)
 				{
 					def += Parameters[i].Type.Name + " " + Parameters[i].Name;
@@ -47,12 +51,12 @@ namespace CowSpeak
 			if (token.IndexOf("(") <= 0 || Utils.GetInitialClosingParenthesis(token) != token.Length - 1)
 				return false;
 
-			string LeftUsage = token.Substring(0, token.IndexOf("("));
+			string leftUsage = token.Substring(0, token.IndexOf("("));
 
-			if (LeftUsage.OccurrencesOf(".") > 1) // ex
+			if (leftUsage.OccurrencesOf(".") > 1) // ex
 				return false;
 
-			return Utils.IsValidFunctionName(LeftUsage.Replace(".", "_"));
+			return Utils.IsValidFunctionName(leftUsage.Replace(".", "_"));
 		}
 
 		public static Any[] ParseParameters(string s_parameters)
@@ -75,10 +79,18 @@ namespace CowSpeak
 					splitParams[i] = splitParams[i].Substring(1, splitParams[i].Length - 1);
 			} // splitting has been done so we can revert placeholders back
 
-			foreach (string parameter in splitParams)
+			for (int i = 0; i < splitParams.Length; i++)
 			{
+				string parameter = splitParams[i];
+
+				while (parameter.Length > 0 && parameter[0] == ' ')
+					parameter = parameter.Remove(0, 1); // remove beginning spaces
+
+				while (parameter.Length > 0 && parameter[parameter.Length - 1] == ' ')
+					parameter = parameter.Remove(parameter.Length - 1, 1); // remove trailing spaces
+
 				string cleanedUp = "";
-				if (parameter != "\"\"" && (parameter[0] == '\"' || parameter[0] == '\'') && (parameter[parameter.Length - 1] == '\"' || parameter[parameter.Length - 1] == '\''))
+				if ((parameter[0] == '\"' || parameter[0] == '\'') && (parameter[parameter.Length - 1] == '\"' || parameter[parameter.Length - 1] == '\''))
 					cleanedUp = parameter.Substring(1, parameter.Length - 2); // remove quotes/apostrophes
 				else
 					cleanedUp = parameter;
@@ -94,24 +106,25 @@ namespace CowSpeak
 
 				if (token == null)
 				{
+					// unknown identifier, could be an equation waiting to be solved
 					Line tl = new Line(Lexer.ParseLine(parameter));
 					parameters.Add(tl.Exec());
 					continue;
-				} // unknown identifier, could be an equation waiting to be solved
+				}
 				else if (token.type == TokenType.VariableIdentifier)
 				{
-					Variable _var = CowSpeak.Vars[token.identifier];
+					Variable _var = Interpreter.Vars[token.identifier];
 					parameters.Add(new Any(_var.Type, _var.Value));
 					continue;
 				}
 				else if (token.type == TokenType.FunctionCall)
 				{
-					while ((int)token.identifier[0] < 'A' || (int)token.identifier[0] > 'z')
+					while (token.identifier[0] < 'A' || token.identifier[0] > 'z')
 						token.identifier = token.identifier.Remove(0, 1); // i don't remember why this is here tbh
-					FunctionBase func = CowSpeak.Functions[token.identifier];
-					if (func.type == Type.Void)
-						throw new Exception("Cannot pass void function as a parameter");
-					parameters.Add(new Any(func.type, func.Execute(token.identifier).Value));
+					FunctionBase func = Interpreter.Functions[token.identifier];
+					if (func.ReturnType == Type.Void)
+						throw new BaseException("Cannot pass void function as a parameter");
+					parameters.Add(new Any(func.ReturnType, func.Execute(token.identifier).Value));
 					continue;
 				}
 				else if (token.type == TokenType.FunctionChain)
@@ -123,12 +136,12 @@ namespace CowSpeak
 				{
 					switch (token.type)
 					{
-					case TokenType.String:
-						vtype = Type.String;
-						break;
-					case TokenType.Character:
-						vtype = Type.Character;
-						break;
+						case TokenType.String:
+							vtype = Type.String;
+							break;
+						case TokenType.Character:
+							vtype = Type.Character;
+							break;
 					}
 
 					if (cleanedUp.Length > 2)
@@ -136,16 +149,33 @@ namespace CowSpeak
 				}
 				else if (token.type == TokenType.Number)
 				{
+					if (Interpreter.Definitions.ContainsKey(cleanedUp))
+						cleanedUp = Interpreter.Definitions[cleanedUp].To;
+
+					if (Utils.IsHexadecimal(cleanedUp))
+						cleanedUp = long.Parse(cleanedUp.Substring(2), NumberStyles.HexNumber).ToString();
+
 					if (token.identifier.IndexOf(".") != -1)
 						vtype = Type.Decimal;
 					else
-						vtype = Type.Integer;
+					{
+						long number;
+						if (!long.TryParse(cleanedUp, out number))
+							throw new BaseException("Number literal '" + cleanedUp + "' is out of range for types: integer and integer64");
+
+						if (number <= int.MaxValue && number >= int.MinValue)
+							vtype = Type.Integer;
+						else // if it's out of bounds for an integer, it's an integer64
+							vtype = Type.Integer64;
+					}
 				}
+				else if (token.type == TokenType.Boolean)
+					vtype = Type.Boolean;
 
 				if (vtype == null)
-					throw new Exception("Unknown type passed as parameter: " + parameter);
+					throw new BaseException("Unknown type passed as parameter: " + token.type);
 
-				parameters.Add(new Any(vtype, System.Convert.ChangeType(cleanedUp, vtype.rep)));
+				parameters.Add(new Any(vtype, Convert.ChangeType(cleanedUp, vtype.rep)));
 			}
 
 			return parameters.ToArray();
@@ -153,13 +183,41 @@ namespace CowSpeak
 
 		public void CheckParameters(List< Any > usedParams)
 		{
-			if (Parameters.Length != usedParams.Count)
-				throw new Exception("Invalid number of parameters passed in FunctionCall (" + Parameters.Length + " expected, " + usedParams.Count + " given)");
+			bool validUsage = Parameters.Length == usedParams.Count;
 
-			for (int i = 0; i < Parameters.Length; i++)
+			if (validUsage)
 			{
-				if (!Conversion.IsCompatible(usedParams[i].Type, Parameters[i].Type))
-					throw new Exception("Parameter '" + Parameters[i].Type.Name + " " + Parameters[i].Name + "' is incompatible with '" + usedParams[i].Type.Name + "'");
+				for (int i = 0; i < Parameters.Length; i++)
+				{
+					if (!Conversion.IsCompatible(usedParams[i].Type, Parameters[i].Type))
+					{
+						validUsage = false;
+						break;
+					}
+				}
+			}
+
+			if (!validUsage)
+			{
+				var usage = Name + "(";
+				for (int i = 0; i < Parameters.Length; i++)
+				{
+					usage += Parameters[i].Type.Name;
+					if (i < Parameters.Length - 1)
+						usage += ", ";
+				}
+				usage = usage + ")";
+
+				var givenUsage = Name + "(";
+				for (int i = 0; i < usedParams.Count; i++)
+				{
+					givenUsage += usedParams[i].Type.Name;
+					if (i < usedParams.Count - 1)
+						givenUsage += ", ";
+				}
+				givenUsage = givenUsage + ")";
+
+				throw new BaseException("Invalid usage of function: " + givenUsage + ". Correct Usage: " + usage);
 			}
 		}
 

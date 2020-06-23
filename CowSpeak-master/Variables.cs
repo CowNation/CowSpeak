@@ -1,3 +1,4 @@
+using CowSpeak.Exceptions;
 using System.Collections.Generic;
 
 namespace CowSpeak
@@ -9,12 +10,20 @@ namespace CowSpeak
 
 		}
 
+		public new void Add(string key, Variable value)
+		{
+			if (ContainsKey(key))
+				throw new BaseException("Variable '" + key + "' has already been defined");
+
+			base.Add(key, value);
+		}
+
 		public new Variable this[string key]
 		{
 			get
 			{
 				if (!ContainsKey(key))
-					throw new Exception("Could not find variable: " + key);
+					throw new BaseException("Could not find variable: " + key);
 
 				return base[key];
 			}
@@ -27,7 +36,7 @@ namespace CowSpeak
 		public Variable Create(Variable variable)
 		{
 			if (ContainsKey(variable.Name))
-				throw new Exception("Cannot create variable '" + variable.Name + "', a variable by that name already exists");
+				throw new BaseException("Cannot create variable '" + variable.Name + "', a variable by that name already exists");
 			
 			Add(variable.Name, variable);
 			

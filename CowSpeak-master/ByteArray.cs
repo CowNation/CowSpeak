@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.InteropServices;
+using CowSpeak.Exceptions;
 
 namespace CowSpeak
 {
@@ -39,7 +40,7 @@ namespace CowSpeak
 		protected object Get()
 		{
 			if (bytes == null)
-				throw new Exception("Object not initialized");
+				throw new BaseException("Object not initialized");
 
 			return ByteArrayToObject(bytes);
 		}

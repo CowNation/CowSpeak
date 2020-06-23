@@ -10,4 +10,4 @@ Print("\nEnter number right of symbol: ")
 decimal right = InputString().ToDecimal()
 
 string expression = "" + left + " " + symbol + " " + right
-Print("" + expression + " = " + Evaluate(expression) + "\n")
+Print("" + expression + " = " + EvaluateExpression(expression) + "\n")

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -5,6 +6,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using CowSpeak.Exceptions;
 
 namespace CowSpeak
 {
@@ -17,14 +19,13 @@ namespace CowSpeak
 
 			if (token.Length > 0)
 			{
-				foreach (Definition Definition in CowSpeak.Definitions)
-					if (token == Definition.from)
-						token = Definition.to;
+				if (Interpreter.Definitions.ContainsKey(token))
+					token = Interpreter.Definitions[token].To;
 
 				if (Utils.IsHexadecimal(token))
-					token = int.Parse(token.Substring(2), System.Globalization.NumberStyles.HexNumber).ToString(); // determine if it's a hexadecimal number
+					token = long.Parse(token.Substring(2), NumberStyles.HexNumber).ToString();
 
-				Type type = Utils.GetType(token, false);
+				Type type = Type.GetType(token, false);
 				if (type != null)
 					return new Token(TokenType.TypeIdentifier, token, Index);
 
@@ -81,7 +82,7 @@ namespace CowSpeak
 				}
 
 				if (token[0] == '\"' && token[token.Length - 1] == '\"' && token.OccurrencesOf("\"") == 2)
-					return new Token(TokenType.String, token.Substring(1, token.Length - 2).FromBase64(), Index);	
+					return new Token(TokenType.String, token.Substring(1, token.Length - 2).FromBase64().Replace("\\\"", "\""), Index);
 				else if (token[0] == '\'' && token[token.Length - 1] == '\'') // we can't ensure the length here because the contents are encoded
 					return new Token(TokenType.Character, token.Substring(1, token.Length - 2).FromBase64(), Index);
 				else if (token.IndexOf(Syntax.Conditionals.If + "(") == 0 && token[token.Length - 1] == ')')
@@ -101,15 +102,15 @@ namespace CowSpeak
 			}
 
 			if (_throw)
-				throw new Exception("Unknown token: " + token);
+				throw new BaseException("Unknown token: " + token);
 
 			return null;
 		}
 
-		public static List < Token > ParseLine(string line, bool _throw = true)
+		public static List<Token> ParseLine(string line, bool _throw = true)
 		{
 			if (string.IsNullOrWhiteSpace(line))
-				return new List< Token >(); // don't parse empty line
+				return new List<Token>(); // don't parse empty line
 
 			string _line = line;
 			for (int Occurrence = 0; Occurrence < Utils.OccurrencesOf(line, " "); Occurrence++)
@@ -125,7 +126,7 @@ namespace CowSpeak
 					else
 						continue;
 
-					if (Regex.IsMatch(before.ToString(), "\\w"))
+					if (Regex.IsMatch(before.ToString(), @"\w"))
 					{
 						StringBuilder fileLine = new StringBuilder(_line);
 						fileLine[i] = (char)0x1D;
@@ -135,8 +136,8 @@ namespace CowSpeak
 			}
 			line = _line;
 
-			System.Tuple<int, string>[] splitLine = Utils.SplitWithIndicies(line, " ");
-			List< Token > tokens = new List< Token >();
+			Tuple<int, string>[] splitLine = Utils.SplitWithIndicies(line, " ");
+			List<Token> tokens = new List<Token>();
 			for (int i = 0; i < splitLine.Length; i++)
 			{
 				if (string.IsNullOrWhiteSpace(splitLine[i].Item2))
@@ -145,8 +146,13 @@ namespace CowSpeak
 				tokens.Add(ParseToken(splitLine[i].Item2, _throw, splitLine[i].Item1));
 			}
 
-			if (tokens.Count > 1 && tokens[0].type == TokenType.VariableIdentifier && tokens[1].type == TokenType.VariableIdentifier)
-				throw new Exception("Unknown type: " + tokens[0].identifier);
+			if (_throw && tokens.Count > 1)
+			{
+				if (tokens[0].type == TokenType.VariableIdentifier && tokens[1].type == TokenType.VariableIdentifier)
+					throw new BaseException("Unknown type: " + tokens[0].identifier);
+				if (tokens[0].type == TokenType.TypeIdentifier && tokens[1].type == TokenType.TypeIdentifier)
+					throw new BaseException("Cannot define a variable with the same name as an existing type");
+			}
 
 			return tokens;
 		}
@@ -159,7 +165,7 @@ namespace CowSpeak
 			foreach (Match match in LiteralMatches)
 			{
 				if (match.Value[0] == '\'' && match.Length > 3)
-					throw new Exception("Character literal must have no more than one character");
+					throw new BaseException("Character literal must have no more than one character");
 
 				if (match.Length > 2) // not just "s or 's
 				{
@@ -172,20 +178,20 @@ namespace CowSpeak
 			return str;
 		}
 
-		public static List<Line> Parse(List< string > CodeLines, int CurrentLineOffset = 0, bool isNestedInFunction = false, bool isNestedInConditional = false)
+		public static List<Line> Parse(List<string> codeLines, int currentLineOffset = 0, bool isNestedInFunction = false, bool isNestedInConditional = false)
 		{
 			Stopwatch sw = new Stopwatch();
 			sw.Start();
 
 			List<Line> lines = new List<Line>();
-			for (int i = 0; i < CodeLines.Count; i++)
+			for (int i = 0; i < codeLines.Count; i++)
 			{
-				CowSpeak.CurrentLine = i + 1 + CurrentLineOffset;
+				Interpreter.CurrentLine = i + 1 + currentLineOffset;
 
-				while (CodeLines[i].IndexOf("	") == 0 || CodeLines[i].IndexOf(" ") == 0)
-					CodeLines[i] = CodeLines[i].Remove(0, 1);
+				while (codeLines[i].IndexOf("	") == 0 || codeLines[i].IndexOf(" ") == 0)
+					codeLines[i] = codeLines[i].Remove(0, 1);
 
-				string SafeLine = CodeLines[i];
+				string SafeLine = codeLines[i];
 				if (!isNestedInConditional && !isNestedInFunction) // literals are already encoded
 					SafeLine = EncodeLiterals(SafeLine);
 
@@ -193,7 +199,7 @@ namespace CowSpeak
 				{
 					int pos = SafeLine.IndexOf(Syntax.Identifiers.Comment);
 					SafeLine = SafeLine.Remove(pos, SafeLine.Length - pos);
-				} // get rid of all Comments and anything after it (but it cannot be enclosed in quotes or apostrophes)
+				} // get rid of all comments and anything after it (but it cannot be enclosed in quotes or apostrophes)
 
 				if (string.IsNullOrWhiteSpace(SafeLine))
 				{
@@ -204,23 +210,23 @@ namespace CowSpeak
 				lines.Add(new Line(ParseLine(SafeLine)));
 				Line RecentLine = lines[lines.Count - 1];
 
-				if (!isNestedInFunction && CowSpeak.Debug && RecentLine.Count > 0)
+				if (!isNestedInFunction && Interpreter.Debug && RecentLine.Count > 0)
 				{
-					System.Console.WriteLine("\n(" + CowSpeak.CurrentFile + ") Line " + (i + 1) + ": ");
+					Console.WriteLine("\n(" + Interpreter.CurrentFile + ") Line " + (i + 1) + ": ");
 					foreach (var token in RecentLine)
-						System.Console.WriteLine(token.type.ToString() + " - " + token.identifier.Replace(System.Environment.NewLine, @"\n").Replace(((char)0x1D).ToString(), " "));
+						Console.WriteLine(token.type.ToString() + " - " + token.identifier.Replace("\n", @"\n").Replace(((char)0x1D).ToString(), " "));
 				}
 
-				if (RecentLine.Count > 0 && RecentLine[0].type == TokenType.FunctionCall && RecentLine[0].identifier.IndexOf("Define(") == 0)
+				if (Interpreter.Functions.FunctionExists("Define(") && RecentLine.Count > 0 && RecentLine[0].type == TokenType.FunctionCall && RecentLine[0].identifier.IndexOf("Define(") == 0)
 				{
-					CowSpeak.Functions["Define("].Execute(RecentLine[0].identifier);
+					Interpreter.Functions["Define("].Execute(RecentLine[0].identifier);
 					lines[lines.Count - 1] = new Line(new List<Token>()); // line was already handled, clear line
 				} // must handle this function before the other lines are compiled to avoid errors
 			}
 
 			sw.Stop();
-			if (CowSpeak.Debug)
-				System.Console.WriteLine("Parsing " + (CowSpeak.CurrentFile != "" ? "'" + CowSpeak.CurrentFile + "'" : CodeLines.Count + " lines") + " took " + sw.ElapsedMilliseconds + " ms");
+			if (Interpreter.Debug)
+				Console.WriteLine("Parsing " + (Interpreter.CurrentFile != "" ? "'" + Interpreter.CurrentFile + "'" : codeLines.Count + " lines") + " took " + sw.ElapsedMilliseconds + " ms");
 
 			return lines;
 		}

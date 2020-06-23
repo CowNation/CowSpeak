@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using CowSpeak.Exceptions;
 using DynamicExpresso;
 
 namespace CowSpeak
@@ -34,12 +35,12 @@ namespace CowSpeak
 			{
 				if (base[i].type == TokenType.FunctionCall)
 				{
-					if (CowSpeak.Functions[base[i].identifier].type == Type.Void)
+					if (Interpreter.Functions[base[i].identifier].ReturnType == Type.Void)
 					{
-						if (GetRange(0, Count).IsIndexValid(i - 1) && Utils.IsOperator(base[i-1].type))
-							throw new Exception("Cannot perform operation: '" + base[i-1].identifier + "' on void function");
-						if (GetRange(0, Count).IsIndexValid(i + 1) && Utils.IsOperator(base[i+1].type))
-							throw new Exception("Cannot perform operation: '" + base[i+1].identifier + "' on void function");
+						if (GetRange(0, Count).IsIndexValid(i - 1) && Utils.IsOperator(base[i - 1].type))
+							throw new BaseException("Cannot perform operation: '" + base[i - 1].identifier + "' on void function");
+						if (GetRange(0, Count).IsIndexValid(i + 1) && Utils.IsOperator(base[i + 1].type))
+							throw new BaseException("Cannot perform operation: '" + base[i + 1].identifier + "' on void function");
 					}
 				}
 			}
@@ -48,6 +49,9 @@ namespace CowSpeak
 			{
 				if (base[i].type == TokenType.EqualOperator)
 				{
+					if (i > 0 && base[i - 1].type != TokenType.VariableIdentifier)
+						throw new BaseException("Cannot assign to a " + base[i - 1].type.ToString() + ", it's a non-modifiable token");
+
 					toEval = GetRange(i + 1, Count - (i + 1));
 					break;
 				}
@@ -64,7 +68,12 @@ namespace CowSpeak
 			if (expression.Length == 0)
 				return null;
 
-			return new Any(Utils.Eval(expression));
+			var evaluated = Utils.Eval(expression);
+
+			if (evaluated.GetType() == typeof(uint)) // causes exception sometimes
+				return new Any(Type.Integer64, evaluated);
+
+			return new Any(evaluated);
 		}
 
 		public override string ToString()

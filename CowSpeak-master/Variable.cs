@@ -1,6 +1,6 @@
 namespace CowSpeak
 {
-	internal class Variable : Any
+	public class Variable : Any
 	{
 		public string Name;
 

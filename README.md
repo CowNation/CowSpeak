@@ -1,27 +1,45 @@
-[![version](https://img.shields.io/badge/version-7.4.3-blue)](https://github.com/CowNation/CowSpeak/releases/tag/v7.4.3)
+
+[![version](https://img.shields.io/badge/version-8-blue)](https://github.com/CowNation/CowSpeak/releases/tag/v8)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Run on Repl.it](https://repl.it/badge/github/CowNation/CowSpeak)](https://repl.it/github/CowNation/CowSpeak)
 # CowSpeak
-Ever wish for an interpreted programming language with a C style syntax? Here's your answer!
-CowSpeak is an open source interpreted programming language made in C# with a C style syntax
+Ever wish for an interpreted programming language with a C style syntax? Here's your solution! CowSpeak is an open source interpreted programming language made in C# with a C style syntax
 ## Info
-This language uses CowConfig. To see CowConfig go to https://github.com/CowNation/CowConfig
-
-If you experience an issue where new printed lines are being written over previous lines after inputting, add a newline after getting a user input. Some operating system's consoles don't go to the next line after the user inputs enter.
+This project's sole developer is a high school student and this is simply a hobby. This language uses CowConfig and isn't thread safe. To see CowConfig go to https://github.com/CowNation/CowConfig
 ## Features
-* Data types: boolean, integer, string, and decimal
+* Data types: object, boolean, integer, integer64, character, string, and decimal
 * Arrays
-* Most standard operators you would expect (+, -, *, /, =, %)
+* Most standard C# operators (+, -, *, /, =, %, =, &&, ||, &, |)
 * Single line comments
 * Conditionals (if, else, loop, while)
+* Custom C# modules
 * Language defined functions
+* OS specific API functions
 * User defined functions
 * Methods
 * Detailed error throwing
 * Simple per-line token debugging
 * Scopes & manual variable deletion
-* Easily modifiable syntax
+* Easily modifiable syntax (even at runtime)
 * Full support for hexadecimal numbers
+## Modules
+### [Main](https://github.com/CowNation/CowSpeak/CowSpeak-master/Modules/Main.cs)
+* [Generated Documentation](https://github.com/CowNation/CowSpeak/CowSpeak-master/Modules/Main.md)
+* This module contains standard CowSpeak functions that should work on all platforms
+### [Windows](https://github.com/CowNation/CowSpeak/CowSpeak-master/Modules/Windows.cs)
+* [Generated Documentation](https://github.com/CowNation/CowSpeak/CowSpeak-master/Modules/Windows.md)
+* This contains various API functions and predefined Windows enums as definitions.
+* This will be loaded automatically on first call to CowSpeak.Execute if you are using CowSpeak on a Windows PC and CowSpeak.UseOSSpecificModules is true.
+### [Linux](https://github.com/CowNation/CowSpeak/CowSpeak-master/Modules/Linux.cs)
+* This is simply a placeholder module with no definitions or functions because I don't use linux
+* Contributions to this would be greatly appreciated
+### [Shorter Type Names](https://github.com/CowNation/CowSpeak/CowSpeak-master/Modules/ShorterTypeNames.cs)
+* [Generated Documentation](https://github.com/CowNation/CowSpeak/CowSpeak-master/Modules/ShorterTypeNames.md)
+* This module is for those who dislike how CowSpeak's defult type names are so long
+* The existing CowSpeak type names will still work as well
+* Function names will still refer to the types as their defualt CowSpeak type names (Ex: myInt.ToCharacter())
+* Exceptions will still also refer to the standard CowSpeak type names
+* This will probably cause several bugs whenever using this module's short type names
 ## Previous Significant Versions
 [v1 (Initial release on May 17, 2019)](https://github.com/CowNation/CowSpeak/tree/295d57e0a54622b5fc0483c6d1f163408d728aaf)
 
@@ -44,3 +62,5 @@ If you experience an issue where new printed lines are being written over previo
 [v7.4 (Major bug fixes, improvements, and changed evaluate method for all types of expessions to DynamicExpresso.Eval April 13, 2020)](https://github.com/CowNation/CowSpeak/tree/71d8f40caf78fdbf9bfe6d41cf28a2781297504a)
 
 [v7.8 (Bug fixes, major optimizations, API changes May 8, 2020)](https://github.com/CowNation/CowSpeak/tree/e5c7222d50f190ef07f464169d6971d17bcc4d10)
+
+[v8 (Added new module system, added byte and ByteArray types, major bug fixes, optimizations, and improvements June 5, 2020)](http://example.org/)

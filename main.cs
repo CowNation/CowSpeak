@@ -1,9 +1,8 @@
-using System.Reflection;
-using System.IO;
 using System.Collections.Generic;
 using CowSpeak;
-using System.Collections;
 using System.Linq;
+using System;
+using System.Reflection;
 
 static class Extensions
 {
@@ -20,89 +19,77 @@ static class Extensions
 	}
 
 	public static int OccurrencesOf(this string str, string splitter) => Split(str, splitter).Length - 1;
-
-	public static bool IsIndexBetween(this string str, int index, string start, string end){
-		string leftOf = str.Substring(0, index);
-		int starts = Split(leftOf, start).Length - 1;
-
-		if (start != end)
-		{
-			int lastStart = leftOf.LastIndexOf(start);
-			int lastEnd = leftOf.LastIndexOf(end);
-			int ends = Split(leftOf, end).Length - 1;
-			return lastStart != -1 && (lastStart > lastEnd || starts > ends);
-		}
-		else
-			return starts % 2 != 0;
-	}
 }
 
 class Shell
 {
-	static string[] RetrieveFunctions()
+	static void PrintFunctions()
 	{
-		var assem = typeof(CowSpeak.CowSpeak).Assembly;
+		foreach (var module in Interpreter.ModuleSystem.LoadedModules)
+		{
+			var functions = module.Value.DefinedFunctions;
 
-		var Functions = ((IDictionary)assem.GetType("CowSpeak.FunctionAttribute").GetMethod("GetFunctions").Invoke(null, new object[]{})).Values;
-		List<string> FunctionUsages = new List<string>();
+			if (functions.Count == 0)
+				continue; // prevent printing of module name if no functions are present
 
-		foreach (var item in Functions)
-			FunctionUsages.Add((string)item.GetType().GetProperty("Usage", BindingFlags.Public | BindingFlags.Instance).GetValue(item));
+			Console.WriteLine("----------| " + module.Key + " |----------"); // module name
+			var sortedFunctions = functions.ToList().OrderBy(function => function.Key);
 
-		FunctionUsages.Sort(); // sort alphabetically
-
-		return FunctionUsages.ToArray();
+			foreach (var function in sortedFunctions)
+				Console.WriteLine(function.Value.Usage);
+		}
 	}
 
 	public static void Main(string[] args)
 	{
-		//CowSpeak.CowSpeak.Execute(new string[]{
-		//	"Run(\"Examples/runner.cf\")"
-		//});
+		PrintFunctions();
 
-		System.Console.WriteLine("Welcome to the CowSpeak(TM) shell!\nIn order to exit the shell, call the Exit() function");
+		new CowSpeak.Module(typeof(CowSpeak.Modules.Main)).GenerateMdDocumentation("CowSpeak-master/Modules/Main.md");
+		new CowSpeak.Module(typeof(CowSpeak.Modules.Windows)).GenerateMdDocumentation("CowSpeak-master/Modules/Windows.md");
+		new CowSpeak.Module(typeof(CowSpeak.Modules.ShorterTypeNames)).GenerateMdDocumentation("CowSpeak-master/Modules/ShorterTypeNames.md");
 
-		var Functions = RetrieveFunctions();
+		Console.WriteLine("Welcome to the CowSpeak(TM) shell!\nIn order to exit the shell, call the Exit() function");
+
+		/*var Functions = RetrieveFunctions();
 		System.Console.WriteLine("Functions (" + Functions.Length + "):");
 		foreach (var Function in Functions)
-			System.Console.WriteLine(Function);
+			System.Console.WriteLine(Function);*/
 
-		List<string> Lines = null;
+		List<string> lines = null;
 		while (true)
 		{
-			Lines = new List<string>();
+			lines = new List<string>();
 			
 			bool first = true;
 
-			int StartBrackets;
-			int EndBrackets;
+			int startBrackets, endBrackets;
 			do
 			{
-				StartBrackets = 0;
-				EndBrackets = 0;
+				startBrackets = 0;
+				endBrackets = 0;
 
-				System.Console.Write((first ? "\n" : "") + "<< ");
-				Lines.Add(System.Console.ReadLine());
+				Console.Write((first ? "\n" : "") + "<< ");
+				lines.Add(Console.ReadLine());
 
-				foreach (string Line in Lines)
+				foreach (string line in lines)
 				{
-					StartBrackets += Line.OccurrencesOf("{");
-					EndBrackets += Line.OccurrencesOf("}");
+					startBrackets += line.OccurrencesOf("{");
+					endBrackets += line.OccurrencesOf("}");
 				}
 				first = false;
-			} while (StartBrackets != EndBrackets);
+			} while (startBrackets != endBrackets);
 
 			try
 			{
-				CowSpeak.CowSpeak.Execute(Lines.ToArray());
+				Interpreter.Execute(lines.ToArray());
 			}
-			catch (CowSpeak.Exception ex)
+			catch (CowSpeak.Exceptions.BaseException ex)
 			{
-				System.Console.WriteLine(ex.Message);
+				Console.WriteLine(ex.Message);
 			}
-			catch (System.Reflection.TargetInvocationException ex)
+			catch (TargetInvocationException ex)
 			{
-				System.Console.WriteLine(ex.GetBaseException().Message);
+				Console.WriteLine(ex.GetBaseException().Message);
 			}
 		}
 	}

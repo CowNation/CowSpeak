@@ -1,33 +1,30 @@
-using System.IO;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel;
 using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
-using DynamicExpresso;
-using DynamicExpresso.Exceptions;
-using System.Diagnostics;
+using CowSpeak.Exceptions;
 
 namespace CowSpeak
 {
 	internal static class Utils
 	{
-		static Interpreter interpreter = new Interpreter();
+		static DynamicExpresso.Interpreter interpreter = new DynamicExpresso.Interpreter();
 
-		public static object Eval(string Expression)
+		public static object Eval(string expression)
 		{
 			try
 			{
-				return interpreter.Eval(Expression);
+				return interpreter.Eval(expression);
 			}
-			catch (DynamicExpressoException ex)
+			catch (Exception ex)
 			{
-				throw new Exception(ex.Message);
+				throw new BaseException("Couldn't evaluate expression '" + expression.Replace("\n", @"\n") + "': " + ex.Message);
 			}
 		}
 
-		public static string GetTokensExpression(List<Token> tokens, ref Any AlreadyEvaluatedValue)
+		public static string GetTokensExpression(List<Token> tokens, ref Any alreadyEvaluatedValue)
 		{
 			string expression = "";
 			for (int i = 0; i < tokens.Count; i++)
@@ -37,8 +34,8 @@ namespace CowSpeak
 				Type objectType = null;
 				if (tokens[i].type == TokenType.VariableIdentifier)
 				{
-					Variable var = CowSpeak.Vars[identifier];
-					identifier = StaticFunction.Functions._ToString(var.Value); // replace variable name with it's value
+					Variable var = Interpreter.Vars[identifier];
+					identifier = Modules.Main._ToString(var.Value); // replace variable name with it's value
 					objectType = var.Type;
 				}
 
@@ -52,47 +49,47 @@ namespace CowSpeak
 
 				if (tokens[i].type == TokenType.FunctionCall)
 				{
-					FunctionBase func = CowSpeak.Functions[identifier];
+					FunctionBase func = Interpreter.Functions[identifier];
 					Any returned = func.Execute(identifier);
-					objectType = func.type;
+					objectType = func.ReturnType;
 
 					if (tokens.Count == 1)
 					{
-						AlreadyEvaluatedValue = returned;
+						alreadyEvaluatedValue = returned;
 						return "";
 					}
 
 					if (returned != null)
-						identifier = StaticFunction.Functions._ToString(returned.Value); // replace function call with it's return value
+						identifier = Modules.Main._ToString(returned.Value); // replace function call with it's return value
 					else
 						identifier = "";
 				}
 				else if (tokens[i].type == TokenType.FunctionChain)
 				{
-					Any EvaluatedChain = FunctionChain.Evaluate(identifier);
+					Any evaluatedChain = FunctionChain.Evaluate(identifier);
 
 					if (tokens.Count == 1)
 					{
-						AlreadyEvaluatedValue = EvaluatedChain;
+						alreadyEvaluatedValue = evaluatedChain;
 						return "";
 					}
 
-					identifier = StaticFunction.Functions._ToString(EvaluatedChain.Value);
+					identifier = Modules.Main._ToString(evaluatedChain.Value);
 					objectType = FunctionChain.GetType(tokens[i].identifier);
 				}
 
 				if (tokens[i].type == TokenType.String || objectType == Type.String)
-					identifier = "\"" + identifier + "\"";
+					identifier = "\"" + identifier.Replace("\"", "\\\"") + "\"";
 				else if (tokens[i].type == TokenType.Character || objectType == Type.Character)
 					identifier = "\'" + identifier + "\'";
 				
-				expression += identifier;
+				expression += identifier + " ";
 			}
-			//System.Console.WriteLine(Expression);
+
 			return expression;
 		}
 
-		public static System.Random rand = new System.Random();
+		public static Random rand = new Random();
 
 		public static byte[] GetBytesFromBinaryString(string binary)
 		{
@@ -102,7 +99,7 @@ namespace CowSpeak
 			{
 				string t = binary.Substring(i, 8);
 
-				list.Add(System.Convert.ToByte(t, 2));
+				list.Add(Convert.ToByte(t, 2));
 			}
 
 			return list.ToArray();
@@ -113,15 +110,17 @@ namespace CowSpeak
 			var bytes = new byte[hexString.Length / 2];
 			for (var i = 0; i < bytes.Length; i++)
 			{
-				bytes[i] = System.Convert.ToByte(hexString.Substring(i * 2, 2), 16);
+				bytes[i] = Convert.ToByte(hexString.Substring(i * 2, 2), 16);
 			}
 
 			return Encoding.Unicode.GetString(bytes);
 		}
 
+		private static Regex initialClosingParenthesis = new Regex(@"\([^()]*\)|\(.*(\(.*?\))*", RegexOptions.Compiled);
+
 		public static int GetInitialClosingParenthesis(string str)
 		{
-			Match match = Regex.Match(str, @"\([^()]*\)|\(.*(\(.*?\))*");
+			Match match = initialClosingParenthesis.Match(str);
 			if (match == null)
 				return -1;
 
@@ -130,17 +129,17 @@ namespace CowSpeak
 
 		public static bool IsHexadecimal(string str) => Utils.OccurrencesOf(str, "0x") == 1 && str.IndexOf("0x") == 0;
 
-		public static System.Tuple<int, string>[] SplitWithIndicies(string str, string splitter)
+		public static Tuple<int, string>[] SplitWithIndicies(string str, string splitter)
 		{
-			List<System.Tuple<int, string>> ret = new List<System.Tuple<int, string>>();
+			List<Tuple<int, string>> ret = new List<Tuple<int, string>>();
 			int Offset = 0;
 			while (str.IndexOf(splitter) != -1)
 			{
-				ret.Add(new System.Tuple<int, string>(Offset, str.Substring(0, str.IndexOf(splitter))));
+				ret.Add(new Tuple<int, string>(Offset, str.Substring(0, str.IndexOf(splitter))));
 				Offset += splitter.Length + str.Substring(0, str.IndexOf(splitter)).Length;
 				str = str.Remove(0, str.IndexOf(splitter) + splitter.Length);
 			}
-			ret.Add(new System.Tuple<int, string>(Offset, str));
+			ret.Add(new Tuple<int, string>(Offset, str));
 			return ret.ToArray();
 		}
 
@@ -168,37 +167,25 @@ namespace CowSpeak
 			return (T)converter.ConvertFromString(null, CultureInfo.InvariantCulture, inValue);
 		}
 
-		public static Type GetType(string usage, bool _throw = true)
+		public static List< string > GetContainedLines(List< string > lines, int endLine, int startLine)
 		{
-			foreach (Type type in Type.GetTypes())
-				if (type.Name == usage)
-					return type;
-
-			if (_throw)
-				throw new Exception("Type '" + usage + "' does not exist");
-
-			return null;
+			return lines.GetRange(startLine + 1, endLine - (startLine + 1));
 		}
 
-		public static List< string > GetContainedLines(List< string > Lines, int EndLine, int StartLine)
+		public static List<Line> GetContainedLines(List< Line > lines, Executor.TokenLocation endLine, Executor.TokenLocation startLine)
 		{
-			return Lines.GetRange(StartLine + 1, EndLine - (StartLine + 1));
-		}
-
-		public static List<Line> GetContainedLines(List< Line > Lines, Executor.TokenLocation EndLine, Executor.TokenLocation StartLine)
-		{
-			if (StartLine.LineIndex == EndLine.LineIndex) // same line
+			if (startLine.LineIndex == endLine.LineIndex) // same line
 			{
-				if (StartLine.TokenIndex + 1 == EndLine.TokenIndex) // empty brackets
+				if (startLine.TokenIndex + 1 == endLine.TokenIndex) // empty brackets
 					return new List<Line>();
 
 				return new List<Line>()
 				{
-					new Line(Lines[StartLine.LineIndex].GetRange(StartLine.TokenIndex + 1, EndLine.TokenIndex - (StartLine.TokenIndex + 1))) // tokens between StartLine.TokenIndex & EndLine.TokenIndex
+					new Line(lines[startLine.LineIndex].GetRange(startLine.TokenIndex + 1, endLine.TokenIndex - (startLine.TokenIndex + 1))) // tokens between StartLine.TokenIndex & EndLine.TokenIndex
 				};
 			}
 
-			return Lines.GetRange(StartLine.LineIndex + 1, EndLine.LineIndex - (StartLine.LineIndex + 1));
+			return lines.GetRange(startLine.LineIndex + 1, endLine.LineIndex - (startLine.LineIndex + 1));
 		}
 
 		public static bool IsIndexBetween(this string str, int index, string start, string end){
@@ -243,12 +230,12 @@ namespace CowSpeak
 
 		public static string ToBase64(this string str)
 		{
-			return System.Convert.ToBase64String(Encoding.ASCII.GetBytes(str.Replace(System.Environment.NewLine, @"\n")));
+			return Convert.ToBase64String(Encoding.ASCII.GetBytes(str.Replace("\n", @"\n")));
 		}
 
 		public static string FromBase64(this string str)
 		{
-			return Encoding.UTF8.GetString(System.Convert.FromBase64String(str)).Replace(@"\n", System.Environment.NewLine);
+			return Encoding.UTF8.GetString(Convert.FromBase64String(str)).Replace(@"\n", "\n");
 		}
 
 		public static string ReplaceBetween(string str, char toReplace, char start, char end, char substitution = (char)0x1a){
@@ -291,18 +278,22 @@ namespace CowSpeak
 		{
 			// A word char is A-z, 0-9, or a _ ([a-zA-Z0-9_] in Regex)
 			// This function returns whether the entire string is only made of one or more word chars
-			return Regex.Match(s, "\\w+").Value == s;
+			return Regex.Match(s, @"\w+").Value == s;
 		}
+
+		private static Regex validFunctionName = new Regex(@"(\w+\.\w+|\w+)", RegexOptions.Compiled);
 
 		public static bool IsValidFunctionName(string s)
 		{
-			return Regex.Match(s, "(\\w+\\.\\w+|\\w+)").Value == s;
+			return validFunctionName.Match(s).Value == s;
 		}
+
+		private static Regex isNumber = new Regex(@"(-|\d*?)\d+(\.\d+|\d*?)");
 
 		public static bool IsNumber(string str)
 		{
 			// regex is really confusing to me but basically this returns if the string is a number (including negatives and decimals)
-			return Regex.Match(str, "(-|\\d*?)\\d+(\\.\\d+|\\d*?)").Value == str;
+			return isNumber.Match(str).Value == str;
 		}
 	}
 }

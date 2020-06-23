@@ -18,6 +18,8 @@ namespace CowSpeak
 			public const string c_Boolean = "Boolean";
 			public const string Character = "character";
 			public const string c_Character = "Character";
+			public const string Byte = "byte";
+			public const string c_Byte = "Byte";
 			public const string Any = "object";
 			public const string c_Any = "Object";
 			public const string ArraySuffix = "Array";

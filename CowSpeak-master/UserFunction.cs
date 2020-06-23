@@ -4,6 +4,7 @@ using System.Text;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using CowSpeak.Exceptions;
 
 namespace CowSpeak
 {
@@ -16,38 +17,38 @@ namespace CowSpeak
 		public UserFunction(string Name, List< Line > Definition, Parameter[] Parameters, Type type, string ProperUsage, int DefinitionOffset)
 		{
 			DefinitionType = DefinitionType.User;
-			this.type = type;
+			this.ReturnType = type;
 			this.Definition = Definition;
 			this.Name = Name;
 			this.Parameters = Parameters;
 			this.DefinitionOffset = DefinitionOffset;
-			DefinedIn = CowSpeak.CurrentFile;
+			DefinedIn = Interpreter.CurrentFile;
 		}
 
 		private Any ExecuteLines()
 		{
-			string CurrentFile = CowSpeak.CurrentFile;
-			CowSpeak.CurrentFile = DefinedIn;
+			string currentFile = Interpreter.CurrentFile;
+			Interpreter.CurrentFile = DefinedIn;
 
-			var ReturnedValue = Executor.Execute(Definition, DefinitionOffset + 1, true);
+			var returnedValue = Executor.Execute(Definition, DefinitionOffset + 1, true);
 
-			if (type == Type.Void)
+			if (ReturnType == Type.Void)
 			{
-				if (ReturnedValue != null)
-					throw new Exception("Cannot return a value from a void function");
+				if (returnedValue != null)
+					throw new BaseException("Cannot return a value from a void function");
 
-				return null; // TODO: Return null
+				return null;
 			}
 
-			if (ReturnedValue == null)
-				throw new Exception("Non-void function '" + Name + "' did not return any valid value");
+			if (returnedValue == null)
+				throw new BaseException("Non-void function '" + Name + "' did not return any valid value");
 
-			if (!Conversion.IsCompatible(ReturnedValue.Type, type))
-				throw new Exception("Incompatible return type, ('" + ReturnedValue.Type.Name + "' is incompatible with '" + type.Name + "')");
+			if (!Conversion.IsCompatible(returnedValue.Type, ReturnType))
+				throw new BaseException("Incompatible return type, ('" + returnedValue.Type.Name + "' is incompatible with '" + ReturnType.Name + "')");
 
-			CowSpeak.CurrentFile = CurrentFile;
+			Interpreter.CurrentFile = currentFile;
 
-			return ReturnedValue;
+			return returnedValue;
 		}
 
 		public static Parameter[] ParseDefinitionParams(string s_params)
@@ -67,9 +68,9 @@ namespace CowSpeak
 
 				List< Token > parameterDefinition = Lexer.ParseLine(parameter);
 				if (parameterDefinition.Count != 2 || parameterDefinition[0].type != TokenType.TypeIdentifier || parameterDefinition[1].type != TokenType.VariableIdentifier)
-					throw new Exception("Invalid definition of parameter");
+					throw new BaseException("Invalid definition of parameter");
 
-				parameters.Add(new Parameter(Utils.GetType(parameterDefinition[0].identifier), parameterDefinition[1].identifier));
+				parameters.Add(new Parameter(Type.GetType(parameterDefinition[0].identifier), parameterDefinition[1].identifier));
 			}
 
 			return parameters.ToArray();
@@ -78,7 +79,7 @@ namespace CowSpeak
 		public override Any Execute(string usage)
 		{
 			if (usage.IndexOf("(") == -1 || usage.IndexOf(")") == -1)
-				throw new Exception("Invalid usage of function: '" + Usage + "'");
+				throw new BaseException("Invalid usage of function: '" + Usage + "'");
 
 			usage = usage.Substring(usage.IndexOf("(")); // reduce it to parentheses and params inside of them
 
@@ -91,16 +92,16 @@ namespace CowSpeak
 			for (int i = 0; i < Parameters.Length; i++)
 			{
 				Parameter parameter = Parameters[i];
-				CowSpeak.Vars.Add(parameter.Name, new Variable(parameter.Type, parameter.Name, parameters[i].Value));
+				Interpreter.Vars.Add(parameter.Name, new Variable(parameter.Type, parameter.Name, parameters[i].Value));
 			}
 
-			bool calledRecursively = CowSpeak.StackTrace.Count > 0 && CowSpeak.StackTrace[CowSpeak.StackTrace.Count - 1] == Usage;
+			bool calledRecursively = Interpreter.StackTrace.Count > 0 && Interpreter.StackTrace[Interpreter.StackTrace.Count - 1] == Usage;
 			if (calledRecursively)
-				throw new Exception("Recursion is not supported in this version of CowSpeak");
+				throw new BaseException("Recursion is not supported in this version of CowSpeak");
 
-			CowSpeak.StackTrace.Add(Usage);
+			Interpreter.StackTrace.Add(Usage);
 			Any returnedValue = ExecuteLines();
-			CowSpeak.StackTrace.RemoveAt(CowSpeak.StackTrace.Count - 1);
+			Interpreter.StackTrace.RemoveAt(Interpreter.StackTrace.Count - 1);
 
 			scope.End();
 

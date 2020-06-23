@@ -1,8 +1,9 @@
+using CowSpeak.Exceptions;
 using System.Collections.Generic;
 
 namespace CowSpeak
 {
-	internal class Functions : Dictionary<string, FunctionBase>
+	public class Functions : Dictionary<string, FunctionBase>
 	{
 		public Functions() : base()
 		{
@@ -18,11 +19,11 @@ namespace CowSpeak
 			{
 				string caller = key.Substring(0, key.IndexOf("."));
 
-				if (CowSpeak.Vars.ContainsKey(caller)) // caller is an existing variable
+				if (Interpreter.Vars.ContainsKey(caller)) // caller is an existing variable
 				{
-					Variable variable = CowSpeak.Vars[caller];
+					Variable variable = Interpreter.Vars[caller];
 
-					if (variable.Type.rep.IsArray)
+					if (variable.Type.rep.IsArray && ContainsKey("Array" + key.Substring(key.IndexOf("."))))
 						key = "Array" + key.Substring(key.IndexOf("."));
 					else
 						key = variable.Type.Name + key.Substring(key.IndexOf("."));
@@ -33,6 +34,18 @@ namespace CowSpeak
 						if (ContainsKey(anyKey)) // we're calling an any method, change the key
 							key = anyKey;
 					}
+				}
+				else if (Interpreter.Definitions.ContainsKey(caller))
+				{
+					caller = Interpreter.Definitions[caller].To;
+					key = caller + key.Substring(key.IndexOf("."));
+				}
+
+				if (Type.GetType(caller, false) != null && !ContainsKey(key))
+				{
+					string anyKey = "Any" + key.Substring(key.IndexOf("."));
+					if (ContainsKey(anyKey)) // we're calling an any method, change the key
+						key = anyKey;
 				}
 			}
 
@@ -48,7 +61,7 @@ namespace CowSpeak
 				key = ParseKey(key);
 
 				if (!ContainsKey(key))
-					throw new Exception("Function '" + key.Replace(System.Environment.NewLine, "\\n") + "' not found");
+					throw new BaseException("Function '" + key.Replace("\n", "\\n") + "' not found");
 
 				return base[key];
 			}
@@ -61,7 +74,7 @@ namespace CowSpeak
 		public FunctionBase Create(FunctionBase function)
 		{
 			if (ContainsKey(function.Name))
-				throw new Exception("Cannot create function '" + function.Name + "', a function by that name already exists");
+				throw new BaseException("Cannot create function '" + function.Name + "', a function by that name already exists");
 
 			Add(function.Name, function);
 

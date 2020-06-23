@@ -14,7 +14,8 @@ namespace CowSpeak
 				(from == Type.Integer && to == Type.Integer64) || 
 				(from == Type.DecimalArray && to == Type.IntegerArray) || 
 				(from == Type.IntegerArray && to == Type.DecimalArray) ||
-				(from == Type.Integer64 && IsCompatible(Type.Integer, to));
+				(from == Type.Integer64 && IsCompatible(Type.Integer, to)) ||
+				(from == Type.Byte && IsCompatible(Type.Integer, to));
 		}
 	}
 }
