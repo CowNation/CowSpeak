@@ -23,18 +23,18 @@ This project's sole developer is a high school student and this is simply a hobb
 * Easily modifiable syntax (even at runtime)
 * Full support for hexadecimal numbers
 ## Modules
-### [Main](https://github.com/CowNation/CowSpeak/CowSpeak-master/Modules/Main.cs)
-* [Generated Documentation](https://github.com/CowNation/CowSpeak/CowSpeak-master/Modules/Main.md)
+### [Main](https://github.com/CowNation/CowSpeak/blob/master/CowSpeak-master/Modules/Main.cs)
+* [Generated Documentation](https://github.com/CowNation/CowSpeak/blob/master/CowSpeak-master/Modules/Main.md)
 * This module contains standard CowSpeak functions that should work on all platforms
-### [Windows](https://github.com/CowNation/CowSpeak/CowSpeak-master/Modules/Windows.cs)
-* [Generated Documentation](https://github.com/CowNation/CowSpeak/CowSpeak-master/Modules/Windows.md)
+### [Windows](https://github.com/CowNation/CowSpeak/blob/master/CowSpeak-master/Modules/Windows.cs)
+* [Generated Documentation](https://github.com/CowNation/CowSpeak/blob/master/CowSpeak-master/Modules/Windows.md)
 * This contains various API functions and predefined Windows enums as definitions.
 * This will be loaded automatically on first call to CowSpeak.Execute if you are using CowSpeak on a Windows PC and CowSpeak.UseOSSpecificModules is true.
-### [Linux](https://github.com/CowNation/CowSpeak/CowSpeak-master/Modules/Linux.cs)
+### [Linux](https://github.com/CowNation/CowSpeak/blob/master/CowSpeak-master/Modules/Linux.cs)
 * This is simply a placeholder module with no definitions or functions because I don't use linux
 * Contributions to this would be greatly appreciated
-### [Shorter Type Names](https://github.com/CowNation/CowSpeak/CowSpeak-master/Modules/ShorterTypeNames.cs)
-* [Generated Documentation](https://github.com/CowNation/CowSpeak/CowSpeak-master/Modules/ShorterTypeNames.md)
+### [Shorter Type Names](https://github.com/CowNation/CowSpeak/blob/master/CowSpeak-master/Modules/ShorterTypeNames.cs)
+* [Generated Documentation](https://github.com/CowNation/CowSpeak/blob/master/CowSpeak-master/Modules/ShorterTypeNames.md)
 * This module is for those who dislike how CowSpeak's defult type names are so long
 * The existing CowSpeak type names will still work as well
 * Function names will still refer to the types as their defualt CowSpeak type names (Ex: myInt.ToCharacter())
@@ -63,4 +63,4 @@ This project's sole developer is a high school student and this is simply a hobb
 
 [v7.8 (Bug fixes, major optimizations, API changes May 8, 2020)](https://github.com/CowNation/CowSpeak/tree/e5c7222d50f190ef07f464169d6971d17bcc4d10)
 
-[v8 (Added new module system, added byte and ByteArray types, major bug fixes, optimizations, and improvements June 5, 2020)](https://github.com/CowNation/CowSpeak/tree/8a5eb6fa70751d4c850da59640d6b675496fa44c)
+[v8 (Current Version) (Added new module system, added byte and ByteArray types, major bug fixes, optimizations, and improvements June 5, 2020)](https://github.com/CowNation/CowSpeak)
