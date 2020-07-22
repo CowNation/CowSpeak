@@ -13,7 +13,7 @@ This project's sole developer is a high school student and this is simply a hobb
 * Single line comments
 * Conditionals (if, else, loop, while)
 * Custom C# modules
-* Interface with native C# types in code
+* Interact with native C# types in code
 * Language defined functions
 * OS specific API functions
 * User defined functions
