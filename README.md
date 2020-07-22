@@ -63,6 +63,8 @@ This project's sole developer is a high school student and this is simply a hobb
 
 [v7.8 (Bug fixes, major optimizations, API changes May 8, 2020)](https://github.com/CowNation/CowSpeak/tree/e5c7222d50f190ef07f464169d6971d17bcc4d10)
 
+[v8 (Added new module system, added byte and ByteArray types, major bug fixes, optimizations, and improvements June 5, 2020)](https://github.com/CowNation/CowSpeak/tree/9bff7b0e3639353d1aa0542564cec3fc9aa7ae06)
+
 Current Version:
 
-[v8 (Added new module system, added byte and ByteArray types, major bug fixes, optimizations, and improvements June 5, 2020)](https://github.com/CowNation/CowSpeak)
+[v8.2 (Embedded DynamicExpresso into the solution, rewrote Any class, and made it possible to interface with native C# types from CowSpeak code July 22, 2020)](https://github.com/CowNation/CowSpeak)
