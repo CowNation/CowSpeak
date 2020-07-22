@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using CowSpeak.Exceptions;
@@ -14,14 +17,14 @@ namespace CowSpeak
 
 		public static object Eval(string expression)
 		{
-			try
-			{
+			//try
+			//{
 				return interpreter.Eval(expression);
-			}
-			catch (Exception ex)
-			{
-				throw new BaseException("Couldn't evaluate expression '" + expression.Replace("\n", @"\n") + "': " + ex.Message);
-			}
+			//}
+			//catch (Exception ex)
+			//{
+				//throw new BaseException("Couldn't evaluate expression '" + expression.Replace("\n", @"\n") + "': " + ex.Message);
+			//}
 		}
 
 		public static string GetTokensExpression(List<Token> tokens, ref Any alreadyEvaluatedValue)
@@ -50,7 +53,7 @@ namespace CowSpeak
 				if (tokens[i].type == TokenType.FunctionCall)
 				{
 					FunctionBase func = Interpreter.Functions[identifier];
-					Any returned = func.Execute(identifier);
+					Any returned = func.Invoke(identifier);
 					objectType = func.ReturnType;
 
 					if (tokens.Count == 1)
@@ -116,7 +119,19 @@ namespace CowSpeak
 			return Encoding.Unicode.GetString(bytes);
 		}
 
-		private static Regex initialClosingParenthesis = new Regex(@"\([^()]*\)|\(.*(\(.*?\))*", RegexOptions.Compiled);
+		private static Regex initialClosingParenthesis = new Regex(@"\((?>[^()]|(?<o>)\(|(?<-o>)\))*\)(?(o)(?!))", RegexOptions.Compiled);
+
+		public static IEnumerable<MethodInfo> GetExtensionMethods(Assembly assembly, System.Type extendedType)
+		{
+			// pasted btw
+			var query = from type in assembly.GetTypes()
+						where !type.IsGenericType && !type.IsNested
+						from method in type.GetMethods(BindingFlags.Static | BindingFlags.Public)
+						where method.IsDefined(typeof(ExtensionAttribute), false)
+						where method.GetParameters()[0].ParameterType == extendedType
+						select method;
+			return query;
+		}
 
 		public static int GetInitialClosingParenthesis(string str)
 		{
@@ -127,7 +142,7 @@ namespace CowSpeak
 			return match.Index + match.Length - 1;
 		}
 
-		public static bool IsHexadecimal(string str) => Utils.OccurrencesOf(str, "0x") == 1 && str.IndexOf("0x") == 0;
+		public static bool IsHexadecimal(string str) => OccurrencesOf(str, "0x") == 1 && str.IndexOf("0x") == 0;
 
 		public static Tuple<int, string>[] SplitWithIndicies(string str, string splitter)
 		{
@@ -238,6 +253,13 @@ namespace CowSpeak
 			return Encoding.UTF8.GetString(Convert.FromBase64String(str)).Replace(@"\n", "\n");
 		}
 
+		public static string RandomString(int length)
+		{
+			const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+			return new string(Enumerable.Repeat(chars, length)
+			  .Select(s => s[rand.Next(s.Length)]).ToArray());
+		}
+
 		public static string ReplaceBetween(string str, char toReplace, char start, char end, char substitution = (char)0x1a){
 			string _str = str;
 			for (int Occurrence = 0; Occurrence < OccurrencesOf(str, toReplace.ToString()); Occurrence++)
@@ -292,7 +314,6 @@ namespace CowSpeak
 
 		public static bool IsNumber(string str)
 		{
-			// regex is really confusing to me but basically this returns if the string is a number (including negatives and decimals)
 			return isNumber.Match(str).Value == str;
 		}
 	}

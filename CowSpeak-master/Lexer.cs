@@ -219,7 +219,7 @@ namespace CowSpeak
 
 				if (Interpreter.Functions.FunctionExists("Define(") && RecentLine.Count > 0 && RecentLine[0].type == TokenType.FunctionCall && RecentLine[0].identifier.IndexOf("Define(") == 0)
 				{
-					Interpreter.Functions["Define("].Execute(RecentLine[0].identifier);
+					Interpreter.Functions["Define("].Invoke(RecentLine[0].identifier);
 					lines[lines.Count - 1] = new Line(new List<Token>()); // line was already handled, clear line
 				} // must handle this function before the other lines are compiled to avoid errors
 			}

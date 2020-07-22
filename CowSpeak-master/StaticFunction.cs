@@ -31,7 +31,7 @@ namespace CowSpeak
 			this.StaticOnly = StaticOnly;
 		}
 
-		public override Any Execute(string usage)
+		public override Any Invoke(string usage)
 		{
 			if (usage.IndexOf("(") == -1 || usage.IndexOf(")") == -1)
 				throw new BaseException("Invalid usage of function: " + usage);
@@ -66,7 +66,12 @@ namespace CowSpeak
 					if (StaticOnly)
 						InvocationParams.Add(callerType);
 					else
+					{
+						if (caller.obj == null)
+							throw new BaseException("Cannot call a method on a null object");
+
 						InvocationParams.Add(caller);
+					}
 				}
 
 				var definitionParams = Definition.GetParameters().ToList();
@@ -75,22 +80,27 @@ namespace CowSpeak
 					definitionParams.RemoveAt(0);
 
 				for (int i = 0; i < parameters.Count; i++)
-					InvocationParams.Add(parameters[i].GetValue(definitionParams[i].ParameterType));
-				
+				{
+					InvocationParams.Add(parameters[i].ConvertValue(definitionParams[i].ParameterType));
+				}
+
 				object returnValue = Definition.Invoke(null, InvocationParams.ToArray()); // obj is null because the function should be static
 				Interpreter.StackTrace.RemoveAt(Interpreter.StackTrace.Count - 1);
 
-				if (returnValue == null)
-					return null; // Probably a void function
-
 				Type returnedType = null;
 
-				if (returnValue is Any)
+				if (ReturnType == Type.Void)
+					return null;
+				else if (returnValue == null)
+					returnedType = Type.Any;
+				else if (returnValue is Any)
 					return (Any)returnValue;
 				else if (returnValue is Array)
 					returnedType = Type.GetType(((Array)returnValue).GetType());
-				else
+				else if (Type.GetType(returnValue.GetType(), false) != null)
 					returnedType = Type.GetType(returnValue.GetType());
+				else
+					returnedType = Type.Any;
 
 				return new Any(returnedType, returnValue);
 			}

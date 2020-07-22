@@ -124,7 +124,7 @@ namespace CowSpeak
 					FunctionBase func = Interpreter.Functions[token.identifier];
 					if (func.ReturnType == Type.Void)
 						throw new BaseException("Cannot pass void function as a parameter");
-					parameters.Add(new Any(func.ReturnType, func.Execute(token.identifier).Value));
+					parameters.Add(new Any(func.ReturnType, func.Invoke(token.identifier).Value));
 					continue;
 				}
 				else if (token.type == TokenType.FunctionChain)
@@ -196,13 +196,12 @@ namespace CowSpeak
 					}
 				}
 			}
-
-			if (!validUsage)
+			else
 			{
 				var usage = Name + "(";
 				for (int i = 0; i < Parameters.Length; i++)
 				{
-					usage += Parameters[i].Type.Name;
+					usage += Parameters[i].Type.Name + " " + Parameters[i].Name;
 					if (i < Parameters.Length - 1)
 						usage += ", ";
 				}
@@ -217,11 +216,11 @@ namespace CowSpeak
 				}
 				givenUsage = givenUsage + ")";
 
-				throw new BaseException("Invalid usage of function: " + givenUsage + ". Correct Usage: " + usage);
+				throw new BaseException("Invalid usage of function: " + givenUsage + "; Correct usage: " + usage);
 			}
 		}
 
 		// To be overridden
-		public abstract Any Execute(string usage);
+		public abstract Any Invoke(string usage);
 	}
 }

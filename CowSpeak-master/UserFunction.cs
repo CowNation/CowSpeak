@@ -76,7 +76,7 @@ namespace CowSpeak
 			return parameters.ToArray();
 		}
 
-		public override Any Execute(string usage)
+		public override Any Invoke(string usage)
 		{
 			if (usage.IndexOf("(") == -1 || usage.IndexOf(")") == -1)
 				throw new BaseException("Invalid usage of function: '" + Usage + "'");

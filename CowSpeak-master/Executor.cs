@@ -188,16 +188,14 @@ namespace CowSpeak
 
 				if (shouldBeSet)
 				{
-					Interpreter.Vars[Lines[i][1].identifier].bytes = retVal.bytes;
-					var val = Interpreter.Vars[Lines[i][1].identifier].Value; // Do this in case there was an error when setting bytes
+					Interpreter.Vars[Lines[i][1].identifier].Value = retVal.obj;
 				}
 				else if (Lines[i].Count >= 2 && Lines[i][0].type == TokenType.VariableIdentifier && Lines[i][1].type == TokenType.EqualOperator)
 				{
 					if (!Interpreter.Vars.ContainsKey(Lines[i][0].identifier))
 						throw new BaseException("Variable '" + Lines[i][0].identifier + "' must be defined before it can be set"); // var not found
 
-					Interpreter.Vars[Lines[i][0].identifier].bytes = retVal.bytes;
-					var val = Interpreter.Vars[Lines[i][0].identifier].Value; // In case there was an error when setting bytes
+					Interpreter.Vars[Lines[i][0].identifier].Value = retVal.obj;
 				} // type is not specified, var must already be defined
 			}
 

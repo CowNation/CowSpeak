@@ -16,28 +16,69 @@ namespace CowSpeak
 			return match.Success && match.Index == 0 && match.Length == token.Length && Utils.GetInitialClosingParenthesis(token) != token.Length - 1;
 		}
 
+		public static int GetChildrenCount(string identifier)
+		{
+			int children = 1, j = Utils.GetInitialClosingParenthesis(identifier);
+			while (j != -1 && j < identifier.Length)
+			{
+				children++;
+
+				string a = identifier.Substring(j);
+
+				j += Utils.GetInitialClosingParenthesis(a) + 1;
+			}
+			return children;
+		}
+
+
 		public static Any Evaluate(string identifier)
 		{
-			List< Any > evaluatedValues = new List< Any >();
-			int Funcs = identifier.OccurrencesOf("(");
-			for (int i = 0; i < Funcs; i++)
+			List<string> temporaryParameters = new List<string>();
+			List<Any> evaluatedValues = new List<Any>();
+
+			int functions = GetChildrenCount(identifier);
+
+			try
 			{
-				int End = identifier.IndexOf(")", i);
-				string funcIdentifier = identifier.Substring(0, End + 1);
+				for (int i = 0; i < functions; i++)
+				{
+					int end = Utils.GetInitialClosingParenthesis(identifier);//identifier.IndexOf(")", i);
+					string funcIdentifier = identifier.Substring(0, end + 1);
 
-				FunctionBase chainFunc = Interpreter.Functions[funcIdentifier];
-				evaluatedValues.Add(chainFunc.Execute(funcIdentifier));
+					FunctionBase chainFunc = Interpreter.Functions[funcIdentifier];
+					evaluatedValues.Add(chainFunc.Invoke(funcIdentifier));
 
-				Interpreter.Vars.Create(new Variable(evaluatedValues.Last().Type, "temp_" + i, evaluatedValues.Last().Value));
-				identifier = ("temp_" + i) + identifier.Substring(End + 1);
+					if (evaluatedValues.Last() == null)
+					{
+						if (i + 1 < functions)
+							throw new BaseException("Cannot evaluate a FunctionChain when one if it's members returns null (excluding the last function)");
+					}
+					else
+					{
+						string temporaryName = Utils.RandomString(10);
+						Interpreter.Vars.Create(new Variable(evaluatedValues.Last().Type, temporaryName, evaluatedValues.Last().Value));
+						identifier = temporaryName + identifier.Substring(end + 1);
 
-				if (Interpreter.Vars.ContainsKey("temp_" + (i - 1)))
-					Interpreter.Vars.Remove("temp_" + (i - 1)); // remove last temp var
+						if (temporaryParameters.Count > 0 && Interpreter.Vars.ContainsKey(temporaryParameters.Last()))
+						{
+							Interpreter.Vars.Remove(temporaryParameters.Last()); // remove last temp var
+							temporaryParameters.RemoveAt(temporaryParameters.Count - 1);
+						}
+
+						temporaryParameters.Add(temporaryName); // add the temporary var we just created
+
+					}
+				}
+			}
+			finally
+			{
+				foreach (var temp in temporaryParameters)
+				{
+					if (Interpreter.Vars.ContainsKey(temp))
+						Interpreter.Vars.Remove(temp);
+				}
 			}
 
-			if (Interpreter.Vars.ContainsKey("temp_" + (Funcs - 1)))
-				Interpreter.Vars.Remove("temp_" + (Funcs - 1));
-				
 			return evaluatedValues.Last();
 		}
 

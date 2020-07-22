@@ -1,17 +1,20 @@
 using CowSpeak.Exceptions;
 using System;
+using System.Linq;
+using System.Reflection;
 
 namespace CowSpeak
 {
-	public class Any : ByteArray
+	public class Any// : ByteArray
 	{
+		public object obj;
 		public Type Type;
 
 		public Any() : base()
 		{
 
 		}
-		
+
 		public Any(object obj) : base()
 		{
 			Type = Type.GetType(obj.GetType());
@@ -26,16 +29,34 @@ namespace CowSpeak
 			this.Value = Value;
 		}
 
-		public object GetValue(System.Type customType)
+		public object ConvertValue(System.Type customType)
 		{
 			try
 			{
-				object value = Get();
+				if (obj == null)
+					return null;
 
-				if (!(value is IConvertible) || customType == typeof(object) || value.GetType() == customType)
-					return value;
+				if (obj.GetType() == customType)
+					return obj;
 
-				return Convert.ChangeType(value, customType);
+				if (obj.GetType().IsArray && customType.IsArray)
+				{
+					Array valueArr = (Array)obj; 
+					Array arr = (Array)Activator.CreateInstance(customType, new object[1]
+					{
+						valueArr.Length
+					});
+					for (int i = 0; i < valueArr.Length; i++)
+					{
+						arr.SetValue(Convert.ChangeType(valueArr.GetValue(i), customType.GetElementType()), i);
+					}
+					return arr;
+				}
+
+				if (!(obj is IConvertible))
+					return obj;
+
+				return Convert.ChangeType(obj, customType);
 			}
 			catch (OverflowException ex)
 			{
@@ -47,11 +68,13 @@ namespace CowSpeak
 		{
 			get
 			{
-				return GetValue(Type.rep);
+				//return (this.Type)obj;
+				return ConvertValue(Type.rep);
 			}
 			set
 			{
-				Set(value);
+				obj = value;
+				//Set(value);
 			}
 		}
 	}

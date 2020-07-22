@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -20,48 +21,92 @@ namespace CowSpeak.Modules
     public static class Windows
     {
         #region Process
-        #region PROCESS_ACCESS_FLAGS
         [Definition.Enum]
         [Flags]
         public enum ProcessAccessFlags : uint
         {
-            All = 0x001F0FFF,
-            Terminate = 0x00000001,
-            CreateThread = 0x00000002,
-            VirtualMemoryOperation = 0x00000008,
-            VirtualMemoryRead = 0x00000010,
-            VirtualMemoryWrite = 0x00000020,
-            DuplicateHandle = 0x00000040,
-            CreateProcess = 0x000000080,
-            SetQuota = 0x00000100,
-            SetInformation = 0x00000200,
-            QueryInformation = 0x00000400,
-            QueryLimitedInformation = 0x00001000,
-            Synchronize = 0x00100000
+            PROCESS_ALL_ACCESS = 0x001F0FFF,
+            PROCESS_TERMINATE = 0x00000001,
+            PROCESS_CREATE_THREAD = 0x00000002,
+            PROCESS_VM_OPERATION = 0x00000008,
+            PROCESS_VM_READ = 0x00000010,
+            PROCESS_VM_WRITE = 0x00000020,
+            PROCESS_DUP_HANDLE = 0x00000040,
+            PROCESS_CREATE_PROCESS = 0x000000080,
+            PROCESS_SET_QUOTA = 0x00000100,
+            PROCESS_SET_INFORMATION = 0x00000200,
+            PROCESS_QUERY_INFORMATION = 0x00000400,
+            PROCESS_QUERY_LIMITED_INFORMATION = 0x00001000,
+            SYNCHRONIZE = 0x00100000
         }
-        #endregion
 
-        [Function("GetBaseAddress")]
-        public static long GetBaseAddress(int processID, string moduleName)
+        [Function("GetCurrentProcessID")]
+        [DllImport("kernel32.dll")]
+        public static extern int GetCurrentProcessId();
+
+        enum SnapshotFlags : uint
         {
-            Process process;
-            try
-            {
-                process = Process.GetProcessById(processID);
-            }
-            catch (ArgumentException ex)
-            {
-                throw new BaseException(ex.Message);
-            }
+            TH32CS_SNAPHEAPLIST = 0x00000001,
+            TH32CS_SNAPPROCESS = 0x00000002,
+            TH32CS_SNAPTHREAD = 0x00000004,
+            TH32CS_SNAPMODULE = 0x00000008,
+            TH32CS_SNAPMODULE32 = 0x00000010,
+            TH32CS_SNAPALL = (TH32CS_SNAPHEAPLIST | TH32CS_SNAPPROCESS | TH32CS_SNAPTHREAD | TH32CS_SNAPMODULE),
+            TH32CS_INHERIT = 0x80000000
+        }
 
-            for (int i = 0; i < process.Modules.Count; i++)
-            {
-                var module = process.Modules[i];
-                if (module.ModuleName == moduleName)
-                    return module.BaseAddress.ToInt64();
-            }
+        [StructLayout(LayoutKind.Sequential, CharSet = System.Runtime.InteropServices.CharSet.Ansi)]
+        struct MODULEENTRY32
+        {
+            internal uint dwSize;
+            internal uint th32ModuleID;
+            internal uint th32ProcessID;
+            internal uint GlblcntUsage;
+            internal uint ProccntUsage;
+            internal IntPtr modBaseAddr;
+            internal uint modBaseSize;
+            internal IntPtr hModule;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 256)]
+            internal string szModule;
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
+            internal string szExePath;
+        }
 
-            throw new BaseException("Module '" + moduleName + "' cannot be found in process '" + process.ProcessName + "'");
+        [DllImport("kernel32.dll")]
+        static extern bool Module32First(IntPtr hSnapshot, ref MODULEENTRY32 lpme);
+
+        [DllImport("kernel32.dll")]
+        static extern bool Module32Next(IntPtr hSnapshot, ref MODULEENTRY32 lpme);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        static extern IntPtr CreateToolhelp32Snapshot(SnapshotFlags dwFlags, int th32ProcessID);
+
+        [Function("GetModuleBaseAddress")]
+        public static long GetModuleBaseAddress(int procId, string modName)
+        {
+            IntPtr modBaseAddr = IntPtr.Zero;
+            IntPtr hSnap = CreateToolhelp32Snapshot(SnapshotFlags.TH32CS_SNAPMODULE | SnapshotFlags.TH32CS_SNAPMODULE32, procId);
+
+            if (hSnap.ToInt64() != -1)
+            {
+                MODULEENTRY32 modEntry = new MODULEENTRY32();
+                modEntry.dwSize = (uint)Marshal.SizeOf(typeof(MODULEENTRY32));
+
+                if (Module32First(hSnap, ref modEntry))
+                {
+                    do
+                    {
+                        if (modEntry.szModule.Equals(modName))
+                        {
+                            modBaseAddr = modEntry.modBaseAddr;
+                            break;
+                        }
+                    } while (Module32Next(hSnap, ref modEntry));
+                }
+            }
+            CloseHandle(hSnap.ToInt64());
+
+            return modBaseAddr.ToInt64();
         }
 
         [Function("GetProcessID")]
@@ -74,6 +119,15 @@ namespace CowSpeak.Modules
             else
                 return -1;
         }
+
+        [Function("NaGetProcess")]
+        public static object GetProcessByName(string processName) => Process.GetProcessesByName(processName).FirstOrDefault();
+
+        //[Function("NaGetProcesses")]
+        //public static object GetProcessesByName(string processName) => Process.GetProcessesByName(processName);
+
+        [Function("GetProcessIDs")]
+        public static int[] GetProcessIDs(string processName) => Process.GetProcessesByName(processName).Select(x => x.Id).ToArray();
 
         [Function("OpenProcess")]
         [DllImport("kernel32.dll", SetLastError = true)]
@@ -95,7 +149,9 @@ namespace CowSpeak.Modules
             if (ReadProcessMemory(new IntPtr(hProcess), new IntPtr(lpBaseAddress), buffer, bytes, out IntPtr lpNumberOfBytesWritten))
                 return buffer;
             else
+            {
                 return new byte[0];
+            }
         }
 
         [DllImport("kernel32.dll", SetLastError = true)]
@@ -431,10 +487,11 @@ namespace CowSpeak.Modules
         [Function("SetWindowLong")]
         public static int _SetWindowLong(long hWnd, int nIndex, int dwNewLong) => SetWindowLong(new IntPtr(hWnd), nIndex, dwNewLong);
 
-        [DllImport("user32.dll", SetLastError = true)]
-        static extern int GetWindowLong(IntPtr hWnd, int nIndex);
         [Function("GetWindowLong")]
-        public static int _GetWindowLong(long hWnd, int nIndex) => GetWindowLong(new IntPtr(hWnd), nIndex);
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern int GetWindowLong(long hWnd, int nIndex);
+        //[Function("GetWindowLong")]
+        //public static int _GetWindowLong(long hWnd, int nIndex) => GetWindowLong(new IntPtr(hWnd), nIndex);
         #endregion
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]

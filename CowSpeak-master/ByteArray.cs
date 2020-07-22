@@ -3,6 +3,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.InteropServices;
 using CowSpeak.Exceptions;
+using System.Runtime.Serialization;
 
 namespace CowSpeak
 {
@@ -13,7 +14,8 @@ namespace CowSpeak
 
 		}
 
-		public byte[] bytes;
+		public object obj;
+		//public byte[] bytes;
 
 		public static object ByteArrayToObject(byte[] arrBytes)
 		{
@@ -39,12 +41,13 @@ namespace CowSpeak
 
 		protected object Get()
 		{
-			if (bytes == null)
+			return obj;
+			/*if (bytes == null)
 				throw new BaseException("Object not initialized");
 
-			return ByteArrayToObject(bytes);
+			return ByteArrayToObject(bytes);*/
 		}
 
-		protected void Set(object to) => bytes = ObjectToByteArray(to);
+		protected void Set(object to) => obj = to;//bytes = ObjectToByteArray(to);
 	}
 }

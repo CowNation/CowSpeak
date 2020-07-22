@@ -3,6 +3,9 @@ using CowSpeak;
 using System.Linq;
 using System;
 using System.Reflection;
+using System.Threading;
+using System.Runtime.InteropServices;
+using System.IO;
 
 static class Extensions
 {
@@ -44,16 +47,11 @@ class Shell
 	{
 		PrintFunctions();
 
-		new CowSpeak.Module(typeof(CowSpeak.Modules.Main)).GenerateMdDocumentation("CowSpeak-master/Modules/Main.md");
-		new CowSpeak.Module(typeof(CowSpeak.Modules.Windows)).GenerateMdDocumentation("CowSpeak-master/Modules/Windows.md");
-		new CowSpeak.Module(typeof(CowSpeak.Modules.ShorterTypeNames)).GenerateMdDocumentation("CowSpeak-master/Modules/ShorterTypeNames.md");
+		//new CowSpeak.Module(typeof(CowSpeak.Modules.Main)).GenerateMdDocumentation("Main.md");
+		//new CowSpeak.Module(typeof(CowSpeak.Modules.Windows)).GenerateMdDocumentation("Windows.md");
+		//new CowSpeak.Module(typeof(CowSpeak.Modules.ShorterTypeNames)).GenerateMdDocumentation("ShorterTypeNames.md");
 
 		Console.WriteLine("Welcome to the CowSpeak(TM) shell!\nIn order to exit the shell, call the Exit() function");
-
-		/*var Functions = RetrieveFunctions();
-		System.Console.WriteLine("Functions (" + Functions.Length + "):");
-		foreach (var Function in Functions)
-			System.Console.WriteLine(Function);*/
 
 		List<string> lines = null;
 		while (true)

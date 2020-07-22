@@ -175,7 +175,7 @@ namespace CowSpeak
 					{
 						definitions.Add(new Definition
 						{
-							From = nestedEnum.Name + "." + name,
+							From = name,
 							To = Convert.ChangeType(Enum.Parse(nestedEnum, name), Enum.GetUnderlyingType(nestedEnum)).ToString() // get the value from the name
 						});
 					}

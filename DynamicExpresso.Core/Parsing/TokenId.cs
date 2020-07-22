@@ -1,0 +1,42 @@
+﻿namespace DynamicExpresso.Parsing
+{
+	internal enum TokenId
+	{
+		Unknown,
+		End,
+		Identifier,
+		CharLiteral,
+		StringLiteral,
+		IntegerLiteral,
+		RealLiteral,
+		Exclamation,
+		Percent,
+		OpenParen,
+		CloseParen,
+		Asterisk,
+		Plus,
+		Comma,
+		Minus,
+		Dot,
+		QuestionDot,
+		QuestionQuestion,
+		Slash,
+		Colon,
+		LessThan,
+		GreaterThan,
+		Question,
+		OpenBracket,
+		CloseBracket,
+		ExclamationEqual,
+		Amphersand,
+		DoubleAmphersand,
+		LessThanEqual,
+		DoubleEqual,
+		GreaterThanEqual,
+		Bar,
+		DoubleBar,
+		Equal,
+		Caret
+	}
+
+}
