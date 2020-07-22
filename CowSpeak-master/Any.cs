@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace CowSpeak
 {
-	public class Any// : ByteArray
+	public class Any
 	{
 		public object obj;
 		public Type Type;
@@ -68,13 +68,11 @@ namespace CowSpeak
 		{
 			get
 			{
-				//return (this.Type)obj;
 				return ConvertValue(Type.rep);
 			}
 			set
 			{
 				obj = value;
-				//Set(value);
 			}
 		}
 	}
