@@ -1,5 +1,5 @@
 
-[![version](https://img.shields.io/badge/version-8-blue)](https://github.com/CowNation/CowSpeak/releases/tag/v8)
+[![version](https://img.shields.io/badge/version-8.2-blue)](https://github.com/CowNation/CowSpeak/releases/tag/v8.2)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Run on Repl.it](https://repl.it/badge/github/CowNation/CowSpeak)](https://repl.it/github/CowNation/CowSpeak)
 # CowSpeak
