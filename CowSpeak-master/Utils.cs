@@ -23,7 +23,7 @@ namespace CowSpeak
 			}
 			catch (Exception ex)
 			{
-				//throw new BaseException("Couldn't evaluate expression '" + expression.Replace("\n", @"\n") + "': " + ex.Message);
+				throw new BaseException("Couldn't evaluate expression '" + expression.Replace("\n", @"\n") + "': " + ex.Message);
 			}
 		}
 
