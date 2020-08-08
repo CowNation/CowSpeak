@@ -17,14 +17,14 @@ namespace CowSpeak
 
 		public static object Eval(string expression)
 		{
-			//try
-			//{
+			try
+			{
 				return interpreter.Eval(expression);
-			//}
-			//catch (Exception ex)
-			//{
+			}
+			catch (Exception ex)
+			{
 				//throw new BaseException("Couldn't evaluate expression '" + expression.Replace("\n", @"\n") + "': " + ex.Message);
-			//}
+			}
 		}
 
 		public static string GetTokensExpression(List<Token> tokens, ref Any alreadyEvaluatedValue)
