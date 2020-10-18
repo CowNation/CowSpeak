@@ -6,7 +6,7 @@ namespace CowSpeak.Exceptions
 		public string ErrorFile;
 		public new string StackTrace = ""; // Hides System.Exception.StackTrace
 
-		public BaseException(string Message) : base((Interpreter.CurrentFile != "" || Interpreter.CurrentLine != -1 ? "(" + (Interpreter.CurrentFile != "" ? Interpreter.CurrentFile : "") + (Interpreter.CurrentFile != "" ? ", " : "") + (Interpreter.CurrentLine != -1 ? Interpreter.CurrentLine.ToString() : "") + ") " : "") + Message)
+		public BaseException(string message) : base((Interpreter.CurrentFile != "" || Interpreter.CurrentLine != -1 ? "(" + (Interpreter.CurrentFile != "" ? Interpreter.CurrentFile : "") + (Interpreter.CurrentFile != "" ? ", " : "") + (Interpreter.CurrentLine != -1 ? Interpreter.CurrentLine.ToString() : "") + ") " : "") + message)
 		{
 			ErrorLine = Interpreter.CurrentLine;
 			ErrorFile = Interpreter.CurrentFile;

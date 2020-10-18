@@ -23,7 +23,7 @@ namespace CowSpeak
 				{
 					Variable variable = Interpreter.Vars[caller];
 
-					if (variable.Type.rep.IsArray && ContainsKey("Array" + key.Substring(key.IndexOf("."))))
+					if (variable.Type.representation.IsArray && ContainsKey("Array" + key.Substring(key.IndexOf("."))))
 						key = "Array" + key.Substring(key.IndexOf("."));
 					else
 						key = variable.Type.Name + key.Substring(key.IndexOf("."));

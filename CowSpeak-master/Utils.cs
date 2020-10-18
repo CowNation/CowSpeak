@@ -15,10 +15,25 @@ namespace CowSpeak
 	{
 		static DynamicExpresso.Interpreter interpreter = new DynamicExpresso.Interpreter();
 
+		public static T[] ConcatArrays<T>(params T[][] p)
+		{
+			var position = 0;
+			var outputArray = new T[p.Sum(a => a.Length)];
+			foreach (var curr in p)
+			{
+				Array.Copy(curr, 0, outputArray, position, curr.Length);
+				position += curr.Length;
+			}
+			return outputArray;
+		}
+
 		public static object Eval(string expression)
 		{
 			try
 			{
+				if (expression == "\'\'\'")
+					return '\'';
+
 				return interpreter.Eval(expression);
 			}
 			catch (Exception ex)
@@ -81,12 +96,12 @@ namespace CowSpeak
 					objectType = FunctionChain.GetType(tokens[i].identifier);
 				}
 
-				if (tokens[i].type == TokenType.String || objectType == Type.String)
+				if (tokens[i].type == TokenType.StringLiteral || objectType == Type.String)
 					identifier = "\"" + identifier.Replace("\"", "\\\"") + "\"";
-				else if (tokens[i].type == TokenType.Character || objectType == Type.Character)
+				else if (tokens[i].type == TokenType.CharacterLiteral || objectType == Type.Character)
 					identifier = "\'" + identifier + "\'";
 				
-				expression += identifier + " ";
+				expression += identifier + (i < tokens.Count - 1 ? " " : "");
 			}
 
 			return expression;
@@ -140,6 +155,11 @@ namespace CowSpeak
 				return -1;
 
 			return match.Index + match.Length - 1;
+		}
+
+		public static List<T> GetChildrenOfClassInstances<T>()
+		{
+			return typeof(T).Assembly.GetTypes().Where(t => t.IsSubclassOf(typeof(T)) && !t.IsAbstract).Select(t => (T)Activator.CreateInstance(t)).ToList();
 		}
 
 		public static bool IsHexadecimal(string str) => OccurrencesOf(str, "0x") == 1 && str.IndexOf("0x") == 0;

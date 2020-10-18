@@ -494,11 +494,11 @@ namespace DynamicExpresso.Parsing
 
 			s = EvalEscapeStringLiteral(s);
 
-			if (s.Length != 1)
+			if (s.Length > 1)
 				throw CreateParseException(_token.pos, ErrorMessages.InvalidCharacterLiteral);
 
 			NextToken();
-			return CreateLiteral(s[0]);
+			return CreateLiteral(s.Length == 0 ? (char)0x0 : s[0]);
 		}
 
 		private Expression ParseStringLiteral()
@@ -2066,7 +2066,8 @@ namespace DynamicExpresso.Parsing
 					NextChar();
 					bool isEscapeC = false;
 					bool isEndC = false;
-					while (_parsePosition < _expressionTextLength && !isEndC)
+					bool isEmpty = _parseChar == '\'';
+					while (_parsePosition < _expressionTextLength && !isEndC && !isEmpty)
 					{
 						isEscapeC = _parseChar == '\\' && !isEscapeC;
 						NextChar();

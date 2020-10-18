@@ -1,34 +1,39 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using CowSpeak.Exceptions;
+using FastDelegate.Net;
 
 namespace CowSpeak
 {
 	internal class StaticFunction : FunctionBase
 	{
 		public MethodInfo Definition;
+		public Func<Object, Object[], Object> BoundDelegate;
+
 		// The method may only be called statically (only Type.Method and not Instance.Method)
 		public bool StaticOnly;
 
-		public StaticFunction(string Name, MethodInfo Definition, Type type, Parameter[] Parameters, bool IsMethod = false, bool StaticOnly = false) {
+		public StaticFunction(string name, MethodInfo definition, Type type, Parameter[] parameters, bool isMethod = false, bool staticOnly = false) {
 			DefinitionType = DefinitionType.Static;
 			this.ReturnType = type;
-			this.Definition = Definition;
+			this.Definition = definition;
+			this.BoundDelegate = definition.Bind();
 
 			string Params = "";
-			for (int i = 0; i < Parameters.Length; i++)
+			for (int i = 0; i < parameters.Length; i++)
 			{
-				Params += Parameters[i].Type + " " + Parameters[i].Name;
-				if (i != Parameters.Length - 1)
+				Params += parameters[i].Type + " " + parameters[i].Name;
+				if (i != parameters.Length - 1)
 					Params += ", ";
 			}
 
-			this.Name = Name;
-			this.Parameters = Parameters;
-			this.IsMethod = IsMethod;
-			this.StaticOnly = StaticOnly;
+			this.Name = name;
+			this.Parameters = parameters;
+			this.IsMethod = isMethod;
+			this.StaticOnly = staticOnly;
 		}
 
 		public override Any Invoke(string usage)
@@ -59,18 +64,18 @@ namespace CowSpeak
 			{
 				Interpreter.StackTrace.Add(Usage);
 
-				List<object> InvocationParams = new List<object>();
+				List<object> invocationParams = new List<object>();
 
 				if (IsMethod)
 				{
 					if (StaticOnly)
-						InvocationParams.Add(callerType);
+						invocationParams.Add(callerType);
 					else
 					{
 						if (caller.obj == null)
 							throw new BaseException("Cannot call a method on a null object");
 
-						InvocationParams.Add(caller);
+						invocationParams.Add(caller);
 					}
 				}
 
@@ -81,10 +86,10 @@ namespace CowSpeak
 
 				for (int i = 0; i < parameters.Count; i++)
 				{
-					InvocationParams.Add(parameters[i].ConvertValue(definitionParams[i].ParameterType));
+					invocationParams.Add(parameters[i].ConvertValue(definitionParams[i].ParameterType));
 				}
 
-				object returnValue = Definition.Invoke(null, InvocationParams.ToArray()); // obj is null because the function should be static
+				object returnValue = BoundDelegate.Invoke(null, invocationParams.ToArray()); // obj is null because the function should be static
 				Interpreter.StackTrace.RemoveAt(Interpreter.StackTrace.Count - 1);
 
 				Type returnedType = null;
@@ -92,7 +97,7 @@ namespace CowSpeak
 				if (ReturnType == Type.Void)
 					return null;
 				else if (returnValue == null)
-					returnedType = Type.Any;
+					returnedType = Type.Object;
 				else if (returnValue is Any)
 					return (Any)returnValue;
 				else if (returnValue is Array)
@@ -100,7 +105,7 @@ namespace CowSpeak
 				else if (Type.GetType(returnValue.GetType(), false) != null)
 					returnedType = Type.GetType(returnValue.GetType());
 				else
-					returnedType = Type.Any;
+					returnedType = Type.Object;
 
 				return new Any(returnedType, returnValue);
 			}
@@ -118,11 +123,16 @@ namespace CowSpeak
 	[AttributeUsage(AttributeTargets.Method)]
 	public class FunctionAttribute : Attribute
 	{
-		public string Name;
+		public string Name = "";
 
-		public FunctionAttribute(string Name)
+		public FunctionAttribute()
 		{
-			this.Name = Name;
+
+		}
+
+		public FunctionAttribute(string name)
+		{
+			this.Name = name;
 		}
 	}
 
@@ -132,9 +142,9 @@ namespace CowSpeak
 		// The method may only be called statically (only Type.Method and not Instance.Method)
 		public bool StaticOnly;
 
-		public MethodAttribute(string Name, bool StaticOnly = false) : base(Name)
+		public MethodAttribute(string name, bool staticOnly = false) : base(name)
 		{
-			this.StaticOnly = StaticOnly;
+			this.StaticOnly = staticOnly;
 		}
 	}
 }

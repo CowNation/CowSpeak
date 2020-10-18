@@ -208,14 +208,17 @@ namespace CowSpeak.Modules
 				.Invoke(encodingType.GetValue(null), new object[] { (byte[])obj.Value });
 		}
 
-		[Method(Syntax.Types.c_Any + Syntax.Types.ArraySuffix + ".Create", true)]
+		[Method(Syntax.Types.c_Object + Syntax.Types.ArraySuffix + ".Create", true)]
 		[Method(Syntax.Types.c_Decimal + Syntax.Types.ArraySuffix + ".Create", true)]
 		[Method(Syntax.Types.c_Boolean + Syntax.Types.ArraySuffix + ".Create", true)]
 		[Method(Syntax.Types.c_Character + Syntax.Types.ArraySuffix + ".Create", true)]
 		[Method(Syntax.Types.c_Integer + Syntax.Types.ArraySuffix + ".Create", true)]
 		[Method(Syntax.Types.c_String + Syntax.Types.ArraySuffix + ".Create", true)]
 		[Method(Syntax.Types.c_Byte + Syntax.Types.ArraySuffix + ".Create", true)]
-		public static Array CreateArray(Type type, int length) => Array.CreateInstance(type.rep.GetElementType(), length);
+		public static Array CreateArray(Type type, int length, params object[] values)
+		{
+			return Array.CreateInstance(type.representation.GetElementType(), length);
+		}
 
 		#region STRING_METHODS
 		static void VerifyParams(int index, int length = 0)
@@ -367,7 +370,7 @@ namespace CowSpeak.Modules
 			var toString = value.GetType().GetMethod("ToString", new System.Type[] { typeof(string) });
 
 			if (toString == null)
-				throw new ConversionException("Cannot find ToString(string) format method from type " + obj.Type.rep.Name);
+				throw new ConversionException("Cannot find ToString(string) format method from type " + obj.Type.representation.Name);
 
 			return (string)toString.Invoke(value, new object[] { "X" });
 		}
@@ -397,7 +400,7 @@ namespace CowSpeak.Modules
 			object result;
 			try
 			{
-				result = Marshal.PtrToStructure(handle.AddrOfPinnedObject(), type.rep);
+				result = Marshal.PtrToStructure(handle.AddrOfPinnedObject(), type.representation);
 			}
 			catch (MissingMethodException)
 			{
@@ -419,15 +422,27 @@ namespace CowSpeak.Modules
 		{
 			Variable iterator = Interpreter.Vars.Create(new Variable(Type.Integer, indexVarName));
 
-			for (long p = startIndex; p < endIndex; p++)
+			try
 			{
-				Scope scope = new Scope();
+				for (long p = startIndex; p < endIndex; p++)
+				{
+					Scope scope = new Scope();
 
-				iterator.Value = p;
+					iterator.Value = p;
 
-				Executor.Execute(containedLines, i + 1 + currentLineOffset, isNestedInFunction, true);
+					Executor.Execute(containedLines, i + 1 + currentLineOffset, isNestedInFunction, true);
 
-				scope.End();
+					scope.End();
+				}
+			}
+			catch (Exception ex)
+			{
+				Interpreter.Vars.Remove(iterator.Name);
+
+				if (ex is BaseException)
+					throw ex;
+				else
+					throw new BaseException(ex.Message);
 			}
 
 			Interpreter.Vars.Remove(iterator.Name); // delete the variable after loop is done
@@ -439,12 +454,12 @@ namespace CowSpeak.Modules
 			var type = System.Type.GetType(typeName);
 
 			if (type == null)
-				throw new BaseException("Cannot find C# type: '" + typeName + "'");
+				throw new BaseException("Cannot find .NET type: '" + typeName + "'");
 
 			var method = type.GetMethod(methodName, parameters.Select(x => x.GetType()).ToArray());
 
 			if (method == null)
-				throw new BaseException("Cannot find method '" + methodName + "' from C# type '" + typeName + "'");
+				throw new BaseException("Cannot find method '" + methodName + "' from .NET type '" + typeName + "'");
 
 			if (!method.IsStatic)
 				throw new BaseException("Cannot invoke non-static method: '" + methodName + "'");
@@ -452,11 +467,18 @@ namespace CowSpeak.Modules
 			return method.Invoke(null, parameters);
 		}
 
+		[Function]
+		public static bool GetDebug() => Interpreter.Debug;
+		[Function]
+		public static string GetCurrentFile() => Interpreter.CurrentFile;
+		[Function]
+		public static int GetCurrentLine() => Interpreter.CurrentLine;
+
 		[Function("GetCurrentSeconds")]
-		public static double GetCurrentSeconds() => DateTime.Now.Second;
+		public static int GetCurrentSeconds() => DateTime.Now.Second;
 
 		[Function("GetCurrentMilliseconds")]
-		public static double GetCurrentMilliseconds() => DateTime.Now.Millisecond;
+		public static int GetCurrentMilliseconds() => DateTime.Now.Millisecond;
 
 		[Function("ReadFileLines")]
 		public static string[] ReadFileLines(string filePath) => File.ReadAllLines(filePath);

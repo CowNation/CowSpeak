@@ -2,6 +2,7 @@ namespace CowSpeak
 {
 	public enum TokenType
 	{
+		None,
 		AddOperator,
 		SubtractOperator,
 		MultiplyOperator,
@@ -26,11 +27,15 @@ namespace CowSpeak
 		VariableIdentifier,
 		TypeIdentifier,
 
-		Number,
-		String,
-		Character,
+		// literals
+		DecimalLiteral,
+		IntegerLiteral,
+		Integer64Literal,
+		StringLiteral,
+		CharacterLiteral,
+		BooleanLiteral,
+
 		Parenthesis,
-		Boolean,
 
 		IfConditional,
 		ElseConditional,
@@ -45,15 +50,20 @@ namespace CowSpeak
 
 	public class Token
 	{
-		public TokenType type;
+		public TokenType type = TokenType.None;
 		public string identifier;
 		public int Index;
-		
-		public Token(TokenType type, string identifier, int Index = -1)
+
+		public Token()
+		{
+
+		}
+
+		public Token(TokenType type, string identifier, int index = -1)
 		{
 			this.type = type;
 			this.identifier = identifier;
-			this.Index = Index;
+			this.Index = index;
 		}
 	}
 }

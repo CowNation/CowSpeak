@@ -105,16 +105,21 @@ namespace CowSpeak
 					FunctionAttribute functionAttr = ((FunctionAttribute[])System.Attribute.GetCustomAttributes(method, typeof(FunctionAttribute))).Where(attr => !(attr is MethodAttribute)).FirstOrDefault(); // get attribute for function
 					MethodAttribute[] methodAttrs = (MethodAttribute[])System.Attribute.GetCustomAttributes(method, typeof(MethodAttribute)); // get attributes for method
 
-					string Name;
+					string name = method.Name;
 					bool isMethod = false, staticOnly = false;
 					if (methodAttrs.Length > 0)
 					{
-						Name = methodAttrs[0].Name;
+						if (methodAttrs[0].Name.Length > 0)
+							name = methodAttrs[0].Name;
+
 						isMethod = true;
 						staticOnly = methodAttrs[0].StaticOnly;
 					}
 					else if (functionAttr != null)
-						Name = functionAttr.Name;
+					{
+						if (functionAttr.Name.Length > 0)
+							name = functionAttr.Name;
+					}
 					else
 						continue; // skip method, it does not have either attribute   
 
@@ -146,12 +151,12 @@ namespace CowSpeak
 
 					var returnType = Type.GetType(method.ReturnType, false);
 					if (returnType == null)
-						returnType = Type.Any;
+						returnType = Type.Object;
 
-					if (functions.ContainsKey(Name))
-						throw new ModuleException("A function by the name of '" + Name + "' has already been defined in this module");
+					if (functions.ContainsKey(name))
+						throw new ModuleException("A function by the name of '" + name + "' has already been defined in this module");
 
-					functions.Add(Name, new StaticFunction(Name, method, returnType, parameters.ToArray(), isMethod, staticOnly));
+					functions.Add(name, new StaticFunction(name, method, returnType, parameters.ToArray(), isMethod, staticOnly));
 					if (methodAttrs.Length > 1)
 					{
 						// Add the function again but with the additional MethodAttribute's name(s)

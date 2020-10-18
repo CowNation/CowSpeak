@@ -153,10 +153,12 @@ namespace CowSpeak
 						else if (Lines[i][0].type == TokenType.LoopConditional)
 						{
 							string usage = Lines[i][0].identifier;
-							Any[] loopParams = StaticFunction.ParseParameters(usage.Substring(usage.IndexOf("("), usage.LastIndexOf(")") - usage.IndexOf("(") + 1));
+							Any[] loopParams = FunctionBase.ParseParameters(usage.Substring(usage.IndexOf("("), usage.LastIndexOf(")") - usage.IndexOf("(") + 1));
 
-							StaticFunction Loop = new StaticFunction("Loop", null, Type.Void, new Parameter[]{ new Parameter(Type.String, "IndexVariableName"), new Parameter(Type.Integer, "StartAt"), new Parameter(Type.Integer, "EndAt") });
-							Loop.CheckParameters(loopParams.ToList()); // throws errors if given parameters are bad
+							// throws errors if given parameters are bad
+							FunctionBase.CheckParameters("Loop", 
+								new Parameter[] { new Parameter(Type.String, "indexVariableName"), new Parameter(Type.Integer, "start"), new Parameter(Type.Integer, "exclusiveEnd") }, 
+								loopParams.ToList());
 
 							Modules.Main.Loop(ContainedLines, i, CurrentLineOffset, isNestedInFunction, loopParams[0].Value.ToString(), (int)loopParams[1].Value, (int)loopParams[2].Value);
 						}
@@ -181,21 +183,24 @@ namespace CowSpeak
 
 				Any retVal = Lines[i].Exec(); // Execute line
 
-				if (Lines[i].Count >= 3 && Lines[i][1].type == TokenType.VariableIdentifier && Lines[i][2].type == TokenType.EqualOperator && !Conversion.IsCompatible(Interpreter.Vars[Lines[i][1].identifier].Type, retVal.Type))
-					throw new ConversionException("Cannot set '" + Lines[i][1].identifier + "', type '" + Interpreter.Vars[Lines[i][1].identifier].Type.Name + "' is incompatible with type '" + retVal.Type.Name + "'"); // check if types are compatible
-				else if (Lines[i].Count >= 2 && Lines[i][0].type == TokenType.VariableIdentifier && Lines[i][1].type == TokenType.EqualOperator && !Conversion.IsCompatible(Interpreter.Vars[Lines[i][0].identifier].Type, retVal.Type))
-					throw new ConversionException("Cannot set '" + Lines[i][0].identifier + "', type '" + Interpreter.Vars[Lines[i][0].identifier].Type.Name + "' is incompatible with type '" + retVal.Type.Name + "'"); // check if types are compatible
+				if (retVal != null)
+				{
+					if (Lines[i].Count >= 3 && Lines[i][1].type == TokenType.VariableIdentifier && Lines[i][2].type == TokenType.EqualOperator && !Conversion.IsCompatible(Interpreter.Vars[Lines[i][1].identifier].Type, retVal.Type))
+						throw new ConversionException("Cannot set '" + Lines[i][1].identifier + "', type '" + Interpreter.Vars[Lines[i][1].identifier].Type.Name + "' is incompatible with type '" + retVal.Type.Name + "'"); // check if types are compatible
+					else if (Lines[i].Count >= 2 && Lines[i][0].type == TokenType.VariableIdentifier && Lines[i][1].type == TokenType.EqualOperator && !Conversion.IsCompatible(Interpreter.Vars[Lines[i][0].identifier].Type, retVal.Type))
+						throw new ConversionException("Cannot set '" + Lines[i][0].identifier + "', type '" + Interpreter.Vars[Lines[i][0].identifier].Type.Name + "' is incompatible with type '" + retVal.Type.Name + "'"); // check if types are compatible
+				}
 
 				if (shouldBeSet)
 				{
-					Interpreter.Vars[Lines[i][1].identifier].Value = retVal.obj;
+					Interpreter.Vars[Lines[i][1].identifier].Value = retVal == null ? null : retVal.obj;
 				}
 				else if (Lines[i].Count >= 2 && Lines[i][0].type == TokenType.VariableIdentifier && Lines[i][1].type == TokenType.EqualOperator)
 				{
 					if (!Interpreter.Vars.ContainsKey(Lines[i][0].identifier))
 						throw new BaseException("Variable '" + Lines[i][0].identifier + "' must be defined before it can be set"); // var not found
 
-					Interpreter.Vars[Lines[i][0].identifier].Value = retVal.obj;
+					Interpreter.Vars[Lines[i][0].identifier].Value = retVal == null ? null : retVal.obj;
 				} // type is not specified, var must already be defined
 			}
 

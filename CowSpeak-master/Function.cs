@@ -132,54 +132,95 @@ namespace CowSpeak
 					parameters.Add(FunctionChain.Evaluate(token.identifier));
 					continue;
 				}
-				else if (token.type == TokenType.String || token.type == TokenType.Character)
+				else if (token.type == TokenType.StringLiteral || token.type == TokenType.CharacterLiteral)
 				{
 					switch (token.type)
 					{
-						case TokenType.String:
+						case TokenType.StringLiteral:
 							vtype = Type.String;
 							break;
-						case TokenType.Character:
+						case TokenType.CharacterLiteral:
 							vtype = Type.Character;
 							break;
 					}
 
 					if (cleanedUp.Length > 2)
-						cleanedUp = cleanedUp.FromBase64(); // convert encoded base64 text given it's not an empty literal
+						cleanedUp = cleanedUp.FromBase64().Replace("\\\"", "\"").Replace("\\'", "\'"); // convert encoded base64 text given it's not an empty literal & do literal conversions (\" -> ") and (\' -> ')
 				}
-				else if (token.type == TokenType.Number)
+				else if (token.type == TokenType.Integer64Literal || token.type == TokenType.IntegerLiteral || token.type == TokenType.DecimalLiteral)
 				{
 					if (Interpreter.Definitions.ContainsKey(cleanedUp))
 						cleanedUp = Interpreter.Definitions[cleanedUp].To;
 
-					if (Utils.IsHexadecimal(cleanedUp))
-						cleanedUp = long.Parse(cleanedUp.Substring(2), NumberStyles.HexNumber).ToString();
-
-					if (token.identifier.IndexOf(".") != -1)
-						vtype = Type.Decimal;
-					else
+					// get the appropriate type for the literal
+					switch (token.type)
 					{
-						long number;
-						if (!long.TryParse(cleanedUp, out number))
-							throw new BaseException("Number literal '" + cleanedUp + "' is out of range for types: integer and integer64");
-
-						if (number <= int.MaxValue && number >= int.MinValue)
+						case TokenType.DecimalLiteral:
+							vtype = Type.Decimal;
+							break;
+						case TokenType.IntegerLiteral:
 							vtype = Type.Integer;
-						else // if it's out of bounds for an integer, it's an integer64
+							if (Utils.IsHexadecimal(cleanedUp))
+								cleanedUp = int.Parse(cleanedUp.Substring(2), NumberStyles.HexNumber).ToString();
+							break;
+						case TokenType.Integer64Literal:
 							vtype = Type.Integer64;
+							if (Utils.IsHexadecimal(cleanedUp))
+								cleanedUp = long.Parse(cleanedUp.Substring(2), NumberStyles.HexNumber).ToString();
+							break;
 					}
 				}
-				else if (token.type == TokenType.Boolean)
+				else if (token.type == TokenType.BooleanLiteral)
 					vtype = Type.Boolean;
 
 				if (vtype == null)
 					throw new BaseException("Unknown type passed as parameter: " + token.type);
 
-				parameters.Add(new Any(vtype, Convert.ChangeType(cleanedUp, vtype.rep)));
+				parameters.Add(new Any(vtype, Convert.ChangeType(cleanedUp, vtype.representation)));
 			}
 
 			return parameters.ToArray();
 		}
+
+		public static void CheckParameters(string name, Parameter[] parameters, List<Any> usedParams)
+		{
+			bool validUsage = parameters.Length == usedParams.Count;
+
+			if (validUsage)
+			{
+				for (int i = 0; i < parameters.Length; i++)
+				{
+					if (!Conversion.IsCompatible(usedParams[i].Type, parameters[i].Type))
+					{
+						validUsage = false;
+						break;
+					}
+				}
+			}
+			else
+			{
+				var usage = name + "(";
+				for (int i = 0; i < parameters.Length; i++)
+				{
+					usage += parameters[i].Type.Name + " " + parameters[i].Name;
+					if (i < parameters.Length - 1)
+						usage += ", ";
+				}
+				usage = usage + ")";
+
+				var givenUsage = name + "(";
+				for (int i = 0; i < usedParams.Count; i++)
+				{
+					givenUsage += usedParams[i].Type.Name;
+					if (i < usedParams.Count - 1)
+						givenUsage += ", ";
+				}
+				givenUsage = givenUsage + ")";
+
+				throw new BaseException("Invalid usage of function: " + givenUsage + "; Correct usage: " + usage);
+			}
+		}
+
 
 		public void CheckParameters(List< Any > usedParams)
 		{

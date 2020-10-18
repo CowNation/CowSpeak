@@ -1,5 +1,5 @@
 
-[![version](https://img.shields.io/badge/version-8.2-blue)](https://github.com/CowNation/CowSpeak/releases/tag/v8.2)
+[![version](https://img.shields.io/badge/version-9-blue)](https://github.com/CowNation/CowSpeak/releases/tag/v8.2)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Run on Repl.it](https://repl.it/badge/github/CowNation/CowSpeak)](https://repl.it/github/CowNation/CowSpeak)
 # CowSpeak
@@ -66,6 +66,8 @@ This project's sole developer is a high school student and this is simply a hobb
 
 [v8 (Added new module system, added byte and ByteArray types, major bug fixes, optimizations, and improvements June 5, 2020)](https://github.com/CowNation/CowSpeak/tree/9bff7b0e3639353d1aa0542564cec3fc9aa7ae06)
 
+[v8.2 (Embedded DynamicExpresso into the solution, rewrote Any class, and made it possible to interface with native C# types from CowSpeak code July 22, 2020)](https://github.com/CowNation/CowSpeak/tree/daa914b517c8ec65287e630f8e1c9f3e29c1decc)
+
 Current Version:
 
-[v8.2 (Embedded DynamicExpresso into the solution, rewrote Any class, and made it possible to interface with native C# types from CowSpeak code July 22, 2020)](https://github.com/CowNation/CowSpeak)
+[v9 (Rewrote lexer to be not dependent on spaces, major optimizations when calling StaticFunctions, bug fixes October 18, 2020)](https://github.com/CowNation/CowSpeak)

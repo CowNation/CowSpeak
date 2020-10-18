@@ -1,4 +1,5 @@
 using CowSpeak.Exceptions;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -6,17 +7,39 @@ namespace CowSpeak
 {
 	public class Type
 	{
-		public string Name; // how the type is referenced in the code
-		public System.Type rep; // C# representation of type
+		// The name that this type will be referred to as
+		public string Name;
 
-		public Type(string Name, System.Type rep)
+		// The C# type representation for this type
+		public System.Type representation;
+
+		// Can the type be initialized as an array
+		public bool CanBeArray;
+
+		public Type()
 		{
-			this.Name = Name;
-			this.rep = rep;
+
 		}
 
-		public static Type Any = new Type(Syntax.Types.Any, typeof(object));
-		public static Type Void = new Type(Syntax.Types.Void, typeof(void));
+		public Type(string name, System.Type representation, bool canBeArray = true)
+		{
+			this.Name = name;
+			this.representation = representation;
+			this.CanBeArray = canBeArray;
+		}
+
+		public Type MakeArrayType()
+		{
+			if (!CanBeArray)
+			{
+				throw new BaseException("The type '" + Name + "' cannot be initialized as an array");
+			}
+			
+			return new Type(char.ToUpper(Name[0]) + Name.Substring(1) + Syntax.Types.ArraySuffix, representation.MakeArrayType());
+		}
+
+		public static Type Object = new Type(Syntax.Types.Object, typeof(object));
+		public static Type Void = new Type(Syntax.Types.Void, typeof(void), false);
 		public static Type Integer = new Type(Syntax.Types.Integer, typeof(int));
 		public static Type Integer64 = new Type(Syntax.Types.Integer64, typeof(long));
 		public static Type Decimal = new Type(Syntax.Types.Decimal, typeof(double));
@@ -25,14 +48,15 @@ namespace CowSpeak
 		public static Type Character = new Type(Syntax.Types.Character, typeof(char));
 		public static Type Byte = new Type(Syntax.Types.Byte, typeof(byte));
 
-		public static Type AnyArray = new Type(Syntax.Types.c_Any + Syntax.Types.ArraySuffix, typeof(object[]));
-		public static Type IntegerArray = new Type(Syntax.Types.c_Integer + Syntax.Types.ArraySuffix, typeof(int[]));
-		public static Type DecimalArray = new Type(Syntax.Types.c_Decimal + Syntax.Types.ArraySuffix, typeof(double[]));
-		public static Type StringArray = new Type(Syntax.Types.c_String + Syntax.Types.ArraySuffix, typeof(string[]));
-		public static Type BooleanArray = new Type(Syntax.Types.c_Boolean + Syntax.Types.ArraySuffix, typeof(bool[]));
-		public static Type CharacterArray = new Type(Syntax.Types.c_Character + Syntax.Types.ArraySuffix, typeof(char[]));
-		public static Type ByteArray = new Type(Syntax.Types.c_Byte + Syntax.Types.ArraySuffix, typeof(byte[]));
-
+		public static Type ObjectArray = Object.MakeArrayType();
+		public static Type IntegerArray = Integer.MakeArrayType();
+		public static Type Integer64Array = Integer64.MakeArrayType();
+		public static Type DecimalArray = Decimal.MakeArrayType();
+		public static Type StringArray = String.MakeArrayType();
+		public static Type BooleanArray = Boolean.MakeArrayType();
+		public static Type CharacterArray = Character.MakeArrayType();
+		public static Type ByteArray = Byte.MakeArrayType();
+		
 		public static readonly Type[] Types = typeof(Type)
 					.GetFields(BindingFlags.Public | BindingFlags.Static)
 					.Where(member => member.FieldType == typeof(Type))
@@ -43,7 +67,7 @@ namespace CowSpeak
 		{
 			foreach (Type type in Types)
 			{
-				if (type.rep == rep)
+				if (type.representation == rep)
 					return type;
 			}
 			

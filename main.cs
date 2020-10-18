@@ -47,10 +47,6 @@ class Shell
 	{
 		PrintFunctions();
 
-		//new CowSpeak.Module(typeof(CowSpeak.Modules.Main)).GenerateMdDocumentation("Main.md");
-		//new CowSpeak.Module(typeof(CowSpeak.Modules.Windows)).GenerateMdDocumentation("Windows.md");
-		//new CowSpeak.Module(typeof(CowSpeak.Modules.ShorterTypeNames)).GenerateMdDocumentation("ShorterTypeNames.md");
-
 		Console.WriteLine("Welcome to the CowSpeak(TM) shell!\nIn order to exit the shell, call the Exit() function");
 
 		List<string> lines = null;
