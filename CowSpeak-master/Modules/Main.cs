@@ -1,4 +1,4 @@
-﻿using CowSpeak.Exceptions;
+using CowSpeak.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -28,17 +28,24 @@ namespace CowSpeak.Modules
 			if (obj.GetType().IsArray)
 			{
 				string ret = "{";
-				Array Items = (Array)obj;
+				Array items = (Array)obj;
 
-				//bool stringArray = obj.GetType().GetElementType() == typeof(string);
-
-				foreach (object Item in Items)
+				foreach (object item in items)
 				{
-					bool isString = Item.GetType() == typeof(string);
-					ret += (isString ? "\"" : "") + (Item != null ? Item.ToString() : "") + (isString ? "\"" : "") + ", ";
+					bool isString = item.GetType() == typeof(string);
+					bool isChar = item.GetType() == typeof(char);
+
+					string itemStr = (item != null ? item.ToString() : "");
+
+					if (isString)
+						itemStr = "\"" + itemStr + "\"";
+					if (isChar)
+						itemStr = "\'" + itemStr + "\'";
+
+					ret += itemStr + ", ";
 				}
 
-				if (Items.Length > 0)
+				if (items.Length > 0)
 					ret = ret.Substring(0, ret.LastIndexOf(", "));
 
 				ret += "}";
@@ -215,7 +222,7 @@ namespace CowSpeak.Modules
 		[Method(Syntax.Types.c_Integer + Syntax.Types.ArraySuffix + ".Create", true)]
 		[Method(Syntax.Types.c_String + Syntax.Types.ArraySuffix + ".Create", true)]
 		[Method(Syntax.Types.c_Byte + Syntax.Types.ArraySuffix + ".Create", true)]
-		public static Array CreateArray(Type type, int length, params object[] values)
+		public static Array CreateArray(Type type, int length)
 		{
 			return Array.CreateInstance(type.representation.GetElementType(), length);
 		}
