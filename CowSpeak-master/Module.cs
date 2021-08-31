@@ -14,7 +14,13 @@ namespace CowSpeak
 	{
 		public string Name;
 
-		public ModuleAttribute(string Name) => this.Name = Name;
+		public ModuleAttribute(string name) => this.Name = name;
+
+		[AttributeUsage(AttributeTargets.Class)]
+		public class AutoImportAttribute : System.Attribute
+		{
+
+		}
 	}
 
 	public class Module
@@ -23,10 +29,12 @@ namespace CowSpeak
 
 		public Module(System.Type container) => this.container = container;
 
+		public string Name => container.Name;
+
 		public void GenerateMdDocumentation(string filepath)
 		{
 			var functions = DefinedFunctions.Values.ToList();
-			functions.Sort(delegate(FunctionBase one, FunctionBase two)
+			functions.Sort(delegate(BaseFunction one, BaseFunction two)
 			{
 				return one.Name.CompareTo(two.Name);
 			}); // sort alphabetically
@@ -151,7 +159,7 @@ namespace CowSpeak
 
 					var returnType = Type.GetType(method.ReturnType, false);
 					if (returnType == null)
-						returnType = Type.Object;
+						returnType = Types.Object;
 
 					if (functions.ContainsKey(name))
 						throw new ModuleException("A function by the name of '" + name + "' has already been defined in this module");

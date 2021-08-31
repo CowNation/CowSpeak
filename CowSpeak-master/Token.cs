@@ -21,8 +21,13 @@ namespace CowSpeak
 		BitwiseANDOperator,
 		BitwiseOROperator,
 
+		// like a FunctionCall, but it defines the parameters and their types for user-defined functions
+		FunctionSignature,
+
 		FunctionCall,
 		FunctionChain,
+
+		FastStruct,
 
 		VariableIdentifier,
 		TypeIdentifier,

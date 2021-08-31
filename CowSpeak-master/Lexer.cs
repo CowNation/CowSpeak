@@ -130,9 +130,11 @@ namespace CowSpeak
 				}
 				else if (FunctionChain.IsChain(token))
 					return new Token(TokenType.FunctionChain, token, index);
-				else if (FunctionBase.IsFunctionCall(token))
+				else if (BaseFunction.IsFunctionCall(token))
 					return new Token(TokenType.FunctionCall, token, index);
-				else if (Utils.IsValidObjectName(token))
+				else if (FastStruct.IsFastStruct(token))
+					return new Token(TokenType.FastStruct, token, index);
+				else if (Utils.IsValidObjectName(token) || FastStruct.IsValidMemberAccessor(token))
 					return new Token(TokenType.VariableIdentifier, token, index);
 			}
 
@@ -161,18 +163,34 @@ namespace CowSpeak
 				if ((Utils.IsValidFunctionName(currentIdentifier) || (currentIdentifier.EndsWith(".") && Utils.IsValidObjectName(currentIdentifier.Substring(0, currentIdentifier.Length - 1)))) && line[i] == '(')
 				{
 					// this is the start of a function, we must handle this differently or it will be parsed into several different tokens
-					int closingParenthesis = Utils.GetInitialClosingParenthesis(line.Substring(i));
+					int closingParenthesis = Utils.GetClosingParenthesis(line.Substring(i));
 					if (closingParenthesis == -1)
-					{
 						throw new BaseException("Function is missing a closing parenthesis");
-					}
-					else
-					{
-						// skip to the closingParenthesis, it will be handled below
-						int closingParenthesisIndex = i + closingParenthesis;
-						currentIdentifier += line.Substring(i, closingParenthesisIndex - i);
-						i = closingParenthesisIndex;
-					}
+
+					// skip to the closing parenthesis, it will be handled below
+					int closingParenthesisIndex = i + closingParenthesis;
+					currentIdentifier += line.Substring(i, closingParenthesisIndex - i);
+					i = closingParenthesisIndex;
+				}
+
+				if (Utils.IsValidObjectName(currentIdentifier) && line[i] == '<')
+				{
+					// this is the start of a FastStruct, we must handle this differently or it will be parsed into several different tokens
+					int closingBracket = Utils.GetClosingBracket(line.Substring(i));
+					if (closingBracket == -1)
+						throw new BaseException("FastStruct definition is missing a closing bracket");
+
+					// skip to the closing bracket, it will be handled below
+					int closingBracketIndex = i + closingBracket;
+					currentIdentifier += line.Substring(i, closingBracketIndex - i);
+					i = closingBracketIndex;
+				}
+
+				// this prevents from periods splitting up identifier when calling static type methods (EX: IntegerArray.Create(0))
+				if (Type.GetType(currentIdentifier, false) != null && line[i] == '.')
+                {
+					currentIdentifier += line[i];
+					continue;
 				}
 
 				if (currentIdentifier == "")
@@ -249,13 +267,25 @@ namespace CowSpeak
 				tokens.Add(currentToken);
 			}
 
+			for (int i = 0; i < tokens.Count; i++)
+			{
+				if (i + 1 < tokens.Count && tokens[i].type == TokenType.VariableIdentifier && tokens[i + 1].type == TokenType.VariableIdentifier)
+				{
+					// this token is a concated version of this token and the one after
+					var concated = new Token(TokenType.VariableIdentifier, tokens[i].identifier + "." + tokens[i + 1].identifier);
+
+					tokens.RemoveRange(i, 2);
+					tokens.Insert(i, concated);
+				}
+			}
+
 			// now we must link consecutive FunctionCall tokens, and VariableIdentifier and consecutive FunctionCall tokens together to form FunctionChains
 			int chainStart = -1;
 			for (int i = 0; i < tokens.Count; i++)
 			{
 				if (chainStart == -1)
 				{
-					if (tokens[i].type == TokenType.VariableIdentifier || tokens[i].type == TokenType.FunctionCall)
+					if (tokens[i].type == TokenType.TypeIdentifier || tokens[i].type == TokenType.VariableIdentifier || tokens[i].type == TokenType.FunctionCall)
 						chainStart = i;
 				}
 				else if (tokens[i].type != TokenType.FunctionCall)
@@ -264,6 +294,11 @@ namespace CowSpeak
 					{
 						// chain is longer than 1 token long
 						var chainTokens = tokens.GetRange(chainStart, i - chainStart);
+
+						// this prevents user defined functions from being put into a singular FunctionCall token (for example, this prevents two tokens: integer foo() from becoming integer.foo())
+						if (chainTokens.Count >= 2 && chainTokens[0].type == TokenType.TypeIdentifier && chainTokens[1].type == TokenType.FunctionCall && !Interpreter.Functions.FunctionExists(chainTokens[0].identifier + chainTokens[1].identifier))
+							break;
+
 						tokens.RemoveRange(chainStart, i - chainStart);
 
 						string identifier = "";
@@ -273,7 +308,7 @@ namespace CowSpeak
 						}
 						identifier = identifier.Remove(identifier.Length - 1);
 
-						if (chainTokens.Count == 2 && chainTokens[0].type == TokenType.VariableIdentifier)
+						if (chainTokens.Count == 2 && (chainTokens[0].type == TokenType.VariableIdentifier || chainTokens[0].type == TokenType.TypeIdentifier))
 						{
 							// it's just a method (EX: myVar.ToString())
 							tokens.Insert(chainStart, new Token(TokenType.FunctionCall, identifier, chainTokens[0].Index));
@@ -291,6 +326,11 @@ namespace CowSpeak
 				else if (i == tokens.Count - 1)
 				{
 					var chainTokens = tokens.GetRange(chainStart, i - chainStart + 1);
+
+					// this prevents user defined functions from being put into a singular FunctionCall token (for example, this prevents two tokens: integer foo() from becoming integer.foo())
+					if (chainTokens.Count >= 2 && chainTokens[0].type == TokenType.TypeIdentifier && chainTokens[1].type == TokenType.FunctionCall && !Interpreter.Functions.FunctionExists(chainTokens[0].identifier + chainTokens[1].identifier))
+						break;
+
 					tokens.RemoveRange(chainStart, i - chainStart + 1);
 
 					string identifier = "";
@@ -300,9 +340,9 @@ namespace CowSpeak
 					}
 					identifier = identifier.Remove(identifier.Length - 1);
 
-					if (chainTokens.Count == 2 && chainTokens[0].type == TokenType.VariableIdentifier)
+					if (chainTokens.Count == 2 && (chainTokens[0].type == TokenType.VariableIdentifier || chainTokens[0].type == TokenType.TypeIdentifier))
 					{
-						// it's just a method (EX: myVar.ToString())
+						// it's just a method (EX: myVar.ToString() or myType.ToString())
 						tokens.Insert(chainStart, new Token(TokenType.FunctionCall, identifier, chainTokens[0].Index));
 					}
 					else
@@ -316,10 +356,33 @@ namespace CowSpeak
 
 			if (@throw && tokens.Count > 1)
 			{
+				// NO? We can't check if a type is valid or not because types can be created at runtime
 				if (tokens[0].type == TokenType.VariableIdentifier && tokens[1].type == TokenType.VariableIdentifier)
 					throw new BaseException("Unknown type: " + tokens[0].identifier);
 				if (tokens[0].type == TokenType.TypeIdentifier && tokens[1].type == TokenType.TypeIdentifier)
 					throw new BaseException("Cannot define a variable with the same name as an existing type");
+			}
+
+			if (@throw)
+			{
+				for (int i = 0; i < tokens.Count; i++)
+				{
+					if (tokens[i].type == TokenType.TypeIdentifier)
+					{
+						if (i + 1 < tokens.Count)
+						{
+							var nextToken = tokens[i + 1];
+							if (nextToken.type != TokenType.FunctionCall && nextToken.type != TokenType.FunctionCall && nextToken.type != TokenType.VariableIdentifier)
+							{
+								throw new BaseException("Unexpected token preceding a TypeIdentifier: '" + nextToken.type.ToString() + "'");
+							}
+						}
+						else
+						{
+							throw new BaseException("Expected a token preceding a TypeIdentifier");
+						}
+					}
+				}
 			}
 
 			return tokens;
@@ -379,20 +442,30 @@ namespace CowSpeak
 				} // no need to parse or evaluate empty line
 
 				lines.Add(new Line(ParseLine(safeLine)));
-				Line RecentLine = lines[lines.Count - 1];
+				Line currentLine = lines[lines.Count - 1];
 
-				if (!isNestedInFunction && Interpreter.Debug && RecentLine.Count > 0)
+				if (!isNestedInFunction && Interpreter.Debug && currentLine.Count > 0)
 				{
 					Console.WriteLine("\n(" + Interpreter.CurrentFile + ") Line " + (i + 1) + ": ");
-					foreach (var token in RecentLine)
-						Console.WriteLine(token.type.ToString() + " - " + token.identifier.Replace("\n", @"\n").Replace(((char)0x1D).ToString(), " "));
+					foreach (var token in currentLine)
+						Console.WriteLine(token.type.ToString() + " - " + token.identifier.Replace("\n", @"\n"));
 				}
 
-				if (Interpreter.Functions.FunctionExists("Define(") && RecentLine.Count > 0 && RecentLine[0].type == TokenType.FunctionCall && RecentLine[0].identifier.IndexOf("Define(") == 0)
+				// We must handle Define function usages and FastStruct definitions before execution to avoid bad lexing errors
+				if (Interpreter.Functions.FunctionExists("Define(") && currentLine.Count > 0 && currentLine[0].type == TokenType.FunctionCall && currentLine[0].identifier.IndexOf("Define(") == 0)
 				{
-					Interpreter.Functions["Define("].Invoke(RecentLine[0].identifier);
+					Interpreter.Functions["Define("].Invoke(currentLine[0].identifier);
 					lines[lines.Count - 1] = new Line(new List<Token>()); // line was already handled, clear line
-				} // must handle this function before the other lines are compiled to avoid errors
+				}
+				else if (currentLine.Count == 1 && currentLine[0].type == TokenType.FastStruct)
+				{
+					var @struct = lines[i][0].identifier;
+					string name = @struct.Substring(0, @struct.IndexOf("<"));
+					@struct = @struct.Substring(@struct.IndexOf("<"));
+
+					Interpreter.Structs.Create(new FastStruct(name, FastStruct.ParseDefinitionParams(@struct)));
+					lines[lines.Count - 1] = new Line(new List<Token>()); // line was already handled, clear line
+				}
 			}
 
 			sw.Stop();

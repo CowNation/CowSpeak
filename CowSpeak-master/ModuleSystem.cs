@@ -50,6 +50,10 @@ namespace CowSpeak
 			if (moduleAttribute == null)
 				throw new ModuleException("Cannot import module, container class is missing ModuleAttribute");
 
+			// under the hood, a static class is simply sealed and abstract. we can only import static module types
+			if (!container.IsStatic())
+				throw new ModuleException("Cannot import module, container class isn't static");
+
 			if (LoadedModules.ContainsKey(moduleAttribute.Name))
 				throw new ModuleException("Module '" + moduleAttribute.Name + "' has already been imported");
 
@@ -112,7 +116,15 @@ namespace CowSpeak
 
 		private void ImportStandardModules()
 		{
-			Import(typeof(Modules.Main)); // these should work on all platforms
+			// an array of all classes in the assembly with the ModuleAttribute and the ModuleAttribute.AutoImportAttribute
+			var standardModules = typeof(Modules.Main).Assembly.GetTypes().Where(x => x.IsStatic() &&
+				x.GetCustomAttributes(typeof(ModuleAttribute), false).Length > 0 &&
+				x.GetCustomAttributes(typeof(ModuleAttribute.AutoImportAttribute), false).Length > 0).ToArray();
+
+			// usually this will import the necessary modules like main, the method modules, ect
+			foreach (var module in standardModules)
+				Import(module);
+
 			if (OSSpecificModules)
 			{
 				if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -120,7 +132,6 @@ namespace CowSpeak
 				else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 					Import(typeof(Modules.Linux));
 			}
-			Import(typeof(Modules.ShorterTypeNames));
 		}
 	}
 }

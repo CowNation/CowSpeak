@@ -49,6 +49,14 @@ class Shell
 
 		Console.WriteLine("Welcome to the CowSpeak(TM) shell!\nIn order to exit the shell, call the Exit() function");
 
+		Interpreter.Execute(new string[]
+		{
+			 ""
+		});
+
+		foreach (var module in Interpreter.ModuleSystem.LoadedModules.Values)
+			module.GenerateMdDocumentation("CowSpeak-master/Modules/" + module.Name + ".md");
+		
 		List<string> lines = null;
 		while (true)
 		{

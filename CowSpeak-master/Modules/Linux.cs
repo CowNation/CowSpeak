@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace CowSpeak.Modules
 {
     [Module("Linux")]
-    public class Linux
+    public static class Linux
     {
     }
 }

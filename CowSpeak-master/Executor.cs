@@ -1,4 +1,5 @@
 using CowSpeak.Exceptions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -41,84 +42,83 @@ namespace CowSpeak
 			throw new BaseException("StartBracket is missing an EndBracket");
 		}
 
-		public static Any Execute(List< Line > Lines, int CurrentLineOffset = 0, bool isNestedInFunction = false, bool isNestedInConditional = false)
+		public static Any Execute(List< Line > lines, int currentLineOffset = 0, bool nestedInFunction = false, bool nestedInConditional = false)
 		{
-			for (int i = 0; i < Lines.Count; i++)
+			for (int i = 0; i < lines.Count; i++)
 			{
-				Interpreter.CurrentLine = i + 1 + CurrentLineOffset;
+				Interpreter.CurrentLine = i + 1 + currentLineOffset;
 
-				if (Lines[i].FirstOrDefault() != null && Lines[i].FirstOrDefault().type == TokenType.ReturnStatement)
+				// if this line starts with a ReturnStatement
+				if (lines[i].FirstOrDefault() != null && lines[i].FirstOrDefault().type == TokenType.ReturnStatement)
 				{
-					if (isNestedInFunction)
+					if (nestedInFunction)
 					{
-						if (Lines[i].Count < 2)
+						// no value is returned
+						if (lines[i].Count < 2)
 							return null;
 
-						return new Line(new List<Token>{Lines[i][1]}).Exec();
+						return new Line(new List<Token>{ lines[i][1] }).Execute();
 					}
 					else
 						throw new BaseException("ReturnStatement must be located inside of a FunctionDefinition");
 				}
 
-				if (Lines[i].HasFunctionDefinition || Lines[i].HasConditional)
+				if (lines[i].IsFunctionDefinition || lines[i].IsConditional)
 				{
-					int ItemIndex = -1; // index of the token that the definition/conditional appears at
-					if (Lines[i].HasFunctionDefinition)
-						ItemIndex = 1;
+					int itemIndex; // index of the token that the definition/conditional appears at
+					if (lines[i].IsFunctionDefinition)
+						itemIndex = 1;
 					else
-						ItemIndex = 0;
+						itemIndex = 0;
 
-					bool NextLineExists = Lines.IsIndexValid(i + 1);
-					bool HasPrecedingBracket = Lines[i].IsIndexValid(ItemIndex + 1) && Lines[i][ItemIndex + 1].type == TokenType.StartBracket;
-					bool NextLineHasBracket = NextLineExists && Lines[i + 1].FirstOrDefault() != null && Lines[i + 1].FirstOrDefault().type == TokenType.StartBracket;
-					if (!HasPrecedingBracket && !NextLineHasBracket)
+					bool nextLineExists = lines.IsIndexValid(i + 1);
+					bool hasPrecedingBracket = lines[i].IsIndexValid(itemIndex + 1) && lines[i][itemIndex + 1].type == TokenType.StartBracket;
+					bool nextLineHasBracket = nextLineExists && lines[i + 1].FirstOrDefault() != null && lines[i + 1].FirstOrDefault().type == TokenType.StartBracket;
+					if (!hasPrecedingBracket && !nextLineHasBracket)
 						throw new BaseException("FunctionDefinition or Conditional is missing a preceding StartBracket");
 
-					TokenLocation StartBracket = new TokenLocation(i, ItemIndex + 1); // index of the line that the StartBracket appears at
-					if (NextLineHasBracket)
-						StartBracket = new TokenLocation(i + 1, 0);
+					TokenLocation startBracket = new TokenLocation(i, itemIndex + 1); // index of the line that the StartBracket appears at
+					if (nextLineHasBracket)
+						startBracket = new TokenLocation(i + 1, 0);
 
-					TokenLocation EndingBracket = GetClosingBracket(Lines, i);
+					TokenLocation endingBracket = GetClosingBracket(lines, i);
 
-					if (Lines[i].HasFunctionDefinition)
+					if (lines[i].IsFunctionDefinition)
 					{
-						if (isNestedInFunction || isNestedInConditional)
+						if (nestedInFunction || nestedInConditional)
 							throw new BaseException("Function cannot be defined inside of a function or conditional");
 
-						string usage = Lines[i][1].identifier.Replace(((char)0x1D).ToString(), " ");
-
-						usage = usage.Substring(0, usage.Length - 1); // remove )
+						string usage = lines[i][1].identifier;
 						string dName = usage.Substring(0, usage.IndexOf("(")); // text before first '('
 
-						var DefinitionLines = Utils.GetContainedLines(Lines, EndingBracket, StartBracket);
-						Interpreter.Functions.Create(new UserFunction(dName, DefinitionLines, UserFunction.ParseDefinitionParams(usage.Substring(usage.IndexOf("("))), Type.GetType(Lines[i][0].identifier), Lines[i][0].identifier + " " + usage + ")", i));
+						var definitionLines = Utils.GetContainedLines(lines, endingBracket, startBracket);
+						Interpreter.Functions.Create(new UserFunction(dName, definitionLines, UserFunction.ParseDefinitionParams(usage.Substring(usage.IndexOf("("))), Type.GetType(lines[i][0].identifier), lines[i][0].identifier + " " + usage + ")", i));
 					}
-					else if (Lines[i].HasConditional)
+					else if (lines[i].IsConditional)
 					{
-						List< Line > ContainedLines = Utils.GetContainedLines(Lines, EndingBracket, StartBracket);
+						var containedLines = Utils.GetContainedLines(lines, endingBracket, startBracket);
 
-						if (Lines[i][0].type == TokenType.IfConditional)
+						if (lines[i][0].type == TokenType.IfConditional)
 						{
-
-							if (new Conditional(Lines[i][0].identifier).EvaluateExpression())
+							if (new Conditional(lines[i][0].identifier).EvaluateExpression())
 							{
 								Scope scope = new Scope();
 
-								Execute(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
+								Execute(containedLines, i + 1 + currentLineOffset, nestedInFunction, true);
 
 								scope.End();
 							}
 						}
-						else if (Lines[i][0].type == TokenType.ElseConditional)
+						else if (lines[i][0].type == TokenType.ElseConditional)
 						{
 							int parentIf = -1;
 
-							if (i == 0 || (Lines[i - 1].Count > 0 && Lines[i - 1][0].type != TokenType.EndBracket))
+							if (i == 0 || (lines[i - 1].Count > 0 && lines[i - 1][0].type != TokenType.EndBracket))
 								throw new BaseException("ElseConditional must immediately precede an EndBracket");
 
 							for (int j = 0; j < i; j++)
 							{
-								if (Lines[j].Count > 0 && Lines[j][0].type == TokenType.IfConditional && GetClosingBracket(Lines, j).LineIndex == i - 1)
+								if (lines[j].Count > 0 && lines[j][0].type == TokenType.IfConditional && GetClosingBracket(lines, j).LineIndex == i - 1)
 								{
 									parentIf = j;
 									break;
@@ -126,81 +126,101 @@ namespace CowSpeak
 							}
 
 							if (parentIf == -1)
-								throw new BaseException("ElseConditional isn't immediately preceding an EndBracket");
+								throw new BaseException("ElseConditional must immediately precede an EndBracket");
 
-							if (!new Conditional(Lines[parentIf][0].identifier).EvaluateExpression())
+							if (!new Conditional(lines[parentIf][0].identifier).EvaluateExpression())
 							{
 								Scope scope = new Scope();
 
-								Execute(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
+								Execute(containedLines, i + 1 + currentLineOffset, nestedInFunction, true);
 
 								scope.End();
 							}
 						}
-						else if (Lines[i][0].type == TokenType.WhileConditional)
+						else if (lines[i][0].type == TokenType.WhileConditional)
 						{
-							Conditional whileStatement = new Conditional(Lines[i][0].identifier);
+							Conditional whileStatement = new Conditional(lines[i][0].identifier);
 							
 							while (whileStatement.EvaluateExpression())
 							{
 								Scope scope = new Scope();
 
-								Execute(ContainedLines, i + 1 + CurrentLineOffset, isNestedInFunction, true);
+								Execute(containedLines, i + 1 + currentLineOffset, nestedInFunction, true);
 
 								scope.End();
 							}
 						}
-						else if (Lines[i][0].type == TokenType.LoopConditional)
+						else if (lines[i][0].type == TokenType.LoopConditional)
 						{
-							string usage = Lines[i][0].identifier;
-							Any[] loopParams = FunctionBase.ParseParameters(usage.Substring(usage.IndexOf("("), usage.LastIndexOf(")") - usage.IndexOf("(") + 1));
+							string usage = lines[i][0].identifier;
+							Any[] loopParams = BaseFunction.ParseParameters(usage.Substring(usage.IndexOf("("), usage.LastIndexOf(")") - usage.IndexOf("(") + 1));
 
 							// throws errors if given parameters are bad
-							FunctionBase.CheckParameters("Loop", 
-								new Parameter[] { new Parameter(Type.String, "indexVariableName"), new Parameter(Type.Integer, "start"), new Parameter(Type.Integer, "exclusiveEnd") }, 
+							BaseFunction.CheckParameters("Loop", 
+								new Parameter[] { new Parameter(Types.String, "indexVariableName"), new Parameter(Types.Integer, "start"), new Parameter(Types.Integer, "exclusiveEnd") }, 
 								loopParams.ToList());
 
-							Modules.Main.Loop(ContainedLines, i, CurrentLineOffset, isNestedInFunction, loopParams[0].Value.ToString(), (int)loopParams[1].Value, (int)loopParams[2].Value);
+							Modules.Main.Loop(containedLines, i, currentLineOffset, nestedInFunction, loopParams[0].Value.ToString(), (int)loopParams[1].Value, (int)loopParams[2].Value);
 						}
 					}
 
 					// skip to after the end of definition
-					i = EndingBracket.LineIndex;
+					i = endingBracket.LineIndex;
 					continue;
 				}
 
-				if (i >= Lines.Count)
+				if (i >= lines.Count)
 					break;
 
 				bool shouldBeSet = false; // topmost variable in list should be set after exec
-				if (Lines[i].Count >= 2 && Lines[i][0].type == TokenType.TypeIdentifier && Lines[i][1].type == TokenType.VariableIdentifier)
+				if (lines[i].Count >= 2 && lines[i][0].type == TokenType.TypeIdentifier && lines[i][1].type == TokenType.VariableIdentifier)
 				{
-					Interpreter.Vars.Create(new Variable(Type.GetType(Lines[i][0].identifier), Lines[i][1].identifier));
+					var varType = Type.GetType(lines[i][0].identifier);
+					var varName = lines[i][1].identifier;
 
-					if (Lines[i].Count >= 3 && Lines[i][2].type == TokenType.EqualOperator)
+					// initializing a variable whose type is a FastStruct
+					if (varType is FastStruct)
+                    {
+						// check if a variable exists with the same name
+						if (Interpreter.Vars.ContainsKey(varName))
+							throw new BaseException("Variable '" + varName + "' has already been defined");
+
+						List<Variable> memberInstances = new List<Variable>();
+						foreach (var member in ((FastStruct)varType).Members)
+                        {
+							var memberVariable = new Variable(member.Value.Type, varName + "." + member.Key);
+							Interpreter.Vars.Add(memberVariable.Name, memberVariable);
+							memberInstances.Add(Interpreter.Vars[memberVariable.Name]);
+						}
+						Interpreter.Vars.Create(new Variable(varType, varName, memberInstances));
+					}
+					else
+						Interpreter.Vars.Create(new Variable(varType, varName));
+
+					if (lines[i].Count >= 3 && lines[i][2].type == TokenType.EqualOperator)
 						shouldBeSet = true;
 				} // variable must be created before exec is called so that it may be accessed
 
-				Any retVal = Lines[i].Exec(); // Execute line
+				Any retVal = lines[i].Execute(); // Execute line
 
 				if (retVal != null)
 				{
-					if (Lines[i].Count >= 3 && Lines[i][1].type == TokenType.VariableIdentifier && Lines[i][2].type == TokenType.EqualOperator && !Conversion.IsCompatible(Interpreter.Vars[Lines[i][1].identifier].Type, retVal.Type))
-						throw new ConversionException("Cannot set '" + Lines[i][1].identifier + "', type '" + Interpreter.Vars[Lines[i][1].identifier].Type.Name + "' is incompatible with type '" + retVal.Type.Name + "'"); // check if types are compatible
-					else if (Lines[i].Count >= 2 && Lines[i][0].type == TokenType.VariableIdentifier && Lines[i][1].type == TokenType.EqualOperator && !Conversion.IsCompatible(Interpreter.Vars[Lines[i][0].identifier].Type, retVal.Type))
-						throw new ConversionException("Cannot set '" + Lines[i][0].identifier + "', type '" + Interpreter.Vars[Lines[i][0].identifier].Type.Name + "' is incompatible with type '" + retVal.Type.Name + "'"); // check if types are compatible
+					if (lines[i].Count >= 3 && lines[i][1].type == TokenType.VariableIdentifier && lines[i][2].type == TokenType.EqualOperator && !Conversion.IsCompatible(Interpreter.Vars[lines[i][1].identifier].Type, retVal.Type))
+						throw new ConversionException("Cannot set '" + lines[i][1].identifier + "', type '" + Interpreter.Vars[lines[i][1].identifier].Type.Name + "' is incompatible with type '" + retVal.Type.Name + "'"); // check if types are compatible
+					else if (lines[i].Count >= 2 && lines[i][0].type == TokenType.VariableIdentifier && lines[i][1].type == TokenType.EqualOperator && !Conversion.IsCompatible(Interpreter.Vars[lines[i][0].identifier].Type, retVal.Type))
+						throw new ConversionException("Cannot set '" + lines[i][0].identifier + "', type '" + Interpreter.Vars[lines[i][0].identifier].Type.Name + "' is incompatible with type '" + retVal.Type.Name + "'"); // check if types are compatible
 				}
 
 				if (shouldBeSet)
 				{
-					Interpreter.Vars[Lines[i][1].identifier].Value = retVal == null ? null : retVal.obj;
+					Interpreter.Vars[lines[i][1].identifier].Value = retVal == null ? null : retVal.obj;
 				}
-				else if (Lines[i].Count >= 2 && Lines[i][0].type == TokenType.VariableIdentifier && Lines[i][1].type == TokenType.EqualOperator)
+				else if (lines[i].Count >= 2 && lines[i][0].type == TokenType.VariableIdentifier && lines[i][1].type == TokenType.EqualOperator)
 				{
-					if (!Interpreter.Vars.ContainsKey(Lines[i][0].identifier))
-						throw new BaseException("Variable '" + Lines[i][0].identifier + "' must be defined before it can be set"); // var not found
+					if (!Interpreter.Vars.ContainsKey(lines[i][0].identifier))
+						throw new BaseException("Variable '" + lines[i][0].identifier + "' must be defined before it can be set"); // var not found
 
-					Interpreter.Vars[Lines[i][0].identifier].Value = retVal == null ? null : retVal.obj;
+					Interpreter.Vars[lines[i][0].identifier].Value = retVal == null ? null : retVal.obj;
 				} // type is not specified, var must already be defined
 			}
 

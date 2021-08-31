@@ -14,8 +14,9 @@ using System.Threading.Tasks;
 
 namespace CowSpeak.Modules
 {
+    [ModuleAttribute.AutoImport]
     [Module("Shorter Type Names")]
-    public class ShorterTypeNames
+    public static class ShorterTypeNames
     {
         // Types
         public static Definition Integer = new Definition

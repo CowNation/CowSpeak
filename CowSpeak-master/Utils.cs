@@ -42,6 +42,8 @@ namespace CowSpeak
 			}
 		}
 
+		public static bool IsStatic(this System.Type type) => type.IsAbstract && type.IsSealed;
+
 		public static string GetTokensExpression(List<Token> tokens, ref Any alreadyEvaluatedValue)
 		{
 			string expression = "";
@@ -67,7 +69,7 @@ namespace CowSpeak
 
 				if (tokens[i].type == TokenType.FunctionCall)
 				{
-					FunctionBase func = Interpreter.Functions[identifier];
+					BaseFunction func = Interpreter.Functions[identifier];
 					Any returned = func.Invoke(identifier);
 					objectType = func.ReturnType;
 
@@ -96,9 +98,9 @@ namespace CowSpeak
 					objectType = FunctionChain.GetType(tokens[i].identifier);
 				}
 
-				if (tokens[i].type == TokenType.StringLiteral || objectType == Type.String)
+				if (tokens[i].type == TokenType.StringLiteral || objectType == Types.String)
 					identifier = "\"" + identifier.Replace("\"", "\\\"") + "\"";
-				else if (tokens[i].type == TokenType.CharacterLiteral || objectType == Type.Character)
+				else if (tokens[i].type == TokenType.CharacterLiteral || objectType == Types.Character)
 					identifier = "\'" + identifier + "\'";
 				
 				expression += identifier + (i < tokens.Count - 1 ? " " : "");
@@ -148,9 +150,18 @@ namespace CowSpeak
 			return query;
 		}
 
-		public static int GetInitialClosingParenthesis(string str)
+		public static int GetClosingParenthesis(string str)
 		{
 			Match match = initialClosingParenthesis.Match(str);
+			if (match == null)
+				return -1;
+
+			return match.Index + match.Length - 1;
+		}
+
+		public static int GetClosingBracket(string str)
+		{
+			Match match = Regex.Match(str, @"<.+?>");
 			if (match == null)
 				return -1;
 
@@ -303,14 +314,6 @@ namespace CowSpeak
 			return _str;
 		} // so you don't have to do it very inefficently with IsIndexBetween on each char
 
-		public static string AddStrings(List< string > toAdd)
-		{
-			string result = "";
-			foreach (string _add in toAdd)
-				result += _add;
-			return result;
-		}
-
 		public static bool IsIndexValid<T>(this ICollection< T > container, int index)
 		{
 			return index >= 0 && index < container.Count && container.Count > 0;
@@ -320,21 +323,21 @@ namespace CowSpeak
 		{
 			// A word char is A-z, 0-9, or a _ ([a-zA-Z0-9_] in Regex)
 			// This function returns whether the entire string is only made of one or more word chars
-			return Regex.Match(s, @"\w+").Value == s;
+			return s.Length > 0 && Regex.Match(s, @"\w+").Value == s;
 		}
 
 		private static Regex validFunctionName = new Regex(@"(\w+\.\w+|\w+)", RegexOptions.Compiled);
 
 		public static bool IsValidFunctionName(string s)
 		{
-			return validFunctionName.Match(s).Value == s;
+			return s.Length > 0 && validFunctionName.Match(s).Value == s;
 		}
 
 		private static Regex isNumber = new Regex(@"(-|\d*?)\d+(\.\d+|\d*?)");
 
-		public static bool IsNumber(string str)
+		public static bool IsNumber(string s)
 		{
-			return isNumber.Match(str).Value == str;
+			return s.Length > 0 && isNumber.Match(s).Value == s;
 		}
 	}
 }

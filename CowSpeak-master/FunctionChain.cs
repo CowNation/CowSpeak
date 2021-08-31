@@ -13,19 +13,19 @@ namespace CowSpeak
 		public static bool IsChain(string token)
 		{
 			var match = isChain.Match(token); // we check if the entire input is a match instead of using IsMatch which simply checks if there is a match
-			return match.Success && match.Index == 0 && match.Length == token.Length && Utils.GetInitialClosingParenthesis(token) != token.Length - 1;
+			return match.Success && match.Index == 0 && match.Length == token.Length && Utils.GetClosingParenthesis(token) != token.Length - 1;
 		}
 
 		public static int GetChildrenCount(string identifier)
 		{
-			int children = 1, j = Utils.GetInitialClosingParenthesis(identifier);
+			int children = 1, j = Utils.GetClosingParenthesis(identifier);
 			while (j != -1 && j < identifier.Length)
 			{
 				children++;
 
 				string a = identifier.Substring(j);
 
-				j += Utils.GetInitialClosingParenthesis(a) + 1;
+				j += Utils.GetClosingParenthesis(a) + 1;
 			}
 			return children;
 		}
@@ -42,10 +42,10 @@ namespace CowSpeak
 			{
 				for (int i = 0; i < functions; i++)
 				{
-					int end = Utils.GetInitialClosingParenthesis(identifier);//identifier.IndexOf(")", i);
+					int end = Utils.GetClosingParenthesis(identifier);//identifier.IndexOf(")", i);
 					string funcIdentifier = identifier.Substring(0, end + 1);
 
-					FunctionBase chainFunc = Interpreter.Functions[funcIdentifier];
+					BaseFunction chainFunc = Interpreter.Functions[funcIdentifier];
 					evaluatedValues.Add(chainFunc.Invoke(funcIdentifier));
 
 					if (evaluatedValues.Last() == null)
@@ -87,7 +87,7 @@ namespace CowSpeak
 			Type lastType = null;
 			while (identifier != "")
 			{
-				int closingParenthesis = Utils.GetInitialClosingParenthesis(identifier);
+				int closingParenthesis = Utils.GetClosingParenthesis(identifier);
 
 				string funcIdentifier = identifier.Substring(0, closingParenthesis + 1);
 

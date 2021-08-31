@@ -1,4 +1,4 @@
-﻿#define NET_FX_4 //If you are using .Net 4.0 or greater, you can un-comment this define
+// #define NET_FX_4 // If you are using .Net 4.0 or greater, you can un-comment this define
 
 using System;
 using System.Linq;

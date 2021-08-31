@@ -3,14 +3,15 @@ using System.Collections.Generic;
 
 namespace CowSpeak
 {
-	public class Functions : Dictionary<string, FunctionBase>
+	public class Functions : Dictionary<string, BaseFunction>
 	{
 		public Functions() : base()
 		{
 
 		}
 
-		private string ParseKey(string key) // parses a potential key so it can be directly used as a key (this[key])
+		// parses a potential key so it can be directly used as a key (this[key])
+		private string ParseKey(string key)
 		{
 			if (key.IndexOf("(") != -1)
 				key = key.Substring(0, key.IndexOf("(")); // reduce the key to the text before the first '('
@@ -23,7 +24,7 @@ namespace CowSpeak
 				{
 					Variable variable = Interpreter.Vars[caller];
 
-					if (variable.Type.representation.IsArray && ContainsKey("Array" + key.Substring(key.IndexOf("."))))
+					if (variable.Type.CSharpType != null && variable.Type.CSharpType.IsArray && ContainsKey("Array" + key.Substring(key.IndexOf("."))))
 						key = "Array" + key.Substring(key.IndexOf("."));
 					else
 						key = variable.Type.Name + key.Substring(key.IndexOf("."));
@@ -54,7 +55,7 @@ namespace CowSpeak
 
 		public bool FunctionExists(string key) => ContainsKey(ParseKey(key));
 
-		public new FunctionBase this[string key]
+		public new BaseFunction this[string key]
 		{
 			get
 			{
@@ -71,7 +72,7 @@ namespace CowSpeak
 			}
 		}
 
-		public FunctionBase Create(FunctionBase function)
+		public BaseFunction Create(BaseFunction function)
 		{
 			if (ContainsKey(function.Name))
 				throw new BaseException("Cannot create function '" + function.Name + "', a function by that name already exists");

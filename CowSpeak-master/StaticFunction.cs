@@ -8,10 +8,10 @@ using FastDelegate.Net;
 
 namespace CowSpeak
 {
-	internal class StaticFunction : FunctionBase
+	internal class StaticFunction : BaseFunction
 	{
 		public MethodInfo Definition;
-		public Func<Object, Object[], Object> BoundDelegate;
+		public Func<object, object[], object> BoundDelegate;
 
 		// The method may only be called statically (only Type.Method and not Instance.Method)
 		public bool StaticOnly;
@@ -94,10 +94,10 @@ namespace CowSpeak
 
 				Type returnedType = null;
 
-				if (ReturnType == Type.Void)
+				if (ReturnType == Types.Void)
 					return null;
 				else if (returnValue == null)
-					returnedType = Type.Object;
+					returnedType = Types.Object;
 				else if (returnValue is Any)
 					return (Any)returnValue;
 				else if (returnValue is Array)
@@ -105,7 +105,7 @@ namespace CowSpeak
 				else if (Type.GetType(returnValue.GetType(), false) != null)
 					returnedType = Type.GetType(returnValue.GetType());
 				else
-					returnedType = Type.Object;
+					returnedType = Types.Object;
 
 				return new Any(returnedType, returnValue);
 			}

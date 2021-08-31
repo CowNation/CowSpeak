@@ -11,7 +11,7 @@ namespace CowSpeak
 
 		}
 
-		public bool HasFunctionDefinition
+		public bool IsFunctionDefinition
 		{
 			get
 			{
@@ -19,7 +19,7 @@ namespace CowSpeak
 			}
 		}
 
-		public bool HasConditional
+		public bool IsConditional
 		{
 			get
 			{
@@ -27,7 +27,7 @@ namespace CowSpeak
 			}
 		}
 
-		public Any Exec()
+		public Any Execute()
 		{
 			List< Token > toEval = GetRange(0, Count); // get a copy
 
@@ -35,12 +35,12 @@ namespace CowSpeak
 			{
 				if (base[i].type == TokenType.FunctionCall)
 				{
-					if (Interpreter.Functions[base[i].identifier].ReturnType == Type.Void)
+					if (Interpreter.Functions[base[i].identifier].ReturnType == Types.Void)
 					{
-						if (GetRange(0, Count).IsIndexValid(i - 1) && Utils.IsOperator(base[i - 1].type))
-							throw new BaseException("Cannot perform operation: '" + base[i - 1].identifier + "' on void function");
-						if (GetRange(0, Count).IsIndexValid(i + 1) && Utils.IsOperator(base[i + 1].type))
-							throw new BaseException("Cannot perform operation: '" + base[i + 1].identifier + "' on void function");
+						if (i - 1 >= 0 && Utils.IsOperator(base[i - 1].type))
+							throw new BaseException("Operator '" + base[i - 1].identifier + "' cannot be performed on a void function");
+						if (i + 1 < Count && Utils.IsOperator(base[i + 1].type))
+							throw new BaseException("Operator '" + base[i + 1].identifier + "' cannot be performed on a void function");
 					}
 				}
 			}
@@ -70,8 +70,11 @@ namespace CowSpeak
 
 			var evaluated = Utils.Eval(expression);
 
+			if (evaluated == null)
+				return null;
+
 			if (evaluated.GetType() == typeof(uint)) // causes exception sometimes
-				return new Any(Type.Integer64, evaluated);
+				return new Any(Types.Integer64, evaluated);
 
 			return new Any(evaluated);
 		}

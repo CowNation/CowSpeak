@@ -11,7 +11,7 @@ namespace CowSpeak
 		public string Name;
 
 		// The C# type representation for this type
-		public System.Type representation;
+		public System.Type CSharpType;
 
 		// Can the type be initialized as an array
 		public bool CanBeArray;
@@ -24,7 +24,7 @@ namespace CowSpeak
 		public Type(string name, System.Type representation, bool canBeArray = true)
 		{
 			this.Name = name;
-			this.representation = representation;
+			this.CSharpType = representation;
 			this.CanBeArray = canBeArray;
 		}
 
@@ -35,9 +35,43 @@ namespace CowSpeak
 				throw new BaseException("The type '" + Name + "' cannot be initialized as an array");
 			}
 			
-			return new Type(char.ToUpper(Name[0]) + Name.Substring(1) + Syntax.Types.ArraySuffix, representation.MakeArrayType());
+			return new Type(char.ToUpper(Name[0]) + Name.Substring(1) + Syntax.Types.ArraySuffix, CSharpType.MakeArrayType());
 		}
 
+		public static Type GetType(System.Type rep, bool @throw = true)
+		{
+			foreach (Type type in Types.All)
+			{
+				if (type.CSharpType == rep)
+					return type;
+			}
+			
+			if (@throw)
+				throw new BaseException("Cannot determine type from representation: " + rep.Name);
+			return null;
+		}
+
+		public static Type GetType(string typeName, bool @throw = true)
+		{
+			if (Interpreter.Definitions.ContainsKey(typeName))
+				typeName = Interpreter.Definitions[typeName].To;
+
+			if (Interpreter.Structs.ContainsKey(typeName))
+				return Interpreter.Structs[typeName];
+
+			foreach (var type in Types.All)
+				if (type.Name == typeName)
+					return type;
+
+			if (@throw)
+				throw new BaseException("Type '" + typeName + "' does not exist");
+
+			return null;
+		}
+	}
+
+	public static class Types
+	{
 		public static Type Object = new Type(Syntax.Types.Object, typeof(object));
 		public static Type Void = new Type(Syntax.Types.Void, typeof(void), false);
 		public static Type Integer = new Type(Syntax.Types.Integer, typeof(int));
@@ -56,39 +90,11 @@ namespace CowSpeak
 		public static Type BooleanArray = Boolean.MakeArrayType();
 		public static Type CharacterArray = Character.MakeArrayType();
 		public static Type ByteArray = Byte.MakeArrayType();
-		
-		public static readonly Type[] Types = typeof(Type)
+
+		public static readonly Type[] All = typeof(Types)
 					.GetFields(BindingFlags.Public | BindingFlags.Static)
 					.Where(member => member.FieldType == typeof(Type))
 					.Select(member => (Type)member.GetValue(null))
 					.ToArray();
-
-		public static Type GetType(System.Type rep, bool _throw = true)
-		{
-			foreach (Type type in Types)
-			{
-				if (type.representation == rep)
-					return type;
-			}
-			
-			if (_throw)
-				throw new BaseException("Cannot determine type from representation: " + rep.Name);
-			return null;
-		}
-
-		public static Type GetType(string typeName, bool _throw = true)
-		{
-			if (Interpreter.Definitions.ContainsKey(typeName))
-				typeName = Interpreter.Definitions[typeName].To;
-
-			foreach (Type type in Types)
-				if (type.Name == typeName)
-					return type;
-
-			if (_throw)
-				throw new BaseException("Type '" + typeName + "' does not exist");
-
-			return null;
-		}
 	}
 }

@@ -68,7 +68,7 @@ namespace CowSpeak
 		{
 			get
 			{
-				return ConvertValue(Type.representation);
+				return ConvertValue(Type.CSharpType);
 			}
 			set
 			{

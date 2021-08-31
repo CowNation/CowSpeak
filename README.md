@@ -1,5 +1,5 @@
 
-[![version](https://img.shields.io/badge/version-9.0.1-blue)](https://github.com/CowNation/CowSpeak/releases/tag/v9.0.1)
+[![version](https://img.shields.io/badge/version-9.2-blue)](https://github.com/CowNation/CowSpeak/releases/tag/v9.2)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Run on Repl.it](https://repl.it/badge/github/CowNation/CowSpeak)](https://repl.it/github/CowNation/CowSpeak)
 # CowSpeak
@@ -27,6 +27,18 @@ This project's sole developer is a high school student and this is simply a hobb
 ### [Main](https://github.com/CowNation/CowSpeak/blob/master/CowSpeak-master/Modules/Main.cs)
 * [Generated Documentation](https://github.com/CowNation/CowSpeak/blob/master/CowSpeak-master/Modules/Main.md)
 * This module contains standard CowSpeak functions that should work on all platforms
+### [Array Methods](https://github.com/CowNation/CowSpeak/blob/master/CowSpeak-master/Modules/ArrayMethods.cs)
+* [Generated Documentation](https://github.com/CowNation/CowSpeak/blob/master/CowSpeak-master/Modules/ArrayMethods.md)
+* This module contains standard CowSpeak array methods
+### [Conversion Methods](https://github.com/CowNation/CowSpeak/blob/master/CowSpeak-master/Modules/ConversionMethods.cs)
+* [Generated Documentation](https://github.com/CowNation/CowSpeak/blob/master/CowSpeak-master/Modules/ConversionMethods.md)
+* This module contains standard CowSpeak type conversion functions
+### [Object Methods](https://github.com/CowNation/CowSpeak/blob/master/CowSpeak-master/Modules/ObjectMethods.cs)
+* [Generated Documentation](https://github.com/CowNation/CowSpeak/blob/master/CowSpeak-master/Modules/ObjectMethods.md)
+* This module contains standard methods that apply to all types in CowSpeak
+### [String Methods](https://github.com/CowNation/CowSpeak/blob/master/CowSpeak-master/Modules/StringMethods.cs)
+* [Generated Documentation](https://github.com/CowNation/CowSpeak/blob/master/CowSpeak-master/Modules/StringMethods.md)
+* This module contains standard methods that apply to the string type
 ### [Windows](https://github.com/CowNation/CowSpeak/blob/master/CowSpeak-master/Modules/Windows.cs)
 * [Generated Documentation](https://github.com/CowNation/CowSpeak/blob/master/CowSpeak-master/Modules/Windows.md)
 * This contains various API functions and predefined Windows enums as definitions.
@@ -68,6 +80,8 @@ This project's sole developer is a high school student and this is simply a hobb
 
 [v8.2 (Embedded DynamicExpresso into the solution, rewrote Any class, and made it possible to interface with native C# types from CowSpeak code July 22, 2020)](https://github.com/CowNation/CowSpeak/tree/daa914b517c8ec65287e630f8e1c9f3e29c1decc)
 
+[v9 (Rewrote lexer to be not dependent on spaces, major optimizations when calling StaticFunctions, bug fixes October 18, 2020)](https://github.com/CowNation/CowSpeak)
+
 Current Version:
 
-[v9 (Rewrote lexer to be not dependent on spaces, major optimizations when calling StaticFunctions, bug fixes October 18, 2020)](https://github.com/CowNation/CowSpeak)
+[v9.2 (Added user defined structures, changes to modules, bug fixes August 31, 2021)](https://github.com/CowNation/CowSpeak)

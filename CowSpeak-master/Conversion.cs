@@ -4,19 +4,19 @@ namespace CowSpeak
 	{
 		public static bool IsCompatible(Type from, Type to)
 		{
-			return to == Type.Object || 
-				from == Type.Object ||
+			return to == Types.Object || 
+				from == Types.Object ||
 				from == to || 
-				(from == Type.Integer && to == Type.Decimal) || 
-				(from == Type.Decimal && to == Type.Integer) || 
-				(from == Type.Boolean && to == Type.Integer) || 
-				(from == Type.Character && to == Type.Integer) || 
-				(from == Type.Integer && to == Type.Character) || 
-				(from == Type.Integer && to == Type.Integer64) || 
-				(from == Type.DecimalArray && to == Type.IntegerArray) || 
-				(from == Type.IntegerArray && to == Type.DecimalArray) ||
-				(from == Type.Integer64 && IsCompatible(Type.Integer, to)) ||
-				(from == Type.Byte && IsCompatible(Type.Integer, to));
+				(from == Types.Integer && to == Types.Decimal) || 
+				(from == Types.Decimal && to == Types.Integer) || 
+				(from == Types.Boolean && to == Types.Integer) || 
+				(from == Types.Character && to == Types.Integer) || 
+				(from == Types.Integer && to == Types.Character) || 
+				(from == Types.Integer && to == Types.Integer64) || 
+				(from == Types.DecimalArray && to == Types.IntegerArray) || 
+				(from == Types.IntegerArray && to == Types.DecimalArray) ||
+				(from == Types.Integer64 && IsCompatible(Types.Integer, to)) ||
+				(from == Types.Byte && IsCompatible(Types.Integer, to));
 		}
 	}
 }

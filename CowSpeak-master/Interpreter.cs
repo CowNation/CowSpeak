@@ -25,6 +25,7 @@ namespace CowSpeak
 		public static List< string > StackTrace = new List< string >();
 
 		internal static Variables Vars = new Variables();
+		internal static Structures Structs = new Structures();
 
 		public static ModuleSystem ModuleSystem = new ModuleSystem();
 
@@ -35,7 +36,7 @@ namespace CowSpeak
 			if (!File.Exists(fileName))
 				throw new BaseException("Cannot execute COWFILE '" + fileName + "', it doesn't exist");
 
-			if (fileName.IndexOf(".cf") == -1)
+			if (!fileName.EndsWith(".cf"))
 				throw new BaseException("Cannot execute file '" + fileName + "', it doesn't the cowfile extension (.cf)");
 
 			Executor.Execute(Lexer.Parse(new CowConfig.ReadConfig(fileName).GetLines(), 0, false, false));

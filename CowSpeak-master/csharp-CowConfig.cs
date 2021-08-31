@@ -10,24 +10,24 @@ namespace CowConfig
 {
 	class ReadConfig
 	{
-		private List< string > Lines = new List< string >();
+		private List< string > lines = new List< string >();
 
 		private void ReadAllLines(string FileName)
 		{
-			Lines = File.ReadAllLines(FileName).ToList();
+			lines = File.ReadAllLines(FileName).ToList();
 		}
 
-		private int FindElement(string Section, string offsetText)
+		private int FindElement(string section, string offsetText)
 		{
-			Section = "[" + Section + "]";
+			section = "[" + section + "]";
 			bool SectionFound = false;
-			for (int i = 0; i < Lines.Count(); i++)
+			for (int i = 0; i < lines.Count(); i++)
 			{
-				if (Lines[i] == Section || Section == "[]")
+				if (lines[i] == section || section == "[]")
 					SectionFound = true;
-				else if (SectionFound && Lines[i].IndexOf("[") != -1 && Lines[i].IndexOf("]") != -1)
+				else if (SectionFound && lines[i].IndexOf("[") != -1 && lines[i].IndexOf("]") != -1)
 					break;
-				if (SectionFound && Lines[i].IndexOf(offsetText) != -1)
+				if (SectionFound && lines[i].IndexOf(offsetText) != -1)
 					return i;
 			}
 			return -1;
@@ -49,18 +49,18 @@ namespace CowConfig
 
 		public List< string > GetLines()
 		{
-			return Lines;
+			return lines;
 		}
 
-		public T Read<T>(string Section, string offsetText)
+		public T Read<T>(string section, string offsetText)
 		{
-			int lineIndex = FindElement(Section, offsetText);
+			int lineIndex = FindElement(section, offsetText);
 			if (lineIndex == -1)
 				return default(T);
 
 			try
 			{
-				string temp = Lines[lineIndex];
+				string temp = lines[lineIndex];
 				temp = temp.Replace(offsetText, "");
 				return TryParse<T>(temp);
 			}

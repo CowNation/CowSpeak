@@ -16,14 +16,14 @@ namespace CowSpeak
 		public string Name;
 		public Type Type;
 
-		public Parameter(Type Type, string Name)
+		public Parameter(Type type, string name)
 		{
-			this.Name = Name;
-			this.Type = Type;
+			this.Name = name;
+			this.Type = type;
 		}
 	}
 
-	public abstract class FunctionBase
+	public abstract class BaseFunction
 	{
 		public string Name;
 		public Type ReturnType;
@@ -48,15 +48,15 @@ namespace CowSpeak
 
 		public static bool IsFunctionCall(string token)
 		{
-			if (token.IndexOf("(") <= 0 || Utils.GetInitialClosingParenthesis(token) != token.Length - 1)
+			if (token.IndexOf("(") <= 0 || Utils.GetClosingParenthesis(token) != token.Length - 1)
 				return false;
 
-			string leftUsage = token.Substring(0, token.IndexOf("("));
+			string functionName = token.Substring(0, token.IndexOf("("));
 
-			if (leftUsage.OccurrencesOf(".") > 1) // ex
+			if (functionName.OccurrencesOf(".") > 1) // it's not a FunctionCall, it's probably a FunctionChain
 				return false;
 
-			return Utils.IsValidFunctionName(leftUsage.Replace(".", "_"));
+			return Utils.IsValidFunctionName(functionName.Replace(".", "_"));
 		}
 
 		public static Any[] ParseParameters(string s_parameters)
@@ -67,7 +67,7 @@ namespace CowSpeak
 			List< Any > parameters = new List< Any >();
 			s_parameters = s_parameters.Substring(1, s_parameters.Length - 2); // remove parentheses
 			
-			s_parameters = Utils.ReplaceBetween(s_parameters, ',', '(', ')', (char)0x1a).Replace(((char)0x1D).ToString(), " "); // prevent splitting of commas in nested parentheses
+			s_parameters = Utils.ReplaceBetween(s_parameters, ',', '(', ')', (char)0x1a); // prevent splitting of commas in nested parentheses
 
 			string[] splitParams = Regex.Split(s_parameters, ","); // split by each comma/space (each item is a parameter)
 
@@ -89,13 +89,11 @@ namespace CowSpeak
 				while (parameter.Length > 0 && parameter[parameter.Length - 1] == ' ')
 					parameter = parameter.Remove(parameter.Length - 1, 1); // remove trailing spaces
 
-				string cleanedUp = "";
-				if ((parameter[0] == '\"' || parameter[0] == '\'') && (parameter[parameter.Length - 1] == '\"' || parameter[parameter.Length - 1] == '\''))
+                string cleanedUp;
+                if ((parameter[0] == '\"' || parameter[0] == '\'') && (parameter[parameter.Length - 1] == '\"' || parameter[parameter.Length - 1] == '\''))
 					cleanedUp = parameter.Substring(1, parameter.Length - 2); // remove quotes/apostrophes
 				else
 					cleanedUp = parameter;
-
-				cleanedUp = cleanedUp.Replace(((char)0x1E).ToString(), ",");
 
 				Token token = null;
 
@@ -108,7 +106,7 @@ namespace CowSpeak
 				{
 					// unknown identifier, could be an equation waiting to be solved
 					Line tl = new Line(Lexer.ParseLine(parameter));
-					parameters.Add(tl.Exec());
+					parameters.Add(tl.Execute());
 					continue;
 				}
 				else if (token.type == TokenType.VariableIdentifier)
@@ -121,8 +119,8 @@ namespace CowSpeak
 				{
 					while (token.identifier[0] < 'A' || token.identifier[0] > 'z')
 						token.identifier = token.identifier.Remove(0, 1); // i don't remember why this is here tbh
-					FunctionBase func = Interpreter.Functions[token.identifier];
-					if (func.ReturnType == Type.Void)
+					BaseFunction func = Interpreter.Functions[token.identifier];
+					if (func.ReturnType == Types.Void)
 						throw new BaseException("Cannot pass void function as a parameter");
 					parameters.Add(new Any(func.ReturnType, func.Invoke(token.identifier).Value));
 					continue;
@@ -137,10 +135,10 @@ namespace CowSpeak
 					switch (token.type)
 					{
 						case TokenType.StringLiteral:
-							vtype = Type.String;
+							vtype = Types.String;
 							break;
 						case TokenType.CharacterLiteral:
-							vtype = Type.Character;
+							vtype = Types.Character;
 							break;
 					}
 
@@ -156,27 +154,27 @@ namespace CowSpeak
 					switch (token.type)
 					{
 						case TokenType.DecimalLiteral:
-							vtype = Type.Decimal;
+							vtype = Types.Decimal;
 							break;
 						case TokenType.IntegerLiteral:
-							vtype = Type.Integer;
+							vtype = Types.Integer;
 							if (Utils.IsHexadecimal(cleanedUp))
 								cleanedUp = int.Parse(cleanedUp.Substring(2), NumberStyles.HexNumber).ToString();
 							break;
 						case TokenType.Integer64Literal:
-							vtype = Type.Integer64;
+							vtype = Types.Integer64;
 							if (Utils.IsHexadecimal(cleanedUp))
 								cleanedUp = long.Parse(cleanedUp.Substring(2), NumberStyles.HexNumber).ToString();
 							break;
 					}
 				}
 				else if (token.type == TokenType.BooleanLiteral)
-					vtype = Type.Boolean;
+					vtype = Types.Boolean;
 
 				if (vtype == null)
 					throw new BaseException("Unknown type passed as parameter: " + token.type);
 
-				parameters.Add(new Any(vtype, Convert.ChangeType(cleanedUp, vtype.representation)));
+				parameters.Add(new Any(vtype, Convert.ChangeType(cleanedUp, vtype.CSharpType)));
 			}
 
 			return parameters.ToArray();

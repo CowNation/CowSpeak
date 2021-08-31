@@ -8,31 +8,31 @@ using CowSpeak.Exceptions;
 
 namespace CowSpeak
 {
-	internal class UserFunction : FunctionBase
+	internal class UserFunction : BaseFunction
 	{
-		List< Line > Definition; // lines contained inside of the function
-		int DefinitionOffset; // offset of where the definition is so CowSpeak.CurrentLine is correct
-		string DefinedIn; // file function was defined in, may be empty
+		private List< Line > definitionLines; // lines contained inside of the function
+		private int definitionOffset; // offset of where the definition is so CowSpeak.CurrentLine is correct
+		private string definedIn; // file function was defined in, may be empty
 
-		public UserFunction(string Name, List< Line > Definition, Parameter[] Parameters, Type type, string ProperUsage, int DefinitionOffset)
+		public UserFunction(string name, List<Line> definition, Parameter[] parameters, Type type, string properUsage, int definitionOffset)
 		{
 			DefinitionType = DefinitionType.User;
 			this.ReturnType = type;
-			this.Definition = Definition;
-			this.Name = Name;
-			this.Parameters = Parameters;
-			this.DefinitionOffset = DefinitionOffset;
-			DefinedIn = Interpreter.CurrentFile;
+			this.definitionLines = definition;
+			this.Name = name;
+			this.Parameters = parameters;
+			this.definitionOffset = definitionOffset;
+			definedIn = Interpreter.CurrentFile;
 		}
 
 		private Any ExecuteLines()
 		{
 			string currentFile = Interpreter.CurrentFile;
-			Interpreter.CurrentFile = DefinedIn;
+			Interpreter.CurrentFile = definedIn;
 
-			var returnedValue = Executor.Execute(Definition, DefinitionOffset + 1, true);
+			var returnedValue = Executor.Execute(definitionLines, definitionOffset + 1, true);
 
-			if (ReturnType == Type.Void)
+			if (ReturnType == Types.Void)
 			{
 				if (returnedValue != null)
 					throw new BaseException("Cannot return a value from a void function");
@@ -51,15 +51,15 @@ namespace CowSpeak
 			return returnedValue;
 		}
 
-		public static Parameter[] ParseDefinitionParams(string s_params)
+		public static Parameter[] ParseDefinitionParams(string definitionParams)
 		{
-			if (s_params == "()")
-				return null; // no parameters
+			if (definitionParams.Length == 2)
+				return new Parameter[0]; // no parameters
 
 			List< Parameter > parameters = new List< Parameter >();
-			s_params = s_params.Substring(1, s_params.Length - 1); // remove parentheses
+			definitionParams = definitionParams.Substring(1, definitionParams.Length - 2); // remove parentheses
 
-			string[] splitParams = Regex.Split(s_params, ","); // split by each comma (each item is a parameter)
+			string[] splitParams = Regex.Split(definitionParams, ","); // split by each comma (each item is a parameter)
 
 			foreach (string parameter in splitParams)
 			{
@@ -95,9 +95,11 @@ namespace CowSpeak
 				Interpreter.Vars.Add(parameter.Name, new Variable(parameter.Type, parameter.Name, parameters[i].Value));
 			}
 
+			// recursion is not supported because of the fact that scope doesn't matter in CowSpeak, you could define a variable, and then call a method and use that variable in the method
+			// so the same parameters would be declared more than once when using recursion
 			bool calledRecursively = Interpreter.StackTrace.Count > 0 && Interpreter.StackTrace[Interpreter.StackTrace.Count - 1] == Usage;
 			if (calledRecursively)
-				throw new BaseException("Recursion is not supported in this version of CowSpeak");
+				throw new NotSupportedException("Recursion is not supported in this version of CowSpeak");
 
 			Interpreter.StackTrace.Add(Usage);
 			Any returnedValue = ExecuteLines();
